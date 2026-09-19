@@ -22,6 +22,10 @@
       secao = s;
       s.innerHTML = `
         <div class="avisos"></div>
+        <div class="ferramentas" style="margin-bottom:8px">
+          <p class="mudo pequeno" id="pf-atualizado">Carregando...</p>
+          <button class="botao empurra" type="button" id="pf-atualizar">Atualizar agora</button>
+        </div>
         <div class="numeros" id="pf-numeros" style="--colunas:5"></div>
         <div class="duas-colunas">
           <div class="cartao">
@@ -51,6 +55,8 @@
       P.$("#pf-novo", s).addEventListener("click", () => abrirForm(null));
       P.$("#pf-lista", s).addEventListener("click", aoClicarNaLista);
       prepararArrasto(P.$("#pf-lista", s));
+      P.$("#pf-atualizar", s).addEventListener("click", () => carregar());
+      prepararAtualizacaoAutomatica();
       await carregar();
     },
     async aoMostrar() { await carregar(); }
@@ -76,6 +82,21 @@
     desenharGrafico(visitas);
     desenharOrigens(visitas);
     desenharVideos();
+    const hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    P.$("#pf-atualizado", secao).textContent = `Atualizado às ${hora}. Os números se atualizam sozinhos a cada 30 segundos. As suas próprias visitas, com o login do painel aberto neste navegador, não entram na conta.`;
+  }
+
+  /* ---------- Atualização automática dos números ----------
+     Enquanto a aba Portfólio estiver na tela, busca as visitas de novo a cada 30 segundos
+     e também quando você volta para esta aba do navegador. Não atualiza no meio de uma
+     edição (janela aberta) nem enquanto você arrasta um vídeo. */
+  function podeAtualizar() {
+    return secao && !secao.hidden && !document.hidden &&
+      !document.querySelector("dialog[open]") && !document.querySelector("tr.arrastando");
+  }
+  function prepararAtualizacaoAutomatica() {
+    setInterval(() => { if (podeAtualizar()) carregar(); }, 30000);
+    document.addEventListener("visibilitychange", () => { if (podeAtualizar()) carregar(); });
   }
 
   /* ---------- Faixa de números ---------- */
