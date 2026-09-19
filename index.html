@@ -1513,7 +1513,8 @@ carregarTrabalhos();
 /* ---------- Registro simples de visita ----------
    Grava só a página e de onde a pessoa veio, na tabela visitas.
    Sem cookie, sem serviço de fora e sem pedir nada ao visitante.
-   Conta uma vez por visita (aba aberta), e não conta você logada nem testes locais. */
+   Conta TODA vez que a página abre (recarregar também conta).
+   Não conta você logada no painel neste navegador, nem testes no seu computador. */
 function deOndeVeio() {
   const params = new URLSearchParams(location.search);
   const utm = params.get("utm_source") || params.get("ref");
@@ -1537,15 +1538,13 @@ function deOndeVeio() {
 async function registrarVisita() {
   if (!window.banco) return;
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === "file:") return;
-  try { if (sessionStorage.getItem("visitaRegistrada") === "1") return; } catch (erro) { /* segue */ }
   try {
     const { data } = await banco.auth.getSession();
     if (data && data.session) return; // é você, logada no painel: não conta
-    const { error } = await banco.from("visitas").insert({
+    await banco.from("visitas").insert({
       pagina: (location.pathname || "/").slice(0, 300),
       origem: deOndeVeio()
     });
-    if (!error) { try { sessionStorage.setItem("visitaRegistrada", "1"); } catch (erro) { /* segue */ } }
   } catch (erro) {
     /* se não der, o site continua normal */
   }
