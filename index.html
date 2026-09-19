@@ -128,11 +128,15 @@ section{padding-block:var(--secao)}
 .faixa{overflow:hidden;padding-block:clamp(36px,5vw,60px);background:var(--creme)}
 .faixa-titulo{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:clamp(22px,3vw,32px);padding-inline:var(--gutter);font-size:.72rem;font-weight:600;letter-spacing:.3em;text-transform:uppercase;text-align:center;color:var(--tinta-2)}
 .faixa-titulo::before,.faixa-titulo::after{content:"";width:40px;height:1px;flex:none;background:currentColor;opacity:.5}
-.faixa-trilho{display:flex;width:max-content;animation:rolar 45s linear infinite}
-.faixa:hover .faixa-trilho{animation-play-state:paused}
+/* A velocidade vem do script (--duracao): quanto mais marcas, mais longo o trilho.
+   Com o mouse em cima, o script só diminui a velocidade, sem parar. */
+.faixa-trilho{display:flex;width:max-content;padding-block:14px;animation:rolar var(--duracao,30s) linear infinite}
 .faixa ul{display:flex;flex:none}
-.faixa li{flex:none;padding-right:clamp(12px,1.4vw,18px)}
-.logo-marca{position:relative;width:clamp(88px,8.4vw,120px);aspect-ratio:1;display:grid;place-items:center;padding:12%;overflow:hidden;border:1px solid var(--linha);border-radius:50%;background:#ebe5de;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.faixa li{position:relative;flex:none;padding-right:clamp(12px,1.4vw,18px)}
+.faixa li:hover{z-index:1}
+.logo-marca{position:relative;width:clamp(88px,8.4vw,120px);aspect-ratio:1;display:grid;place-items:center;padding:12%;overflow:hidden;border:1px solid var(--linha);border-radius:50%;background:#ebe5de;box-shadow:inset 0 1px 0 rgba(255,255,255,.7);transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+/* Mouse em cima da logo: o círculo cresce um pouco e ganha uma sombra leve */
+.logo-marca:hover{transform:scale(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 14px 26px -12px rgba(23,59,67,.38)}
 .logo-marca img{position:absolute;inset:18%;width:64%;height:64%;object-fit:contain}
 .logo-marca span{font-family:var(--serif);font-style:italic;font-size:clamp(.82rem,1vw,1rem);line-height:1.1;text-align:center;color:var(--tinta)}
 @keyframes rolar{to{transform:translateX(-50%)}}
@@ -772,20 +776,28 @@ const TEMPO_MIDIA_KIT = 7000;
 // com o mesmo nome escrito no campo logo (ex.: garnier.png). Enquanto a imagem não existir,
 // aparece o nome da marca dentro do círculo.
 // Para outra marca: copie uma linha, troque o nome e o arquivo. Pode ser .png, .jpg, .webp ou .svg.
-// PLACEHOLDER: "Marca 09" a "Marca 12" são exemplos, troque pelas marcas reais ou apague as linhas.
+// Os arquivos originais, em tamanho grande, ficam guardados em logos/originais.
 const MARCAS = [
   { nome: "Garnier",               logo: "logos/garnier.png" },
-  { nome: "SOOE Beauty",           logo: "logos/sooe-beauty.png" },
   { nome: "L’Oréal Profissionnel", logo: "logos/loreal-profissionnel.png" },
   { nome: "Creamy",                logo: "logos/creamy.png" },
-  { nome: "Elseve L’Oréal Paris",  logo: "logos/elseve.png" },
   { nome: "Dove",                  logo: "logos/dove.png" },
+  { nome: "Maybelline",            logo: "logos/maybelline.png" },
+  { nome: "Elseve L’Oréal Paris",  logo: "logos/elseve.png" },
+  { nome: "SOOE Beauty",           logo: "logos/sooe-beauty.png" },
+  { nome: "La Roche-Posay",        logo: "logos/la-roche-posay.png" },
   { nome: "Neutrogena",            logo: "logos/neutrogena.png" },
+  { nome: "Pantene",               logo: "logos/pantene.png" },
   { nome: "Ruby Rose",             logo: "logos/ruby-rose.png" },
-  { nome: "Marca 09",              logo: "logos/marca-09.png" },
-  { nome: "Marca 10",              logo: "logos/marca-10.png" },
-  { nome: "Marca 11",              logo: "logos/marca-11.png" },
-  { nome: "Marca 12",              logo: "logos/marca-12.png" }
+  { nome: "Matrix",                logo: "logos/matrix.png" },
+  { nome: "Rexona",                logo: "logos/rexona.png" },
+  { nome: "Color Wow",             logo: "logos/color-wow.png" },
+  { nome: "Mary & May",            logo: "logos/mary-&-may.png" },
+  { nome: "Unleashia",             logo: "logos/unleashia.png" },
+  { nome: "Dryskin",               logo: "logos/dryskin.png" },
+  { nome: "Saint Germain",         logo: "logos/saint-germain.png" },
+  { nome: "Electrolux",            logo: "logos/electrolux.png" },
+  { nome: "Tour Curitiba",         logo: "logos/tour-curitiba.png" }
 ];
 
 // MÉTRICAS: os três primeiros itens aparecem na capa, e os quatro aparecem na seção Números.
@@ -967,6 +979,35 @@ const marcasHTML = MARCAS.map((m) => {
 }).join("");
 $("#lista-marcas").innerHTML = marcasHTML;
 $("#lista-marcas-copia").innerHTML = marcasHTML;
+
+// VELOCIDADE DA FAIXA DE MARCAS: segundos que cada logo leva para passar.
+// Menor = mais rápido. VELOCIDADE_NO_MOUSE: quanto ela anda com o mouse em cima (0.35 = 35%).
+const SEGUNDOS_POR_MARCA = 1.7;
+const VELOCIDADE_NO_MOUSE = 0.35;
+const trilhoMarcas = $(".faixa-trilho");
+trilhoMarcas.style.setProperty("--duracao", Math.max(12, MARCAS.length * SEGUNDOS_POR_MARCA) + "s");
+
+// Com o mouse em cima, a faixa desacelera aos poucos (sem parar) e volta ao normal ao sair
+let quadroVelocidade = null;
+let garantiaVelocidade = null;
+function mudarVelocidade(alvo) {
+  const animacao = trilhoMarcas.getAnimations ? trilhoMarcas.getAnimations()[0] : null;
+  if (!animacao) return;
+  cancelAnimationFrame(quadroVelocidade);
+  clearTimeout(garantiaVelocidade);
+  // garantia: se a transição suave não rodar, chega na velocidade certa mesmo assim
+  garantiaVelocidade = setTimeout(() => { animacao.playbackRate = alvo; }, 500);
+  const inicial = animacao.playbackRate;
+  const comeco = performance.now();
+  const passo = (agora) => {
+    const p = Math.min((agora - comeco) / 450, 1);
+    animacao.playbackRate = inicial + (alvo - inicial) * (1 - Math.pow(1 - p, 2));
+    if (p < 1) quadroVelocidade = requestAnimationFrame(passo);
+  };
+  quadroVelocidade = requestAnimationFrame(passo);
+}
+$(".faixa").addEventListener("mouseenter", () => mudarVelocidade(VELOCIDADE_NO_MOUSE));
+$(".faixa").addEventListener("mouseleave", () => mudarVelocidade(1));
 
 $("#numeros-capa").innerHTML = METRICAS.slice(0, 3)
   .map((m) => `<li>${contador(m)}<span class="num-rotulo">${esc(m.rotulo)}</span></li>`).join("");
