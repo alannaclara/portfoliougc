@@ -125,12 +125,16 @@ section{padding-block:var(--secao)}
 .selo{position:absolute;left:-34px;bottom:56px;width:128px;height:128px;display:grid;place-items:center;padding:18px;border-radius:50%;background:var(--laranja);color:var(--tinta);font-family:var(--serif);font-style:italic;font-size:1.05rem;line-height:1.15;text-align:center;box-shadow:var(--sombra);transform:rotate(-9deg)}
 
 /* ===== FAIXA DE MARCAS ===== */
-.faixa{overflow:hidden;padding-block:20px;border-block:1px solid var(--tinta);background:var(--creme)}
+.faixa{overflow:hidden;padding-block:clamp(36px,5vw,60px);background:var(--creme)}
+.faixa-titulo{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:clamp(22px,3vw,32px);padding-inline:var(--gutter);font-size:.72rem;font-weight:600;letter-spacing:.3em;text-transform:uppercase;text-align:center;color:var(--tinta-2)}
+.faixa-titulo::before,.faixa-titulo::after{content:"";width:40px;height:1px;flex:none;background:currentColor;opacity:.5}
 .faixa-trilho{display:flex;width:max-content;animation:rolar 45s linear infinite}
 .faixa:hover .faixa-trilho{animation-play-state:paused}
 .faixa ul{display:flex;flex:none}
-.faixa li{display:flex;align-items:center;gap:40px;padding-right:40px;font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(1.25rem,2.2vw,1.7rem);white-space:nowrap}
-.faixa li::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--laranja)}
+.faixa li{flex:none;padding-right:clamp(12px,1.4vw,18px)}
+.logo-marca{position:relative;width:clamp(88px,8.4vw,120px);aspect-ratio:1;display:grid;place-items:center;padding:12%;overflow:hidden;border:1px solid var(--linha);border-radius:50%;background:#ebe5de;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.logo-marca img{position:absolute;inset:18%;width:64%;height:64%;object-fit:contain}
+.logo-marca span{font-family:var(--serif);font-style:italic;font-size:clamp(.82rem,1vw,1rem);line-height:1.1;text-align:center;color:var(--tinta)}
 @keyframes rolar{to{transform:translateX(-50%)}}
 
 /* ===== SOBRE MIM ===== */
@@ -409,7 +413,7 @@ div.video:not([data-video]){cursor:default}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.001ms!important;transition-delay:0s!important}
   .js .revelar{opacity:1;transform:none}
   .faixa-trilho{animation:none!important;width:auto;justify-content:center}
-  .faixa ul{flex:1 1 auto;flex-wrap:wrap;justify-content:center;row-gap:8px;padding-inline:var(--gutter)}
+  .faixa ul{flex:1 1 auto;flex-wrap:wrap;justify-content:center;row-gap:14px;padding-inline:var(--gutter)}
   .faixa ul[aria-hidden="true"]{display:none}
 }
 </style>
@@ -492,8 +496,9 @@ div.video:not([data-video]){cursor:default}
     </div>
   </div>
 
-  <!-- Faixa de marcas: os nomes vêm do array MARCAS no script -->
-  <div class="faixa" role="region" aria-label="Marcas que já atendi">
+  <!-- Faixa de marcas: as logos vêm da pasta "logos" e da lista MARCAS no script -->
+  <div class="faixa" role="region" aria-labelledby="faixa-titulo">
+    <p class="faixa-titulo" id="faixa-titulo">Marcas que confiam no meu trabalho</p>
     <div class="faixa-trilho">
       <ul id="lista-marcas"></ul>
       <ul id="lista-marcas-copia" aria-hidden="true"></ul>
@@ -760,11 +765,25 @@ div.video:not([data-video]){cursor:default}
 // Tempo (em milissegundos) até o card do mídia kit aparecer. 7000 = 7 segundos.
 const TEMPO_MIDIA_KIT = 7000;
 
-// MARCAS: nomes que passam na faixa logo abaixo da capa.
-// PLACEHOLDER: troque pelos nomes reais das marcas que você já atendeu.
+// MARCAS: logos redondas que passam na faixa logo abaixo da capa.
+// Como adicionar uma logo: salve a imagem dentro da pasta "logos" (fica ao lado do index.html)
+// com o mesmo nome escrito no campo logo (ex.: garnier.png). Enquanto a imagem não existir,
+// aparece o nome da marca dentro do círculo.
+// Para outra marca: copie uma linha, troque o nome e o arquivo. Pode ser .png, .jpg, .webp ou .svg.
+// PLACEHOLDER: "Marca 09" a "Marca 12" são exemplos, troque pelas marcas reais ou apague as linhas.
 const MARCAS = [
-  "Marca 01", "Marca 02", "Marca 03", "Marca 04", "Marca 05", "Marca 06",
-  "Marca 07", "Marca 08", "Marca 09", "Marca 10", "Marca 11", "Marca 12"
+  { nome: "Garnier",               logo: "logos/garnier.png" },
+  { nome: "SOOE Beauty",           logo: "logos/sooe-beauty.png" },
+  { nome: "L’Oréal Profissionnel", logo: "logos/loreal-profissionnel.png" },
+  { nome: "Creamy",                logo: "logos/creamy.png" },
+  { nome: "Elseve L’Oréal Paris",  logo: "logos/elseve.png" },
+  { nome: "Dove",                  logo: "logos/dove.png" },
+  { nome: "Neutrogena",            logo: "logos/neutrogena.png" },
+  { nome: "Ruby Rose",             logo: "logos/ruby-rose.png" },
+  { nome: "Marca 09",              logo: "logos/marca-09.png" },
+  { nome: "Marca 10",              logo: "logos/marca-10.png" },
+  { nome: "Marca 11",              logo: "logos/marca-11.png" },
+  { nome: "Marca 12",              logo: "logos/marca-12.png" }
 ];
 
 // MÉTRICAS: os três primeiros itens aparecem na capa, e os quatro aparecem na seção Números.
@@ -939,7 +958,14 @@ function sigla(nome) {
 }
 
 /* ---------- Monta as seções a partir dos arrays ---------- */
-const marcasHTML = MARCAS.map((m) => `<li>${esc(m)}</li>`).join("");
+// Cada marca vira um círculo com a logo. Se a imagem não carregar, mostra o nome no lugar.
+const marcasHTML = MARCAS.map((m) => {
+  const nome = esc(m.nome);
+  const conteudo = m.logo
+    ? `<img src="${esc(m.logo)}" alt="${nome}" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:this.alt}))">`
+    : `<span>${nome}</span>`;
+  return `<li><span class="logo-marca" title="${nome}">${conteudo}</span></li>`;
+}).join("");
 $("#lista-marcas").innerHTML = marcasHTML;
 $("#lista-marcas-copia").innerHTML = marcasHTML;
 
