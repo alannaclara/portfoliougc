@@ -574,7 +574,7 @@ div.video:not([data-video]){cursor:default}
       </div>
       <p class="intro revelar">Escolha um nicho e veja como eu adapto a linguagem, o cenário e o ritmo para cada tipo de produto. Passe o mouse sobre um vídeo para ver a prévia sem som e clique para assistir com som.</p>
     </header>
-    <!-- Os botões de filtro e os carrosséis vêm do array TRABALHOS no script -->
+    <!-- Os botões de filtro e os carrosséis vêm do painel (tabela videos). Reserva: array TRABALHOS no script -->
     <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho"></div>
     <p class="sr" id="status-filtro" aria-live="polite"></p>
     <div class="nichos" id="nichos"></div>
@@ -654,9 +654,8 @@ div.video:not([data-video]){cursor:default}
     </div>
 
     <div class="formulario revelar">
-      <!-- FORMULÁRIO: hoje ele só mostra a confirmação na tela.
-           Para receber as mensagens no seu e-mail, crie um formulário grátis no Formspree
-           e siga a instrução no script, na função enviarContato. -->
+      <!-- FORMULÁRIO: cada mensagem enviada entra no painel, na aba Marcas, como Lead
+           (função salvarLead, no script). -->
       <form id="form-contato" novalidate>
         <h3 class="form-titulo">Me manda uma <em>mensagem</em></h3>
         <div class="campo">
@@ -755,6 +754,9 @@ div.video:not([data-video]){cursor:default}
   </div>
 </dialog>
 
+<!-- Conexão com o painel (Supabase). O endereço e a chave pública ficam em js/banco.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+<script src="js/banco.js"></script>
 <script>
 /* =========================================================
    DADOS DO PORTFÓLIO
@@ -849,7 +851,9 @@ const FRASES_NICHOS = {
   tech: "Tecnologia sem complicação"
 };
 
-// TRABALHOS: um carrossel por nicho. Use as chaves de NICHOS no campo "nicho".
+// TRABALHOS: LISTA RESERVA. Agora os vídeos do site vêm do painel (aba Portfólio).
+// Esta lista só aparece se o banco não responder, para o site nunca ficar sem vídeos.
+// Um carrossel por nicho. Use as chaves de NICHOS no campo "nicho".
 // marca = nome que aparece no card
 // video = link do YouTube (Shorts ou normal). O vídeo roda no próprio site: prévia sem som ao passar o mouse
 //         e com som ao clicar. A capa é puxada sozinha do YouTube.
@@ -908,11 +912,6 @@ const DEPOIMENTOS = [
    DAQUI PARA BAIXO É O FUNCIONAMENTO DO SITE.
    Não precisa mexer para editar o conteúdo.
    ========================================================= */
-
-// ENVIO DE VERDADE (opcional): crie um formulário grátis em formspree.io, copie o endereço
-// que ele te der (algo como https://formspree.io/f/abcdefg) e cole entre as aspas abaixo.
-// Vazio = os formulários só mostram a confirmação na tela.
-const ENDERECO_FORMULARIO = "";
 
 document.documentElement.classList.add("js");
 
@@ -1000,22 +999,34 @@ const idYoutube = (url) => {
   const m = String(url || "").match(/(?:shorts\/|[?&]v=|youtu\.be\/|embed\/)([\w-]{11})/);
   return m ? m[1] : "";
 };
-const nichosUsados = Object.keys(NICHOS).filter((n) => TRABALHOS.some((t) => t.nicho === n));
+// Nome bonito do nicho (os que não estão em NICHOS ganham a primeira letra maiúscula)
+const nomeNicho = (n) => NICHOS[n] || (n ? String(n).charAt(0).toUpperCase() + String(n).slice(1) : "Outros");
 
 function cardVideo(t) {
   const id = idYoutube(t.video);
-  const nicho = NICHOS[t.nicho] || t.nicho;
-  const etiquetas = `<span class="etiquetas"><span class="etiqueta">${esc(t.marca)}</span>${t.views ? `<span class="etiqueta etiqueta-views">${esc(t.views)}</span>` : ""}</span>`;
-  const info = `<span class="video-info"><span class="video-titulo">${esc(t.marca)}</span><span class="video-nicho">${esc(nicho)}</span></span>`;
+  const nicho = nomeNicho(t.nicho);
+  const titulo = t.titulo || t.marca || nicho;
+  const etiquetas = `<span class="etiquetas">${t.marca ? `<span class="etiqueta">${esc(t.marca)}</span>` : ""}${t.views ? `<span class="etiqueta etiqueta-views">${esc(t.views)}</span>` : ""}</span>`;
+  const info = `<span class="video-info"><span class="video-titulo">${esc(titulo)}</span><span class="video-nicho">${esc(nicho)}</span></span>`;
+  const linkSeguro = /^https?:\/\//i.test(String(t.video || "")) ? t.video : "";
+  if (!id && linkSeguro) {
+    // Link que não é do YouTube (Instagram, TikTok, Drive): abre numa aba nova
+    return `<a class="video" href="${esc(linkSeguro)}" target="_blank" rel="noopener" aria-label="${esc(`Ver vídeo: ${titulo}, ${nicho} (abre em nova aba)`)}">
+        <span class="ph ph-${esc(t.nicho)}"></span>
+        ${etiquetas}
+        <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
+        ${info}
+      </a>`;
+  }
   if (!id) {
-    return `<div class="video" role="img" aria-label="${esc(`Espaço para vídeo de ${nicho}: ${t.marca}`)}">
+    return `<div class="video" role="img" aria-label="${esc(`Espaço para vídeo de ${nicho}: ${titulo}`)}">
         <span class="ph ph-${esc(t.nicho)}"><span class="legenda">capa do vídeo · 9:16</span></span>
         ${etiquetas}${info}
       </div>`;
   }
   const capaSrc = t.capa ? esc(t.capa) : `https://i.ytimg.com/vi/${id}/oar2.jpg`;
   const reserva = t.capa ? "" : ` onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'"`;
-  return `<div class="video" role="button" tabindex="0" data-video="${id}" data-marca="${esc(t.marca)}" data-nicho="${esc(nicho)}" aria-label="${esc(`Assistir vídeo: ${t.marca}, ${nicho}`)}">
+  return `<div class="video" role="button" tabindex="0" data-video="${id}" data-marca="${esc(titulo)}" data-nicho="${esc(nicho)}" aria-label="${esc(`Assistir vídeo: ${titulo}, ${nicho}`)}">
       <img class="video-capa" src="${capaSrc}"${reserva} alt="" loading="lazy" decoding="async">
       ${etiquetas}
       <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
@@ -1024,9 +1035,20 @@ function cardVideo(t) {
 }
 
 const areaNichos = $("#nichos");
-areaNichos.innerHTML = nichosUsados.map((n) => {
-  const itens = TRABALHOS.filter((t) => t.nicho === n);
-  const nome = esc(NICHOS[n]);
+areaNichos.classList.add("revelar");
+
+// Monta os carrosséis a partir de uma lista de vídeos (do banco ou da lista reserva)
+function montarTrabalhos(lista) {
+  const chaves = [...new Set(lista.map((t) => t.nicho))];
+  const nichosUsados = Object.keys(NICHOS).filter((n) => chaves.includes(n)).concat(chaves.filter((n) => !NICHOS[n]));
+  if (!nichosUsados.length) {
+    areaNichos.innerHTML = `<p class="nicho-sub" style="text-align:center">Novos vídeos chegando em breve.</p>`;
+    filtros.innerHTML = "";
+    return;
+  }
+  areaNichos.innerHTML = nichosUsados.map((n) => {
+  const itens = lista.filter((t) => t.nicho === n);
+  const nome = esc(nomeNicho(n));
   return `<article class="nicho" data-nicho="${esc(n)}" aria-labelledby="nicho-${esc(n)}">
       <div class="nicho-topo">
         <div>
@@ -1040,10 +1062,21 @@ areaNichos.innerHTML = nichosUsados.map((n) => {
       </div>
       <div class="trilho" role="region" tabindex="0" aria-label="Carrossel de vídeos de ${nome}">${itens.map(cardVideo).join("")}</div>
     </article>`;
-}).join("");
-areaNichos.classList.add("revelar");
+  }).join("");
+
+  // Botões de filtro, com a quantidade de vídeos de cada nicho
+  filtros.innerHTML = [["todos", "Todos", lista.length]].concat(
+    nichosUsados.map((n) => [n, nomeNicho(n), lista.filter((t) => t.nicho === n).length])
+  ).map(([chave, nome, qtd]) =>
+    `<button class="filtro" type="button" data-filtro="${esc(chave)}" aria-pressed="${chave === "todos"}">${esc(nome)}<span class="qtd" aria-hidden="true">${String(qtd).padStart(2, "0")}</span></button>`
+  ).join("");
+
+  prepararSetas();
+  ligarPrevias();
+}
 
 // Setas: andam uma "tela" de vídeos por clique e somem quando não há o que rolar
+function prepararSetas() {
 $$(".nicho", areaNichos).forEach((bloco) => {
   const trilho = $(".trilho", bloco);
   const setas = $(".setas", bloco);
@@ -1064,6 +1097,7 @@ $$(".nicho", areaNichos).forEach((bloco) => {
   bloco.atualizarSetas = atualizar;
   atualizar();
 });
+}
 
 $("#grade-servicos").innerHTML = SERVICOS.map((s, i) =>
   `<li class="servico"><span class="servico-num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span><h3>${esc(s.titulo)}</h3><p>${esc(s.descricao)}</p></li>`
@@ -1090,12 +1124,6 @@ $("#lista-depoimentos").innerHTML = DEPOIMENTOS.map((d, i) =>
 
 /* ---------- Filtro de trabalhos por nicho ---------- */
 const filtros = $("#filtros");
-const opcoes = [["todos", "Todos", TRABALHOS.length]].concat(
-  nichosUsados.map((n) => [n, NICHOS[n], TRABALHOS.filter((t) => t.nicho === n).length])
-);
-filtros.innerHTML = opcoes.map(([chave, nome, qtd]) =>
-  `<button class="filtro" type="button" data-filtro="${esc(chave)}" aria-pressed="${chave === "todos"}">${esc(nome)}<span class="qtd" aria-hidden="true">${String(qtd).padStart(2, "0")}</span></button>`
-).join("");
 
 filtros.addEventListener("click", (e) => {
   const botao = e.target.closest(".filtro");
@@ -1119,7 +1147,7 @@ filtros.addEventListener("click", (e) => {
   });
   $("#status-filtro").textContent = escolha === "todos"
     ? `Mostrando todos os ${visiveis} trabalhos`
-    : `Mostrando ${visiveis} ${visiveis === 1 ? "trabalho" : "trabalhos"} de ${NICHOS[escolha]}`;
+    : `Mostrando ${visiveis} ${visiveis === 1 ? "trabalho" : "trabalhos"} de ${nomeNicho(escolha)}`;
 });
 
 /* ---------- Vídeos: prévia sem som no mouse e player com som no clique ---------- */
@@ -1163,7 +1191,8 @@ function pararPrevia(card) {
   if (caixa) caixa.remove();
   card.classList.remove("tocando");
 }
-if (temMouse && !movimentoReduzido) {
+function ligarPrevias() {
+  if (!temMouse || movimentoReduzido) return;
   $$(".video[data-video]", areaNichos).forEach((card) => {
     let espera;
     card.addEventListener("mouseenter", () => { espera = setTimeout(() => iniciarPrevia(card), 200); });
@@ -1341,21 +1370,49 @@ document.addEventListener("input", (e) => {
   }
 });
 
-function enviarContato(dados) {
-  if (!ENDERECO_FORMULARIO) return;
-  fetch(ENDERECO_FORMULARIO, { method: "POST", body: dados, headers: { Accept: "application/json" } }).catch(() => {});
+// Guarda o contato na sua base de marcas do painel (tabela marcas), entrando como Lead.
+// Devolve true se deu certo.
+async function salvarLead(nome, email, obs) {
+  if (!window.banco) return false;
+  try {
+    const { error } = await banco.from("marcas").insert({
+      nome: String(nome).trim().slice(0, 200),
+      email: String(email).trim().slice(0, 200),
+      obs: String(obs).trim().slice(0, 3000),
+      origem: "site"
+    });
+    return !error;
+  } catch (erro) {
+    return false;
+  }
 }
 
 const primeiroNome = (nome) => String(nome).trim().split(/\s+/)[0];
 
 const formContato = $("#form-contato");
 const okContato = $("#ok-contato");
-formContato.addEventListener("submit", (e) => {
+const erroEnvio = document.createElement("p");
+erroEnvio.className = "erro";
+erroEnvio.setAttribute("role", "alert");
+erroEnvio.style.marginTop = "12px";
+$(".form-nota", formContato).before(erroEnvio);
+
+formContato.addEventListener("submit", async (e) => {
   e.preventDefault();
+  erroEnvio.textContent = "";
   if (!validar(formContato)) return;
   const dados = new FormData(formContato);
-  dados.append("origem", "Formulário de contato");
-  enviarContato(dados);
+  const botao = $("button[type=submit]", formContato);
+  botao.disabled = true;
+  const textoBotao = botao.innerHTML;
+  botao.textContent = "Enviando...";
+  const deuCerto = await salvarLead(dados.get("nome"), dados.get("email"), `Mensagem pelo site: ${dados.get("mensagem")}`);
+  botao.disabled = false;
+  botao.innerHTML = textoBotao;
+  if (!deuCerto) {
+    erroEnvio.textContent = "Não consegui enviar agora. Me chama no WhatsApp (41) 99866-9857 ou no e-mail contatoalannaclara@gmail.com.";
+    return;
+  }
   $("#ok-contato-texto").textContent = `Obrigada, ${primeiroNome(dados.get("nome"))}! Vou ler com carinho e te respondo em breve.`;
   formContato.hidden = true;
   okContato.hidden = false;
@@ -1406,12 +1463,12 @@ document.addEventListener("keydown", (e) => {
 });
 
 const formKit = $("#form-kit");
-formKit.addEventListener("submit", (e) => {
+formKit.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!validar(formKit)) return;
   const dados = new FormData(formKit);
-  dados.append("origem", "Mídia kit");
-  enviarContato(dados);
+  // Quem pede o mídia kit também entra na sua base de marcas como Lead
+  await salvarLead(dados.get("nome"), dados.get("email"), "Pediu o mídia kit pelo site.");
   $("#ok-kit-texto").textContent = `Obrigada, ${primeiroNome(dados.get("nome"))}! O mídia kit vai chegar em ${String(dados.get("email")).trim()} em breve.`;
   $("#kit-corpo").hidden = true;
   const ok = $("#ok-kit");
@@ -1420,6 +1477,80 @@ formKit.addEventListener("submit", (e) => {
 });
 
 if (!kitJaMostrado()) setTimeout(abrirKit, TEMPO_MIDIA_KIT);
+
+/* ---------- Vídeos: vêm do painel (tabela videos) ----------
+   O site pergunta ao banco quais vídeos estão visíveis, na ordem do painel.
+   Se o banco não responder, usa a lista TRABALHOS lá de cima como reserva. */
+const doBanco = (v) => ({
+  nicho: String(v.nicho || "").trim().toLowerCase() || "outros",
+  marca: v.marca || "",
+  titulo: v.titulo || "",
+  video: v.link || "",
+  views: v.destaque || "",
+  capa: ""
+});
+
+async function carregarTrabalhos() {
+  let lista = TRABALHOS;
+  if (window.banco) {
+    try {
+      const limite = new Promise((_, falhou) => setTimeout(() => falhou(new Error("demorou")), 6000));
+      const consulta = banco.from("videos")
+        .select("titulo,link,nicho,formato,marca,destaque,ordem")
+        .eq("visivel", true)
+        .eq("exemplo", false)
+        .order("ordem", { ascending: true });
+      const { data, error } = await Promise.race([consulta, limite]);
+      if (!error && Array.isArray(data)) lista = data.map(doBanco);
+    } catch (erro) {
+      /* sem banco agora: fica com a lista reserva */
+    }
+  }
+  montarTrabalhos(lista);
+}
+carregarTrabalhos();
+
+/* ---------- Registro simples de visita ----------
+   Grava só a página e de onde a pessoa veio, na tabela visitas.
+   Sem cookie, sem serviço de fora e sem pedir nada ao visitante.
+   Conta uma vez por visita (aba aberta), e não conta você logada nem testes locais. */
+function deOndeVeio() {
+  const params = new URLSearchParams(location.search);
+  const utm = params.get("utm_source") || params.get("ref");
+  let host = "";
+  try { host = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : ""; } catch (erro) { host = ""; }
+  const fonte = String(utm || host).toLowerCase();
+  if (!fonte || host === location.hostname) return "Direto";
+  if (fonte.includes("instagram") || fonte === "ig") return "Instagram";
+  if (fonte.includes("google")) return "Google";
+  if (fonte.includes("tiktok")) return "TikTok";
+  if (fonte.includes("facebook") || fonte === "fb" || fonte.includes("fb.me")) return "Facebook";
+  if (fonte.includes("whatsapp") || fonte.includes("wa.me")) return "WhatsApp";
+  if (fonte.includes("linkedin") || fonte.includes("lnkd")) return "LinkedIn";
+  if (fonte.includes("youtube") || fonte.includes("youtu.be")) return "YouTube";
+  if (fonte === "t.co" || fonte.includes("twitter") || fonte === "x.com") return "X (Twitter)";
+  if (fonte.includes("bing")) return "Bing";
+  if (fonte.includes("linktr")) return "Linktree";
+  return fonte.slice(0, 100);
+}
+
+async function registrarVisita() {
+  if (!window.banco) return;
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === "file:") return;
+  try { if (sessionStorage.getItem("visitaRegistrada") === "1") return; } catch (erro) { /* segue */ }
+  try {
+    const { data } = await banco.auth.getSession();
+    if (data && data.session) return; // é você, logada no painel: não conta
+    const { error } = await banco.from("visitas").insert({
+      pagina: (location.pathname || "/").slice(0, 300),
+      origem: deOndeVeio()
+    });
+    if (!error) { try { sessionStorage.setItem("visitaRegistrada", "1"); } catch (erro) { /* segue */ } }
+  } catch (erro) {
+    /* se não der, o site continua normal */
+  }
+}
+registrarVisita();
 
 /* ---------- Ano automático no rodapé ---------- */
 $("#ano").textContent = new Date().getFullYear();
