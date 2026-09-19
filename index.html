@@ -118,11 +118,19 @@ section{padding-block:var(--secao)}
 .foto{position:relative;overflow:hidden;border-radius:var(--raio);box-shadow:var(--sombra-forte);isolation:isolate}
 .foto img{width:100%;height:100%;object-fit:cover}
 .foto-ph{aspect-ratio:4/5;display:flex;align-items:flex-end;padding:18px}
-.foto-capa{background:radial-gradient(90% 60% at 25% 12%,rgba(255,255,255,.55),transparent 60%),linear-gradient(165deg,#a7ebf2 0%,#d2f1f0 38%,#f3d6c8 72%,#f4b8a8 100%)}
 .foto-sobre{background:radial-gradient(80% 60% at 80% 18%,rgba(255,255,255,.5),transparent 60%),linear-gradient(200deg,#f6e2c9 0%,#e9b98a 40%,#c9e6de 72%,#a7ebf2 100%)}
 .legenda{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(23,59,67,.6);color:#fff;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .capa-foto{position:relative;max-width:460px;justify-self:end;width:100%}
-.selo{position:absolute;left:-34px;bottom:56px;width:128px;height:128px;display:grid;place-items:center;padding:18px;border-radius:50%;background:var(--laranja);color:var(--tinta);font-family:var(--serif);font-style:italic;font-size:1.05rem;line-height:1.15;text-align:center;box-shadow:var(--sombra);transform:rotate(-9deg)}
+/* Rosto na capa: duas fotos com fundo transparente, uma em cima da outra.
+   A cada 3,4 segundos a foto troca de repente para a piscadinha (como um piscar de verdade),
+   com um leve tombo de cabeça, e volta. A sombra segue o contorno do rosto. */
+.rosto{position:relative;aspect-ratio:1;filter:drop-shadow(0 26px 30px rgba(23,59,67,.28)) drop-shadow(0 2px 4px rgba(23,59,67,.08));transform-origin:50% 70%;animation:brincadeira 3.4s ease-in-out infinite}
+.rosto img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.rosto-aberto{animation:foto-aberta 3.4s infinite}
+.rosto-piscada{opacity:0;animation:foto-piscada 3.4s infinite}
+@keyframes foto-aberta{0%,63.9%{opacity:1}64%,87.9%{opacity:0}88%,100%{opacity:1}}
+@keyframes foto-piscada{0%,63.9%{opacity:0}64%,87.9%{opacity:1}88%,100%{opacity:0}}
+@keyframes brincadeira{0%,60%{transform:none}64%{transform:rotate(-4deg) scale(1.05)}70%,84%{transform:rotate(-2.5deg) scale(1.03)}90%,100%{transform:none}}
 
 /* ===== FAIXA DE MARCAS ===== */
 .faixa{overflow:hidden;padding-block:clamp(36px,5vw,60px);background:var(--creme)}
@@ -397,7 +405,6 @@ div.video:not([data-video]){cursor:default}
   .video{--por-tela:2.4}
   .servicos-grade,.depoimentos{grid-template-columns:minmax(0,1fr)}
   .capa-meta span:nth-child(2){display:none}
-  .selo{left:-8px;bottom:28px;width:104px;height:104px;font-size:.9rem;padding:14px}
   .sobre-foto::before{top:14px;left:14px;right:-14px;bottom:-14px}
 }
 @media (max-width:480px){
@@ -423,6 +430,9 @@ div.video:not([data-video]){cursor:default}
   .faixa-trilho{animation:none!important;width:auto;justify-content:center}
   .faixa ul{flex:1 1 auto;flex-wrap:wrap;justify-content:center;row-gap:14px;padding-inline:var(--gutter)}
   .faixa ul[aria-hidden="true"]{display:none}
+  .rosto,.rosto img{animation:none!important;transform:none}
+  .rosto-aberto{opacity:1}
+  .rosto-piscada{opacity:0}
 }
 </style>
 </head>
@@ -491,15 +501,15 @@ div.video:not([data-video]){cursor:default}
       </div>
 
       <div class="capa-foto entrada" style="--atraso:.3s">
-        <!-- FOTO DA CAPA
-             Para usar sua foto real, coloque o arquivo na mesma pasta do index.html (ex.: foto-capa.jpg)
-             e troque o bloco div abaixo inteiro por:
-             <div class="foto"><img src="foto-capa.jpg" alt="Alanna Clara sorrindo e segurando um produto" width="800" height="1000"></div>
-             Formato ideal: vertical 4:5, JPG ou WebP, com até 300 KB para abrir rápido no celular. -->
-        <div class="foto foto-ph foto-capa" role="img" aria-label="Espaço para a foto da Alanna Clara">
-          <span class="legenda">foto da creator · 4:5</span>
+        <!-- FOTO DA CAPA COM PISCADINHA
+             Duas fotos com fundo transparente, uma em cima da outra, na pasta "fotos":
+             alanna-olhos-abertos.webp (a que aparece quase o tempo todo) e
+             alanna-piscadinha.webp (a da piscadinha com beijinho, que aparece rapidinho).
+             Para trocar, salve fotos novas com os mesmos nomes (mesmo tamanho e mesmo enquadramento). -->
+        <div class="rosto" role="img" aria-label="Foto de Alanna Clara dando uma piscadinha">
+          <img class="rosto-aberto" src="fotos/alanna-olhos-abertos.webp" alt="" width="1254" height="1254" fetchpriority="high" decoding="async">
+          <img class="rosto-piscada" src="fotos/alanna-piscadinha.webp" alt="" width="1254" height="1254" decoding="async">
         </div>
-        <p class="selo" aria-hidden="true">Agenda aberta para marcas</p>
       </div>
     </div>
   </div>
