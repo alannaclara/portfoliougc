@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Entrar | Painel Alanna Clara</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a7ebf2'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='40' fill='%23173b43'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --creme:#f3eee9;--papel:#fbf8f5;--tinta:#173b43;--tinta-2:#554b41;
+  --azul:#a7ebf2;--pessego:#f4b8a8;--linha:rgba(23,59,67,.14);
+  --erro-fundo:#fbe3de;--erro:#8f2b17;--ok-fundo:#dcf6f9;--ok:#17606b;
+  --raio:14px;--raio-sm:10px;
+  --fonte:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;display:grid;place-items:center;padding:24px 16px;background:var(--creme);color:var(--tinta);font:14px/1.55 var(--fonte);-webkit-font-smoothing:antialiased}
+.cartao{width:100%;max-width:380px;padding:32px 28px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);box-shadow:0 1px 2px rgba(23,59,67,.05),0 18px 40px -22px rgba(23,59,67,.3)}
+.marca{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.marca-selo{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:var(--azul);font-weight:700}
+.marca b{display:block;font-size:14px}
+.marca small{display:block;font-size:12px;color:var(--tinta-2)}
+h1{margin:0 0 4px;font-size:17px;font-weight:700}
+.sub{margin:0 0 20px;font-size:13px;color:var(--tinta-2)}
+.faixa{margin:0 0 16px;padding:10px 12px;border-radius:var(--raio-sm);font-size:13px;font-weight:500}
+.faixa-erro{background:var(--erro-fundo);color:var(--erro)}
+.faixa-ok{background:var(--ok-fundo);color:var(--ok)}
+.campo{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+label{font-size:12px;font-weight:600}
+input{width:100%;padding:11px 12px;border:1px solid rgba(23,59,67,.22);border-radius:var(--raio-sm);background:#fff;color:var(--tinta);font:inherit;font-size:16px}
+input:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px var(--azul)}
+.botao{width:100%;min-height:44px;margin-top:4px;padding:10px 16px;border:1.5px solid var(--tinta);border-radius:var(--raio-sm);background:var(--azul);color:var(--tinta);font:600 14px var(--fonte);cursor:pointer;transition:background-color .2s,color .2s}
+.botao:hover:not(:disabled){background:var(--tinta);color:var(--azul)}
+.botao:disabled{opacity:.6;cursor:wait}
+.link{display:block;margin:14px auto 0;padding:6px;border:0;background:none;color:var(--tinta);font:500 13px var(--fonte);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.voltar{display:block;margin-top:18px;text-align:center;font-size:12px;color:var(--tinta-2)}
+.voltar a{color:inherit}
+:focus-visible{outline:2px solid var(--tinta);outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="cartao">
+  <div class="marca">
+    <span class="marca-selo" aria-hidden="true">A</span>
+    <span><b>Alanna Clara</b><small>Painel do portfólio</small></span>
+  </div>
+
+  <!-- Tela de entrar -->
+  <form id="form-entrar" novalidate>
+    <h1>Entrar</h1>
+    <p class="sub">Acesso só para a dona do portfólio.</p>
+    <p class="faixa faixa-erro" id="erro" role="alert" hidden></p>
+    <p class="faixa faixa-ok" id="aviso" role="status" hidden></p>
+    <div class="campo">
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="username" inputmode="email" required>
+    </div>
+    <div class="campo">
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="current-password" required>
+    </div>
+    <button class="botao" type="submit" id="entrar">Entrar</button>
+    <button class="link" type="button" id="esqueci">Esqueci minha senha</button>
+  </form>
+
+  <!-- Tela de criar senha nova (abre pelo link do e-mail de recuperação) -->
+  <form id="form-nova" novalidate hidden>
+    <h1>Criar senha nova</h1>
+    <p class="sub">Escolha uma senha com pelo menos 8 caracteres.</p>
+    <p class="faixa faixa-erro" id="erro-nova" role="alert" hidden></p>
+    <div class="campo">
+      <label for="nova">Senha nova</label>
+      <input id="nova" type="password" autocomplete="new-password" minlength="8" required>
+    </div>
+    <div class="campo">
+      <label for="nova2">Repita a senha nova</label>
+      <input id="nova2" type="password" autocomplete="new-password" minlength="8" required>
+    </div>
+    <button class="botao" type="submit" id="salvar-nova">Salvar senha e entrar</button>
+  </form>
+
+  <p class="voltar"><a href="../">Voltar para o portfólio</a></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+<script src="../js/banco.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const ADMIN = "../admin/";
+  const veioDoEmailDeRecuperacao = /type=recovery/.test(location.hash);
+
+  function mostrar(el, texto) { el.textContent = texto; el.hidden = !texto; }
+  function limparAvisos() { mostrar($("erro"), ""); mostrar($("aviso"), ""); }
+
+  // Traduz os erros do Supabase para frases simples, nunca em inglês
+  function traduzir(erro) {
+    const msg = String((erro && erro.message) || "").toLowerCase();
+    if (msg.includes("invalid login") || msg.includes("invalid credentials") || msg.includes("invalid email or password")) return "E-mail ou senha incorretos";
+    if (msg.includes("email not confirmed")) return "Esse e-mail ainda não foi confirmado. Confirme pelo link que chegou no seu e-mail.";
+    if (msg.includes("rate limit") || msg.includes("too many")) return "Muitas tentativas seguidas. Espere alguns minutos e tente de novo.";
+    if (msg.includes("password") && msg.includes("characters")) return "A senha precisa ter pelo menos 8 caracteres.";
+    if (msg.includes("fetch") || msg.includes("network")) return "Não consegui falar com o servidor. Confira sua internet e tente de novo.";
+    return "Não deu certo agora. Tente de novo em instantes.";
+  }
+
+  if (!window.banco) {
+    mostrar($("erro"), "Não consegui carregar o sistema de login. Confira sua internet e recarregue a página.");
+    $("entrar").disabled = true;
+    return;
+  }
+
+  // Chegou pelo link de recuperação: mostra a tela de senha nova
+  if (veioDoEmailDeRecuperacao) {
+    $("form-entrar").hidden = true;
+    $("form-nova").hidden = false;
+  } else {
+    // Já tem sessão aberta? Vai direto pro painel.
+    banco.auth.getSession().then(({ data }) => {
+      if (data && data.session) location.replace(ADMIN);
+    });
+  }
+
+  banco.auth.onAuthStateChange((evento) => {
+    if (evento === "PASSWORD_RECOVERY") {
+      $("form-entrar").hidden = true;
+      $("form-nova").hidden = false;
+    }
+  });
+
+  $("form-entrar").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    limparAvisos();
+    const email = $("email").value.trim();
+    const senha = $("senha").value;
+    if (!email || !senha) { mostrar($("erro"), "Preencha o e-mail e a senha."); return; }
+    $("entrar").disabled = true;
+    $("entrar").textContent = "Entrando...";
+    const { error } = await banco.auth.signInWithPassword({ email, password: senha });
+    if (error) {
+      mostrar($("erro"), traduzir(error));
+      $("entrar").disabled = false;
+      $("entrar").textContent = "Entrar";
+      $("senha").focus();
+      return;
+    }
+    location.replace(ADMIN);
+  });
+
+  $("esqueci").addEventListener("click", async () => {
+    limparAvisos();
+    const email = $("email").value.trim();
+    if (!email) { mostrar($("erro"), "Escreva o seu e-mail no campo acima e clique de novo em Esqueci minha senha."); $("email").focus(); return; }
+    $("esqueci").disabled = true;
+    const voltarPara = new URL("./", location.href).href;
+    const { error } = await banco.auth.resetPasswordForEmail(email, { redirectTo: voltarPara });
+    $("esqueci").disabled = false;
+    if (error) { mostrar($("erro"), traduzir(error)); return; }
+    mostrar($("aviso"), "Se esse e-mail tiver acesso, chega uma mensagem com o link para criar uma senha nova. Olhe também o spam.");
+  });
+
+  $("form-nova").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    mostrar($("erro-nova"), "");
+    const nova = $("nova").value;
+    if (nova.length < 8) { mostrar($("erro-nova"), "A senha precisa ter pelo menos 8 caracteres."); return; }
+    if (nova !== $("nova2").value) { mostrar($("erro-nova"), "As duas senhas não estão iguais."); return; }
+    $("salvar-nova").disabled = true;
+    const { error } = await banco.auth.updateUser({ password: nova });
+    $("salvar-nova").disabled = false;
+    if (error) { mostrar($("erro-nova"), traduzir(error)); return; }
+    location.replace(ADMIN);
+  });
+})();
+</script>
+</body>
+</html>
