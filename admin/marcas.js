@@ -24,7 +24,7 @@
     ["Beleza", "pessego", ["beleza", "make", "maquiagem", "cosmetic", "batom", "unha", "cabelo", "hair", "salao", "estetica", "perfum", "esmalte"]],
     ["Skincare", "ciano", ["skin", "pele", "derma", "serum", "protetor solar", "hidratante"]],
     ["Comida", "amarelo", ["cafe", "cafeteria", "doceria", "restaurante", "pizza", "padaria", "gastr", "food", "bistro", "confeitaria", "burger", "acai", "comida", "bebida", "cerveja", "vinho", "sorvete", "chocolate"]],
-    ["Casa e decoração", "verde", ["casa", "decor", "movel", "moveis", "lar", "interior", "arquitet", "ceramica", "enxoval", "jardim"]],
+    ["Casa&Decoração", "verde", ["casa", "decor", "movel", "moveis", "lar", "interior", "arquitet", "ceramica", "enxoval", "enxovais", "cama mesa", "jardim", "home"]],
     ["Tech", "escuro", ["tech", "digital", "software", "app", "eletro", "informatica", "celular", "sistema", "ia "]],
     ["Moda", "lilas", ["moda", "roupa", "boutique", "jeans", "brecho", "calcad", "sapat", "joia", "acessori", "bolsa", "fashion"]],
     ["Pet", "verde", ["pet", "cachorro", "gato", "veterinar", "racao"]],
