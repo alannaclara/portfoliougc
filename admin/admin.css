@@ -275,6 +275,19 @@ tr.arrastando .alca{cursor:grabbing}
 .revisao textarea{width:100%;min-height:420px;padding:12px;border:1px solid var(--linha-forte);border-radius:var(--raio);background:#fff;font-size:14px;line-height:1.6;resize:vertical}
 .revisao textarea:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px var(--azul)}
 
+/* ---------- Caixa de entrada do formulário do site ---------- */
+.menu-item{position:relative}
+.menu-aviso{margin-left:auto;min-width:20px;height:20px;padding:0 6px;display:inline-grid;place-items:center;border-radius:999px;background:var(--pessego);color:var(--pessego-texto);font-size:11px;font-weight:700;line-height:1}
+.recados{display:grid;gap:10px}
+.recado{padding:12px 14px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:#fff}
+.recado-novo{border-color:var(--pessego);box-shadow:inset 3px 0 0 var(--pessego)}
+.recado-topo{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px}
+.recado-quem{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.recado-quem b{font-size:14px}
+.recado-texto{margin-top:6px;font-size:13.5px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.recado-acoes{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.recado-acoes .botao{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+
 /* ---------- Escolher marcas para o disparo ---------- */
 .col-marcar{width:34px}
 .tabela td.col-marcar{padding-right:0}

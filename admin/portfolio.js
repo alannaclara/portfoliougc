@@ -13,9 +13,38 @@
 
   let secao = null;
   let videos = [];
+  let leads = [];          // quem preencheu o formulário do site e ainda não foi para o funil
+  let temNoFunil = true;   // a coluna no_funil existe no banco?
+  const VISTOS = "pf-leads-vistos";
 
   const nomeNicho = (n) => NICHOS[n] || (n ? n.charAt(0).toUpperCase() + n.slice(1) : "Sem nicho");
   const noAr = (v) => v.visivel !== false && !v.exemplo;
+
+  // Um recado só sai da caixa de entrada quando você manda ele para Marcas ou apaga
+  const ehRecado = (m) => m.origem === "site" && !m.no_funil;
+
+  const vistoAte = () => { try { return localStorage.getItem(VISTOS) || ""; } catch (e) { return ""; } };
+  const marcarVistos = () => {
+    try {
+      const maior = leads.reduce((m, l) => (String(l.criado_em || "") > m ? String(l.criado_em) : m), "");
+      if (maior) localStorage.setItem(VISTOS, maior);
+    } catch (e) { /* sem espaço, tudo bem */ }
+  };
+  const ehNovo = (l) => String(l.criado_em || "") > vistoAte();
+
+  // "há 3 minutos", "há 2 horas", "ontem"
+  function quandoFoi(iso) {
+    const d = iso ? new Date(iso) : null;
+    if (!d || isNaN(d)) return "";
+    const seg = Math.round((Date.now() - d.getTime()) / 1000);
+    if (seg < 60) return "agora mesmo";
+    if (seg < 3600) return `há ${P.plural(Math.round(seg / 60), "minuto", "minutos")}`;
+    if (seg < 86400) return `há ${P.plural(Math.round(seg / 3600), "hora", "horas")}`;
+    const dias = Math.round(seg / 86400);
+    if (dias === 1) return "ontem";
+    if (dias < 30) return `há ${P.plural(dias, "dia", "dias")}`;
+    return d.toLocaleDateString("pt-BR");
+  }
 
   P.abas.portfolio = {
     async iniciar(s) {
@@ -25,6 +54,16 @@
         <div class="ferramentas" style="margin-bottom:8px">
           <p class="mudo pequeno" id="pf-atualizado">Carregando...</p>
           <button class="botao empurra" type="button" id="pf-atualizar">Atualizar agora</button>
+        </div>
+        <div class="cartao bloco" id="pf-caixa">
+          <div class="cartao-topo">
+            <h2>Quem preencheu o formulário</h2>
+            <div class="grupo-botoes">
+              <span class="mudo pequeno" id="pf-caixa-resumo"></span>
+              <button class="botao" type="button" id="pf-vistos" hidden>${P.icone("check", "ico-p")}Marcar como vistos</button>
+            </div>
+          </div>
+          <div class="cartao-corpo" id="pf-recados"><p class="carregando">Carregando...</p></div>
         </div>
         <div class="numeros" id="pf-numeros" style="--colunas:5"></div>
         <div class="duas-colunas">
@@ -56,6 +95,8 @@
       P.$("#pf-lista", s).addEventListener("click", aoClicarNaLista);
       prepararArrasto(P.$("#pf-lista", s));
       P.$("#pf-atualizar", s).addEventListener("click", () => carregar());
+      P.$("#pf-recados", s).addEventListener("click", aoClicarNoRecado);
+      P.$("#pf-vistos", s).addEventListener("click", () => { marcarVistos(); desenharRecados(); });
       prepararAtualizacaoAutomatica();
       await carregar();
     },
@@ -68,22 +109,40 @@
     const inicio = new Date();
     inicio.setHours(0, 0, 0, 0);
     inicio.setDate(inicio.getDate() - 13);
-    const [rv, rs] = await Promise.all([
+    const [rv, rs, rm] = await Promise.all([
       P.lerSeguro("videos", (q) => q.order("ordem", { ascending: true }).order("criado_em", { ascending: true })),
-      P.lerSeguro("visitas", (q) => q.gte("data", inicio.toISOString()).order("data", { ascending: true }).limit(20000))
+      P.lerSeguro("visitas", (q) => q.gte("data", inicio.toISOString()).order("data", { ascending: true }).limit(20000)),
+      P.lerSeguro("marcas", (q) => q.eq("origem", "site").order("criado_em", { ascending: false }))
     ]);
     if (rv.erro) P.avisar(avisos, rv.erro);
     if (rs.erro) P.avisar(avisos, rs.erro);
+    if (rm.erro) P.avisar(avisos, rm.erro);
     P.conferirCampos(avisos, "videos", rv.dados, ["titulo", "link", "nicho", "formato", "marca", "destaque", "ordem", "visivel"]);
     P.conferirCampos(avisos, "visitas", rs.dados, ["data", "pagina", "origem"]);
     videos = rv.dados;
+    temNoFunil = !rm.dados.length || "no_funil" in rm.dados[0];
+    if (!temNoFunil) P.avisar(avisos, "Os recados do site ainda não têm a chavinha que separa eles das marcas. Rode o arquivo leads.sql no SQL Editor do Supabase. Até lá eles aparecem aqui e também na aba Marcas.");
+    leads = rm.dados.filter(ehRecado);
     const visitas = rs.dados.filter((v) => v.data && new Date(v.data) >= inicio);
+    desenharRecados();
     desenharNumeros(visitas);
     desenharGrafico(visitas);
     desenharOrigens(visitas);
     desenharVideos();
     const hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-    P.$("#pf-atualizado", secao).textContent = `Atualizado às ${hora}. Os números se atualizam sozinhos a cada 30 segundos. As suas próprias visitas, com o login do painel aberto neste navegador, não entram na conta.`;
+    P.$("#pf-atualizado", secao).textContent = `Atualizado às ${hora}. Quem preenche o formulário aparece aqui em até 12 segundos, sem você precisar recarregar nada. As suas próprias visitas, com o login do painel aberto neste navegador, não entram na conta.`;
+  }
+
+  // Busca só os recados. É uma consulta pequena, por isso roda de 12 em 12 segundos.
+  async function carregarRecados() {
+    const r = await P.lerSeguro("marcas", (q) => q.eq("origem", "site").order("criado_em", { ascending: false }));
+    if (r.erro) return;
+    if (r.dados.length && !("no_funil" in r.dados[0])) temNoFunil = false;
+    const antes = leads.length;
+    leads = r.dados.filter(ehRecado);
+    desenharRecados();
+    atualizarSino();
+    if (leads.length > antes) P.toast(leads.length - antes === 1 ? "Chegou um recado novo pelo site." : `Chegaram ${leads.length - antes} recados novos pelo site.`);
   }
 
   /* ---------- Atualização automática dos números ----------
@@ -96,7 +155,125 @@
   }
   function prepararAtualizacaoAutomatica() {
     setInterval(() => { if (podeAtualizar()) carregar(); }, 30000);
+    // Os recados do site são o que mais importa ver na hora, então busco eles com mais frequência
+    setInterval(() => { if (podeAtualizar()) carregarRecados(); }, 12000);
     document.addEventListener("visibilitychange", () => { if (podeAtualizar()) carregar(); });
+    // O aviso no menu funciona mesmo quando você está em outra aba do painel
+    setInterval(() => { if (!document.hidden && (!secao || secao.hidden)) contarParaSino(); }, 25000);
+  }
+
+  /* ---------- Aviso redondo no menu, do lado da palavra Portfólio ---------- */
+  function atualizarSino() {
+    const item = document.querySelector('.menu-item[data-aba="portfolio"]');
+    if (!item) return;
+    let selo = item.querySelector(".menu-aviso");
+    const novos = leads.filter(ehNovo).length;
+    if (!novos) { if (selo) selo.remove(); return; }
+    if (!selo) {
+      selo = document.createElement("span");
+      selo.className = "menu-aviso";
+      item.appendChild(selo);
+    }
+    selo.textContent = novos > 9 ? "9+" : String(novos);
+    selo.title = `${P.plural(novos, "recado novo", "recados novos")} pelo formulário do site`;
+  }
+
+  // Conta os recados sem redesenhar a aba, para o aviso do menu aparecer de qualquer lugar
+  async function contarParaSino() {
+    const r = await P.ler("marcas", (q) => q.eq("origem", "site"));
+    if (r.erro) return;
+    leads = r.dados.filter(ehRecado);
+    atualizarSino();
+  }
+
+  /* ---------- Caixa de entrada do formulário do site ---------- */
+  function desenharRecados() {
+    const alvo = P.$("#pf-recados", secao);
+    const resumo = P.$("#pf-caixa-resumo", secao);
+    const botaoVistos = P.$("#pf-vistos", secao);
+    const novos = leads.filter(ehNovo).length;
+    atualizarSino();
+
+    resumo.textContent = leads.length
+      ? `${P.plural(leads.length, "recado esperando", "recados esperando")}${novos ? `, ${novos === 1 ? "1 novo" : novos + " novos"}` : ""}`
+      : "";
+    botaoVistos.hidden = !novos;
+
+    if (!leads.length) {
+      alvo.innerHTML = `<p class="vazio">Quando alguém preencher o formulário de contato do seu site, ou pedir o mídia kit, o recado cai aqui na hora, com o nome, o e-mail e o que a pessoa escreveu. Você não precisa ficar recarregando a página.</p>`;
+      return;
+    }
+
+    alvo.innerHTML = `<div class="recados">${leads.map((l) => {
+      const whats = P.linkWhats(l.telefone);
+      const numero = P.primeiroTelefone(l.telefone);
+      return `<article class="recado${ehNovo(l) ? " recado-novo" : ""}" data-id="${P.esc(l.id)}">
+        <div class="recado-topo">
+          <div class="recado-quem">
+            <b>${P.esc(l.nome || "Sem nome")}</b>
+            ${ehNovo(l) ? `<span class="pilula p-pessego">novo</span>` : ""}
+          </div>
+          <span class="mudo pequeno" title="${P.esc(l.criado_em ? new Date(l.criado_em).toLocaleString("pt-BR") : "")}">${P.esc(quandoFoi(l.criado_em))}</span>
+        </div>
+        ${l.obs ? `<p class="recado-texto">${P.esc(l.obs)}</p>` : `<p class="recado-texto mudo">Não escreveu mensagem.</p>`}
+        <div class="recado-acoes">
+          ${l.email ? `<a class="botao" href="mailto:${P.esc(l.email)}">${P.icone("carta", "ico-p")}${P.esc(l.email)}</a>` : ""}
+          ${whats ? `<a class="botao" href="${whats}" target="_blank" rel="noopener" title="Abrir conversa com ${P.esc(numero)}">${P.icone("whats", "ico-p")}WhatsApp</a>` : ""}
+          <button class="botao botao-principal empurra" type="button" data-recado="funil">${P.icone("marcas", "ico-p")}Mandar para Marcas</button>
+          <button class="botao botao-perigo" type="button" data-recado="apagar" aria-label="Apagar este recado" title="Apagar este recado">${P.icone("lixo", "ico-p")}</button>
+        </div>
+      </article>`;
+    }).join("")}</div>`;
+  }
+
+  async function aoClicarNoRecado(e) {
+    const botao = e.target.closest("[data-recado]");
+    if (!botao) return;
+    const artigo = botao.closest("[data-id]");
+    const lead = leads.find((l) => String(l.id) === artigo.dataset.id);
+    if (!lead) return;
+
+    if (botao.dataset.recado === "apagar") {
+      if (!confirm(`Apagar o recado de "${lead.nome || "sem nome"}"? Isso não tem volta.`)) return;
+      const erro = await P.gravar("marcas", "apagar", null, lead.id);
+      if (erro) { P.toast(erro, "erro"); return; }
+      P.toast("Recado apagado.");
+      marcarVistos();
+      await carregar();
+      return;
+    }
+
+    if (botao.dataset.recado === "funil") mandarParaMarcas(lead);
+  }
+
+  // Passa o recado para a aba Marcas, com a situação e o nicho que você escolher
+  function mandarParaMarcas(lead) {
+    if (!temNoFunil) {
+      P.toast("Para isso funcionar, rode o arquivo leads.sql no Supabase. Este contato já aparece na aba Marcas.", "erro");
+      return;
+    }
+    const situacoes = P.situacoesMarcas || [["lead", "Lead"]];
+    P.formulario({
+      titulo: "Mandar para Marcas",
+      textoSalvar: "Mandar para Marcas",
+      valores: { nome: lead.nome, email: lead.email, telefone: lead.telefone, obs: lead.obs, situacao: "conversando", ultimo_contato: P.hoje(), nicho: lead.nicho },
+      campos: [
+        { nome: "nome", rotulo: "Marca", tipo: "texto", obrigatorio: true, largo: true },
+        { nome: "nicho", rotulo: "Nicho", tipo: "texto", lista: P.nichosMarcas || [], ajuda: "Escolha um da lista ou escreva o seu." },
+        { nome: "situacao", rotulo: "Situação", tipo: "escolha", opcoes: situacoes },
+        { nome: "email", rotulo: "E-mail", tipo: "email" },
+        { nome: "telefone", rotulo: "WhatsApp", tipo: "tel" },
+        { nome: "ultimo_contato", rotulo: "Último contato", tipo: "data" },
+        { nome: "obs", rotulo: "Observação", tipo: "texto-longo", largo: true }
+      ],
+      aoSalvar: async (dados) => {
+        const erro = await P.gravar("marcas", "atualizar", { ...dados, no_funil: true }, lead.id);
+        if (erro) return erro;
+        P.toast("Pronto, essa marca agora está na aba Marcas.");
+        await carregar();
+        return null;
+      }
+    });
   }
 
   /* ---------- Faixa de números ---------- */

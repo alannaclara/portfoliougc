@@ -15,7 +15,8 @@
     ["parada", "Parada", "cinza"]
   ];
   const nomeSituacao = (s) => (SITUACOES.find((x) => x[0] === s) || [s, s || "Sem situação"])[1];
-  P.nomeSituacao = nomeSituacao; // a aba Prospecção usa para escrever o nome bonito da situação
+  P.nomeSituacao = nomeSituacao;                              // a aba Prospecção usa para o nome bonito da situação
+  P.situacoesMarcas = SITUACOES.map(([v, n]) => [v, n]);      // a aba Portfólio usa ao mandar um recado para cá
   const corSituacao = (s) => (SITUACOES.find((x) => x[0] === s) || [0, 0, "cinza"])[2];
 
   /* ---------- Nichos ----------
@@ -35,6 +36,7 @@
     ["Turismo", "amarelo", ["tour", "turismo", "viagem", "hotel", "pousada", "resort"]],
     ["Maternidade", "pessego", ["materni", "bebe", "infantil", "crianca", "baby"]]
   ];
+  P.nichosMarcas = NICHOS.map((n) => n[0]); // a aba Portfólio usa a mesma lista de nichos
   const nomeNicho = (n) => { const achado = NICHOS.find((x) => semAcento(x[0]) === semAcento(n)); return achado ? achado[0] : n; };
   const corNicho = (n) => { const achado = NICHOS.find((x) => semAcento(x[0]) === semAcento(n)); return achado ? achado[1] : "cinza"; };
 
@@ -53,6 +55,7 @@
   let busca = "";
   let ordem = "recentes"; // recentes, antigas, az, za
   let temSelecao = true;  // vira false se a coluna "selecionada" ainda não existir no banco
+  let esperandoNoPortfolio = 0; // recados do site que ainda estão na caixa de entrada da aba Portfólio
 
   const temEmail = (m) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(m.email || "").trim());
 
@@ -149,7 +152,10 @@
     const r = await P.lerSeguro("marcas", (q) => q.order("criado_em", { ascending: false }));
     if (r.erro) P.avisar(avisos, r.erro);
     P.conferirCampos(avisos, "marcas", r.dados, ["nome", "instagram", "email", "telefone", "situacao", "obs", "ultimo_contato"]);
-    marcas = r.dados;
+    // Quem preencheu o formulário do site fica na aba Portfólio até você mandar para cá
+    const temNoFunil = !r.dados.length || "no_funil" in r.dados[0];
+    marcas = temNoFunil ? r.dados.filter((m) => m.origem !== "site" || m.no_funil) : r.dados;
+    esperandoNoPortfolio = temNoFunil ? r.dados.length - marcas.length : 0;
     // A caixinha do disparo só aparece se a coluna existir no banco
     temSelecao = !marcas.length || "selecionada" in marcas[0];
     if (!temSelecao) P.avisar(avisos, "As caixinhas de seleção para o disparo de e-mails ainda não existem no banco. Rode o arquivo disparo.sql no SQL Editor do Supabase. O resto da aba continua funcionando.");
@@ -222,9 +228,14 @@
     const lista = filtradas();
     const corpo = P.$("#mc-lista", secao);
     desenharSelecao();
-    P.$("#mc-rodape", secao).textContent = marcas.length ? `Mostrando ${P.plural(lista.length, "marca", "marcas")} de ${marcas.length}. Clique numa linha para editar.` : "";
+    const aviso = esperandoNoPortfolio
+      ? ` ${esperandoNoPortfolio === 1 ? "Tem 1 recado do formulário do site esperando" : `Tem ${esperandoNoPortfolio} recados do formulário do site esperando`} na aba Portfólio.`
+      : "";
+    P.$("#mc-rodape", secao).innerHTML = marcas.length
+      ? `Mostrando ${P.plural(lista.length, "marca", "marcas")} de ${marcas.length}. Clique numa linha para editar.${aviso ? `<b>${P.esc(aviso)}</b>` : ""}`
+      : P.esc(aviso.trim());
     if (!marcas.length) {
-      corpo.innerHTML = `<tr><td colspan="10" class="vazio">Nenhuma marca ainda. Quando alguém mandar mensagem pelo formulário do site, ela aparece aqui como Lead.</td></tr>`;
+      corpo.innerHTML = `<tr><td colspan="10" class="vazio">Nenhuma marca ainda. Clique em Adicionar marca, ou use Importar planilha. Quem preenche o formulário do site cai na aba Portfólio, e de lá você manda para cá quando quiser.</td></tr>`;
       return;
     }
     if (!lista.length) {
