@@ -275,12 +275,77 @@ tr.arrastando .alca{cursor:grabbing}
 .revisao textarea{width:100%;min-height:420px;padding:12px;border:1px solid var(--linha-forte);border-radius:var(--raio);background:#fff;font-size:14px;line-height:1.6;resize:vertical}
 .revisao textarea:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px var(--azul)}
 
+/* ---------- Escolher marcas para o disparo ---------- */
+.col-marcar{width:34px}
+.tabela td.col-marcar{padding-right:0}
+.tabela input[type="checkbox"]{width:17px;height:17px;margin:0;accent-color:var(--tinta);cursor:pointer}
+.tabela input[type="checkbox"]:disabled{cursor:default;opacity:.35}
+.tabela tbody tr.escolhida{background:var(--azul-bem-suave)}
+.barra-selecao{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px;padding:10px 14px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--azul-bem-suave);font-size:13px}
+.barra-selecao-conta{min-width:0}
+
+/* ---------- Aba Prospecção ---------- */
+.aviso-suave{display:flex;gap:9px;align-items:flex-start;margin-top:10px;padding:10px 12px;border:1px solid rgba(122,83,0,.22);border-radius:var(--raio-sm);background:var(--amarelo-fundo);color:var(--amarelo);font-size:12.5px;line-height:1.55}
+.aviso-suave .ico{margin-top:2px}
+
+.prosp-capa{position:relative;overflow:hidden;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;margin-bottom:16px;padding:24px 26px;border-radius:var(--raio);background:linear-gradient(130deg,#173b43 0%,#22626d 52%,#3d9aa4 100%);color:#fff}
+.prosp-capa::after{content:"";position:absolute;right:-70px;top:-90px;width:260px;height:260px;border-radius:50%;background:rgba(167,235,242,.16);pointer-events:none}
+.prosp-capa-texto{position:relative;z-index:1;min-width:0;max-width:560px}
+.prosp-selo{display:grid;place-items:center;width:38px;height:38px;margin-bottom:10px;border-radius:11px;background:rgba(167,235,242,.9);color:#173b43}
+.prosp-capa h2{font-size:20px;font-weight:700}
+.prosp-capa p{margin-top:5px;font-size:13.5px;line-height:1.6;color:rgba(255,255,255,.88)}
+.prosp-lembretes{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.prosp-lembretes span{padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.16);font-size:11.5px;font-weight:600}
+.prosp-total{position:relative;z-index:1;text-align:right;min-width:120px}
+.prosp-total b{display:block;font-size:40px;line-height:1;font-weight:700;color:#a7ebf2}
+.prosp-total span{display:block;margin-top:4px;font-size:12px;color:rgba(255,255,255,.85)}
+
+.prosp-cartoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:16px}
+.prosp-metrica{min-width:0;padding:12px 14px;border:1px solid var(--linha);border-left:4px solid var(--linha-forte);border-radius:var(--raio);background:var(--papel)}
+.prosp-metrica>*{display:block}
+.prosp-metrica .numero-valor{font-size:22px}
+.prosp-metrica .numero-sub{line-height:1.45}
+.m-azul{border-left-color:#4fc3d1}
+.m-pessego{border-left-color:var(--pessego)}
+.m-verde{border-left-color:#4f9a63}
+.m-vermelho{border-left-color:#c9634a}
+.m-cinza{border-left-color:var(--cinza)}
+
+.prosp-grade{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:16px;align-items:start;margin-bottom:16px}
+.prosp-coluna{min-width:0}
+.prosp-conta{margin-top:12px;font-size:13.5px}
+.prosp-listinha{margin:8px 0 0;padding-left:18px;font-size:12.5px;color:var(--tinta-2);display:grid;gap:3px}
+
+.prosp-palco{position:sticky;top:16px;min-width:0;padding:18px;border:1px solid var(--linha);border-radius:var(--raio);background:linear-gradient(165deg,var(--creme-2),rgba(167,235,242,.35))}
+.prosp-palco-topo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.prosp-palco-topo b{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-2)}
+.prosp-janela{border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 26px 50px -28px rgba(23,59,67,.7),0 2px 6px rgba(23,59,67,.08)}
+.prosp-janela-topo{display:flex;align-items:center;gap:11px;padding:13px 15px;border-bottom:1px solid var(--linha)}
+.prosp-avatar{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--azul);color:var(--tinta);font-size:16px;font-weight:700}
+.prosp-janela-quem{min-width:0;display:grid;gap:1px}
+.prosp-janela-quem b{font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prosp-janela-quem span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prosp-quadro{display:block;width:100%;height:360px;border:0;background:#fff}
+.prosp-quadro-grande{height:70vh;border-radius:var(--raio-sm)}
+.prosp-lembrete-baixo{margin-top:12px;font-size:12px;line-height:1.55;color:var(--tinta-2)}
+.prosp-progresso-texto{font-size:13.5px;font-weight:600}
+.prosp-resumo-ok{font-size:14px;font-weight:700;color:var(--verde)}
+.prosp-resumo{margin-top:14px}
+
 /* ---------- Tela de espera e erro geral ---------- */
 .tela-cheia{min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}
 
 /* ---------- Celular ---------- */
+@media (max-width:1100px){
+  .prosp-grade{grid-template-columns:minmax(0,1fr)}
+  .prosp-palco{position:static}
+}
 @media (max-width:980px){
   .duas-colunas,.revisao{grid-template-columns:minmax(0,1fr)}
+  .prosp-capa{padding:20px}
+  .prosp-total{text-align:left}
+  .prosp-total b{font-size:32px}
+  .prosp-quadro{height:300px}
   .numeros{grid-template-columns:repeat(2,minmax(0,1fr))}
   .numero+.numero{border-left:0}
   .numero{border-top:1px solid var(--linha)}

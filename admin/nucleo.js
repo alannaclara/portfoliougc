@@ -287,6 +287,7 @@
   const TITULOS = {
     portfolio: "Portfólio",
     marcas: "Marcas",
+    prospeccao: "Prospecção",
     calendario: "Calendário",
     campanhas: "Campanhas",
     checklist: "Checklist portfólio"

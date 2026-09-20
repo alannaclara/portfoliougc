@@ -15,6 +15,7 @@
     ["parada", "Parada", "cinza"]
   ];
   const nomeSituacao = (s) => (SITUACOES.find((x) => x[0] === s) || [s, s || "Sem situação"])[1];
+  P.nomeSituacao = nomeSituacao; // a aba Prospecção usa para escrever o nome bonito da situação
   const corSituacao = (s) => (SITUACOES.find((x) => x[0] === s) || [0, 0, "cinza"])[2];
 
   /* ---------- Nichos ----------
@@ -51,6 +52,9 @@
   let filtro = "todas";
   let busca = "";
   let ordem = "recentes"; // recentes, antigas, az, za
+  let temSelecao = true;  // vira false se a coluna "selecionada" ainda não existir no banco
+
+  const temEmail = (m) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(m.email || "").trim());
 
   P.abas.marcas = {
     async iniciar(s) {
@@ -75,11 +79,12 @@
           </div>
           <input type="file" id="mc-arquivo" accept=".csv,.txt,text/csv" hidden>
         </div>
+        <div class="barra-selecao" id="mc-selecao" hidden></div>
         <div class="cartao">
           <div class="tabela-rolagem">
             <table class="tabela">
-              <thead><tr><th><span class="sr">Favorita</span></th><th>Marca</th><th>Nicho</th><th>Instagram</th><th>E-mail</th><th>WhatsApp</th><th>Situação</th><th>Observação</th><th>Último contato</th></tr></thead>
-              <tbody id="mc-lista"><tr><td colspan="9" class="carregando">Carregando...</td></tr></tbody>
+              <thead><tr><th class="col-marcar"><span class="sr">Selecionar</span></th><th><span class="sr">Favorita</span></th><th>Marca</th><th>Nicho</th><th>Instagram</th><th>E-mail</th><th>WhatsApp</th><th>Situação</th><th>Observação</th><th>Último contato</th></tr></thead>
+              <tbody id="mc-lista"><tr><td colspan="10" class="carregando">Carregando...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -103,6 +108,12 @@
         if (!tr) return;
         const marca = marcas.find((m) => String(m.id) === tr.dataset.id);
         if (!marca) return;
+        // Clique na caixinha: entra ou sai do disparo, sem abrir a edição
+        const caixa = e.target.closest("[data-marcar]");
+        if (caixa) {
+          await trocarSelecao([marca], caixa.checked);
+          return;
+        }
         // Clique na estrela: favorita ou desfavorita, sem abrir a edição
         if (e.target.closest("[data-estrela]")) {
           const novo = !marca.favorita;
@@ -115,9 +126,17 @@
         abrirForm(marca);
       });
       P.$("#mc-lista", s).addEventListener("keydown", (e) => {
-        if (e.key !== "Enter" || e.target.closest("a") || e.target.closest("button")) return;
+        if (e.key !== "Enter" || e.target.closest("a") || e.target.closest("button") || e.target.closest("input")) return;
         const tr = e.target.closest("tr[data-id]");
         if (tr) tr.click();
+      });
+      P.$("#mc-selecao", s).addEventListener("click", async (e) => {
+        const botao = e.target.closest("[data-selecao]");
+        if (!botao) return;
+        const acao = botao.dataset.selecao;
+        if (acao === "todas") await trocarSelecao(filtradas().filter((m) => temEmail(m) && !m.selecionada), true);
+        if (acao === "limpar") await trocarSelecao(marcas.filter((m) => m.selecionada), false);
+        if (acao === "ir") location.hash = "#prospeccao";
       });
       await carregar();
     },
@@ -131,7 +150,42 @@
     if (r.erro) P.avisar(avisos, r.erro);
     P.conferirCampos(avisos, "marcas", r.dados, ["nome", "instagram", "email", "telefone", "situacao", "obs", "ultimo_contato"]);
     marcas = r.dados;
+    // A caixinha do disparo só aparece se a coluna existir no banco
+    temSelecao = !marcas.length || "selecionada" in marcas[0];
+    if (!temSelecao) P.avisar(avisos, "As caixinhas de seleção para o disparo de e-mails ainda não existem no banco. Rode o arquivo disparo.sql no SQL Editor do Supabase. O resto da aba continua funcionando.");
     desenhar();
+  }
+
+  // Marca ou desmarca a caixinha, e já grava no banco
+  async function trocarSelecao(lista, ligada) {
+    if (!temSelecao || !lista.length) { desenhar(); return; }
+    const ids = lista.map((m) => m.id);
+    lista.forEach((m) => { m.selecionada = ligada; });
+    desenhar();
+    try {
+      const { error } = await banco.from("marcas").update({ selecionada: ligada }).in("id", ids);
+      if (error) throw error;
+    } catch (erro) {
+      lista.forEach((m) => { m.selecionada = !ligada; });
+      desenhar();
+      P.toast(P.explicarErro(erro, "marcas"), "erro");
+    }
+  }
+
+  // A barra que mostra quantas estão escolhidas para o disparo
+  function desenharSelecao() {
+    const barra = P.$("#mc-selecao", secao);
+    if (!temSelecao || !marcas.length) { barra.hidden = true; return; }
+    const escolhidas = marcas.filter((m) => m.selecionada).length;
+    const naTela = filtradas().filter((m) => temEmail(m) && !m.selecionada).length;
+    const semEmail = marcas.filter((m) => !temEmail(m)).length;
+    barra.hidden = false;
+    barra.innerHTML = `
+      <span class="barra-selecao-conta">${escolhidas ? `<b>${P.plural(escolhidas, "marca escolhida", "marcas escolhidas")}</b> para o disparo` : "Nenhuma marca escolhida para o disparo ainda"}</span>
+      ${naTela ? `<button class="botao" type="button" data-selecao="todas">Escolher ${P.plural(naTela, "marca que aparece", "marcas que aparecem")}</button>` : ""}
+      ${escolhidas ? `<button class="botao" type="button" data-selecao="limpar">Limpar escolha</button>` : ""}
+      ${escolhidas ? `<button class="botao botao-principal empurra" type="button" data-selecao="ir">Ir para Prospecção</button>` : ""}
+      ${semEmail ? `<span class="mudo pequeno">${P.plural(semEmail, "marca está", "marcas estão")} sem e-mail e não dá para escolher</span>` : ""}`;
   }
 
   function filtradas() {
@@ -167,13 +221,14 @@
 
     const lista = filtradas();
     const corpo = P.$("#mc-lista", secao);
+    desenharSelecao();
     P.$("#mc-rodape", secao).textContent = marcas.length ? `Mostrando ${P.plural(lista.length, "marca", "marcas")} de ${marcas.length}. Clique numa linha para editar.` : "";
     if (!marcas.length) {
-      corpo.innerHTML = `<tr><td colspan="9" class="vazio">Nenhuma marca ainda. Quando alguém mandar mensagem pelo formulário do site, ela aparece aqui como Lead.</td></tr>`;
+      corpo.innerHTML = `<tr><td colspan="10" class="vazio">Nenhuma marca ainda. Quando alguém mandar mensagem pelo formulário do site, ela aparece aqui como Lead.</td></tr>`;
       return;
     }
     if (!lista.length) {
-      corpo.innerHTML = `<tr><td colspan="9" class="vazio">Nenhuma marca com essa busca ou filtro.</td></tr>`;
+      corpo.innerHTML = `<tr><td colspan="10" class="vazio">Nenhuma marca com essa busca ou filtro.</td></tr>`;
       return;
     }
     corpo.innerHTML = lista.map((m) => {
@@ -181,9 +236,13 @@
       const linkInsta = P.linkInstagram(m.instagram);
       const whats = P.linkWhats(m.telefone);
       const numero = P.primeiroTelefone(m.telefone);
-      return `<tr class="clicavel${m.favorita ? " favorita" : ""}" data-id="${P.esc(m.id)}" tabindex="0">
+      const podeEnviar = temEmail(m);
+      return `<tr class="clicavel${m.favorita ? " favorita" : ""}${m.selecionada ? " escolhida" : ""}" data-id="${P.esc(m.id)}" tabindex="0">
+        <td class="col-marcar">${temSelecao
+          ? `<input type="checkbox" data-marcar${m.selecionada ? " checked" : ""}${podeEnviar ? "" : " disabled"} aria-label="${podeEnviar ? `Incluir ${P.esc(m.nome || "esta marca")} no disparo de e-mails` : "Sem e-mail, não dá para incluir no disparo"}" title="${podeEnviar ? "Incluir no disparo de e-mails" : "Esta marca está sem e-mail"}">`
+          : ""}</td>
         <td><button class="estrela${m.favorita ? " ativa" : ""}" type="button" data-estrela aria-pressed="${!!m.favorita}" aria-label="${m.favorita ? "Tirar dos favoritos" : "Marcar como favorita"}" title="${m.favorita ? "Favorita. Clique para tirar" : "Marcar como favorita (vai para o topo)"}">${P.icone("estrela")}</button></td>
-        <td><b>${P.esc(m.nome || "Sem nome")}</b>${P.pilulaExemplo(m)}${m.origem === "site" ? ` <span class="pilula p-pessego" title="Chegou pelo formulário do site">site</span>` : ""}</td>
+        <td><b>${P.esc(m.nome || "Sem nome")}</b>${P.pilulaExemplo(m)}${m.origem === "site" ? ` <span class="pilula p-pessego" title="Chegou pelo formulário do site">site</span>` : ""}${m.enviado_em ? ` <span class="pilula p-ciano" title="Recebeu um e-mail seu em ${P.dataBR(m.enviado_em)}">e-mail ${P.dataBR(m.enviado_em).slice(0, 5)}</span>` : ""}</td>
         <td class="curta">${m.nicho ? P.pilula(nomeNicho(m.nicho), corNicho(m.nicho)) : `<span class="mudo pequeno">sem nicho</span>`}</td>
         <td class="curta">${linkInsta ? `<a class="link-tabela" href="${linkInsta}" target="_blank" rel="noopener">${P.esc(insta)}</a>` : ""}</td>
         <td class="curta">${m.email ? `<a class="link-tabela" href="mailto:${P.esc(m.email)}">${P.esc(m.email)}</a>` : ""}</td>
