@@ -50,6 +50,7 @@
   let marcas = [];
   let filtro = "todas";
   let busca = "";
+  let ordem = "recentes"; // recentes, antigas, az, za
 
   P.abas.marcas = {
     async iniciar(s) {
@@ -59,6 +60,13 @@
         <div class="ferramentas">
           <label class="busca"><span class="sr">Buscar</span>${P.icone("busca", "ico-p")}<input type="search" id="mc-busca" placeholder="Buscar por nome, nicho, @ ou e-mail"></label>
           <div class="filtros" id="mc-filtros" role="group" aria-label="Filtrar por situação"></div>
+          <label class="sr" for="mc-ordem">Ordenar por</label>
+          <select class="selecao" id="mc-ordem" title="Como a lista fica ordenada. As favoritas ficam sempre no topo.">
+            <option value="recentes">Últimas adicionadas</option>
+            <option value="antigas">Primeiras adicionadas</option>
+            <option value="az">Ordem crescente (A a Z)</option>
+            <option value="za">Ordem decrescente (Z a A)</option>
+          </select>
           <div class="grupo-botoes empurra">
             <button class="botao" type="button" id="mc-nichos-base" hidden>${P.icone("check", "ico-p")}Identificar nichos</button>
             <button class="botao" type="button" id="mc-importar">${P.icone("subir", "ico-p")}Importar planilha</button>
@@ -70,8 +78,8 @@
         <div class="cartao">
           <div class="tabela-rolagem">
             <table class="tabela">
-              <thead><tr><th>Nicho</th><th>Marca</th><th>Instagram</th><th>E-mail</th><th>WhatsApp</th><th>Situação</th><th>Observação</th><th>Último contato</th></tr></thead>
-              <tbody id="mc-lista"><tr><td colspan="8" class="carregando">Carregando...</td></tr></tbody>
+              <thead><tr><th><span class="sr">Favorita</span></th><th>Marca</th><th>Nicho</th><th>Instagram</th><th>E-mail</th><th>WhatsApp</th><th>Situação</th><th>Observação</th><th>Último contato</th></tr></thead>
+              <tbody id="mc-lista"><tr><td colspan="9" class="carregando">Carregando...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -88,15 +96,26 @@
       P.$("#mc-importar", s).addEventListener("click", () => P.$("#mc-arquivo", s).click());
       P.$("#mc-nichos-base", s).addEventListener("click", identificarNichos);
       P.$("#mc-arquivo", s).addEventListener("change", aoEscolherArquivo);
-      P.$("#mc-lista", s).addEventListener("click", (e) => {
+      P.$("#mc-ordem", s).addEventListener("change", (e) => { ordem = e.target.value; desenhar(); });
+      P.$("#mc-lista", s).addEventListener("click", async (e) => {
         if (e.target.closest("a")) return; // links (WhatsApp, Instagram, e-mail) abrem sozinhos
         const tr = e.target.closest("tr[data-id]");
         if (!tr) return;
         const marca = marcas.find((m) => String(m.id) === tr.dataset.id);
-        if (marca) abrirForm(marca);
+        if (!marca) return;
+        // Clique na estrela: favorita ou desfavorita, sem abrir a edição
+        if (e.target.closest("[data-estrela]")) {
+          const novo = !marca.favorita;
+          const erro = await P.gravar("marcas", "atualizar", { favorita: novo }, marca.id);
+          if (erro) { P.toast(erro, "erro"); return; }
+          marca.favorita = novo;
+          desenhar();
+          return;
+        }
+        abrirForm(marca);
       });
       P.$("#mc-lista", s).addEventListener("keydown", (e) => {
-        if (e.key !== "Enter" || e.target.closest("a")) return;
+        if (e.key !== "Enter" || e.target.closest("a") || e.target.closest("button")) return;
         const tr = e.target.closest("tr[data-id]");
         if (tr) tr.click();
       });
@@ -116,10 +135,20 @@
   }
 
   function filtradas() {
-    return marcas.filter((m) => {
+    const escolhidas = marcas.filter((m) => {
       if (filtro !== "todas" && m.situacao !== filtro) return false;
       if (!busca) return true;
       return [m.nome, m.instagram, m.email, m.nicho].some((c) => String(c || "").toLowerCase().includes(busca));
+    });
+    // As favoritas ficam sempre no topo, seja qual for a ordem escolhida
+    const porNome = (a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", { sensitivity: "base" });
+    const porData = (a, b) => String(a.criado_em || "").localeCompare(String(b.criado_em || ""));
+    return escolhidas.sort((a, b) => {
+      if (!!a.favorita !== !!b.favorita) return a.favorita ? -1 : 1;
+      if (ordem === "az") return porNome(a, b);
+      if (ordem === "za") return porNome(b, a);
+      if (ordem === "antigas") return porData(a, b);
+      return porData(b, a); // recentes
     });
   }
 
@@ -140,11 +169,11 @@
     const corpo = P.$("#mc-lista", secao);
     P.$("#mc-rodape", secao).textContent = marcas.length ? `Mostrando ${P.plural(lista.length, "marca", "marcas")} de ${marcas.length}. Clique numa linha para editar.` : "";
     if (!marcas.length) {
-      corpo.innerHTML = `<tr><td colspan="8" class="vazio">Nenhuma marca ainda. Quando alguém mandar mensagem pelo formulário do site, ela aparece aqui como Lead.</td></tr>`;
+      corpo.innerHTML = `<tr><td colspan="9" class="vazio">Nenhuma marca ainda. Quando alguém mandar mensagem pelo formulário do site, ela aparece aqui como Lead.</td></tr>`;
       return;
     }
     if (!lista.length) {
-      corpo.innerHTML = `<tr><td colspan="8" class="vazio">Nenhuma marca com essa busca ou filtro.</td></tr>`;
+      corpo.innerHTML = `<tr><td colspan="9" class="vazio">Nenhuma marca com essa busca ou filtro.</td></tr>`;
       return;
     }
     corpo.innerHTML = lista.map((m) => {
@@ -152,9 +181,10 @@
       const linkInsta = P.linkInstagram(m.instagram);
       const whats = P.linkWhats(m.telefone);
       const numero = P.primeiroTelefone(m.telefone);
-      return `<tr class="clicavel" data-id="${P.esc(m.id)}" tabindex="0">
-        <td class="curta">${m.nicho ? P.pilula(nomeNicho(m.nicho), corNicho(m.nicho)) : `<span class="mudo pequeno">sem nicho</span>`}</td>
+      return `<tr class="clicavel${m.favorita ? " favorita" : ""}" data-id="${P.esc(m.id)}" tabindex="0">
+        <td><button class="estrela${m.favorita ? " ativa" : ""}" type="button" data-estrela aria-pressed="${!!m.favorita}" aria-label="${m.favorita ? "Tirar dos favoritos" : "Marcar como favorita"}" title="${m.favorita ? "Favorita. Clique para tirar" : "Marcar como favorita (vai para o topo)"}">${P.icone("estrela")}</button></td>
         <td><b>${P.esc(m.nome || "Sem nome")}</b>${P.pilulaExemplo(m)}${m.origem === "site" ? ` <span class="pilula p-pessego" title="Chegou pelo formulário do site">site</span>` : ""}</td>
+        <td class="curta">${m.nicho ? P.pilula(nomeNicho(m.nicho), corNicho(m.nicho)) : `<span class="mudo pequeno">sem nicho</span>`}</td>
         <td class="curta">${linkInsta ? `<a class="link-tabela" href="${linkInsta}" target="_blank" rel="noopener">${P.esc(insta)}</a>` : ""}</td>
         <td class="curta">${m.email ? `<a class="link-tabela" href="mailto:${P.esc(m.email)}">${P.esc(m.email)}</a>` : ""}</td>
         <td class="curta">${whats ? `<a class="botao" href="${whats}" target="_blank" rel="noopener" title="Abrir conversa com ${P.esc(numero)} no WhatsApp">${P.icone("whats", "ico-p")}WhatsApp</a>` : ""}</td>
@@ -509,7 +539,7 @@
     const lista = filtradas();
     if (!lista.length) { P.toast("Não tem nenhuma marca para baixar com esse filtro."); return; }
     P.baixarCSV("marcas",
-      ["Nicho", "Marca", "Instagram", "E-mail", "WhatsApp", "Situação", "Observação", "Último contato", "Veio do site"],
-      lista.map((m) => [m.nicho, m.nome, P.arroba(m.instagram), m.email, m.telefone, nomeSituacao(m.situacao), m.obs, P.dataBR(m.ultimo_contato), m.origem === "site" ? "Sim" : "Não"]));
+      ["Favorita", "Marca", "Nicho", "Instagram", "E-mail", "WhatsApp", "Situação", "Observação", "Último contato", "Veio do site"],
+      lista.map((m) => [m.favorita ? "Sim" : "", m.nome, m.nicho, P.arroba(m.instagram), m.email, m.telefone, nomeSituacao(m.situacao), m.obs, P.dataBR(m.ultimo_contato), m.origem === "site" ? "Sim" : "Não"]));
   }
 })();
