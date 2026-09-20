@@ -140,7 +140,6 @@ h1,h2,h3,h4,p{margin:0}
 .tabela .corta{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tabela .acoes{white-space:nowrap;text-align:right}
 .tabela tr.escondido td:not(.acoes){opacity:.5}
-.tabela tr.favorita td:first-child{box-shadow:inset 3px 0 0 var(--pessego)}
 .ordenar{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:none;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;cursor:pointer}
 .ordenar:hover{color:var(--tinta)}
 .ordenar .seta-ord{font-size:11px;opacity:.35}
@@ -294,6 +293,18 @@ tr.arrastando .alca{cursor:grabbing}
 .tabela input[type="checkbox"]{width:17px;height:17px;margin:0;accent-color:var(--tinta);cursor:pointer}
 .tabela input[type="checkbox"]:disabled{cursor:default;opacity:.35}
 .tabela tbody tr.escolhida{background:var(--azul-bem-suave)}
+
+/* ---------- Marca favorita: a linha inteira fica cor de pêssego ---------- */
+.tabela tbody tr.favorita{background:var(--pessego-fundo)}
+.tabela tbody tr.favorita:hover{background:#fbd5c9}
+.tabela tbody tr.favorita td{border-bottom-color:rgba(138,58,36,.16)}
+.tabela tbody tr.favorita td:first-child{box-shadow:inset 3px 0 0 #e58e71}
+.tabela tbody tr.favorita .estrela{color:var(--pessego-texto)}
+.tabela tbody tr.favorita .estrela.ativa .ico{fill:#f3a48c}
+.tabela tbody tr.favorita .estrela:hover{background:rgba(255,255,255,.65)}
+.tabela tbody tr.favorita .botao{background:rgba(255,255,255,.75)}
+.tabela tbody tr.favorita .botao:hover{background:#fff}
+.tabela tbody tr.favorita .pilula.p-pessego{background:rgba(255,255,255,.8)}
 .barra-selecao{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px;padding:10px 14px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--azul-bem-suave);font-size:13px}
 .barra-selecao-conta{min-width:0}
 
