@@ -17,6 +17,35 @@
   const nomeSituacao = (s) => (SITUACOES.find((x) => x[0] === s) || [s, s || "Sem situação"])[1];
   const corSituacao = (s) => (SITUACOES.find((x) => x[0] === s) || [0, 0, "cinza"])[2];
 
+  /* ---------- Nichos ----------
+     Para incluir um nicho novo, acrescente uma linha: [nome que aparece, cor, palavras que ajudam a reconhecer].
+     Cores possíveis: ciano, verde, amarelo, lilas, pessego, cinza, vermelho, escuro. */
+  const NICHOS = [
+    ["Beleza", "pessego", ["beleza", "make", "maquiagem", "cosmetic", "batom", "unha", "cabelo", "hair", "salao", "estetica", "perfum", "esmalte"]],
+    ["Skincare", "ciano", ["skin", "pele", "derma", "serum", "protetor solar", "hidratante"]],
+    ["Comida", "amarelo", ["cafe", "cafeteria", "doceria", "restaurante", "pizza", "padaria", "gastr", "food", "bistro", "confeitaria", "burger", "acai", "comida", "bebida", "cerveja", "vinho", "sorvete", "chocolate"]],
+    ["Casa e decoração", "verde", ["casa", "decor", "movel", "moveis", "lar", "interior", "arquitet", "ceramica", "enxoval", "jardim"]],
+    ["Tech", "escuro", ["tech", "digital", "software", "app", "eletro", "informatica", "celular", "sistema", "ia "]],
+    ["Moda", "lilas", ["moda", "roupa", "boutique", "jeans", "brecho", "calcad", "sapat", "joia", "acessori", "bolsa", "fashion"]],
+    ["Pet", "verde", ["pet", "cachorro", "gato", "veterinar", "racao"]],
+    ["Fitness", "ciano", ["fit", "academia", "treino", "pilates", "yoga", "nutri", "suplement"]],
+    ["Saúde", "ciano", ["clinica", "odonto", "dentista", "saude", "farmacia", "medic", "psic"]],
+    ["Serviços", "cinza", ["servico", "agencia", "consultoria", "contabil", "advocacia", "imobiliaria", "escola", "curso"]],
+    ["Turismo", "amarelo", ["tour", "turismo", "viagem", "hotel", "pousada", "resort"]],
+    ["Maternidade", "pessego", ["materni", "bebe", "infantil", "crianca", "baby"]]
+  ];
+  const nomeNicho = (n) => { const achado = NICHOS.find((x) => semAcento(x[0]) === semAcento(n)); return achado ? achado[0] : n; };
+  const corNicho = (n) => { const achado = NICHOS.find((x) => semAcento(x[0]) === semAcento(n)); return achado ? achado[1] : "cinza"; };
+
+  // Tenta descobrir o nicho pelo nome da marca, pelo @ e pela observação
+  function adivinharNicho(marca) {
+    const texto = semAcento([marca.nome, marca.instagram, marca.obs, marca.email].join(" "));
+    for (const [nome, , palavras] of NICHOS) {
+      if (palavras.some((p) => texto.includes(semAcento(p)))) return nome;
+    }
+    return "";
+  }
+
   let secao = null;
   let marcas = [];
   let filtro = "todas";
@@ -28,9 +57,10 @@
       s.innerHTML = `
         <div class="avisos"></div>
         <div class="ferramentas">
-          <label class="busca"><span class="sr">Buscar</span>${P.icone("busca", "ico-p")}<input type="search" id="mc-busca" placeholder="Buscar por nome, @ ou e-mail"></label>
+          <label class="busca"><span class="sr">Buscar</span>${P.icone("busca", "ico-p")}<input type="search" id="mc-busca" placeholder="Buscar por nome, nicho, @ ou e-mail"></label>
           <div class="filtros" id="mc-filtros" role="group" aria-label="Filtrar por situação"></div>
           <div class="grupo-botoes empurra">
+            <button class="botao" type="button" id="mc-nichos-base" hidden>${P.icone("check", "ico-p")}Identificar nichos</button>
             <button class="botao" type="button" id="mc-importar">${P.icone("subir", "ico-p")}Importar planilha</button>
             <button class="botao" type="button" id="mc-csv">${P.icone("baixar", "ico-p")}Baixar CSV</button>
             <button class="botao botao-principal" type="button" id="mc-novo">${P.icone("mais", "ico-p")}Adicionar marca</button>
@@ -40,7 +70,7 @@
         <div class="cartao">
           <div class="tabela-rolagem">
             <table class="tabela">
-              <thead><tr><th>Marca</th><th>Instagram</th><th>E-mail</th><th>Telefone</th><th>Situação</th><th>Observação</th><th>Último contato</th><th class="acoes"><span class="sr">Ações</span></th></tr></thead>
+              <thead><tr><th>Nicho</th><th>Marca</th><th>Instagram</th><th>E-mail</th><th>WhatsApp</th><th>Situação</th><th>Observação</th><th>Último contato</th></tr></thead>
               <tbody id="mc-lista"><tr><td colspan="8" class="carregando">Carregando...</td></tr></tbody>
             </table>
           </div>
@@ -56,6 +86,7 @@
       P.$("#mc-novo", s).addEventListener("click", () => abrirForm(null));
       P.$("#mc-csv", s).addEventListener("click", baixar);
       P.$("#mc-importar", s).addEventListener("click", () => P.$("#mc-arquivo", s).click());
+      P.$("#mc-nichos-base", s).addEventListener("click", identificarNichos);
       P.$("#mc-arquivo", s).addEventListener("change", aoEscolherArquivo);
       P.$("#mc-lista", s).addEventListener("click", (e) => {
         if (e.target.closest("a")) return; // links (WhatsApp, Instagram, e-mail) abrem sozinhos
@@ -88,7 +119,7 @@
     return marcas.filter((m) => {
       if (filtro !== "todas" && m.situacao !== filtro) return false;
       if (!busca) return true;
-      return [m.nome, m.instagram, m.email].some((c) => String(c || "").toLowerCase().includes(busca));
+      return [m.nome, m.instagram, m.email, m.nicho].some((c) => String(c || "").toLowerCase().includes(busca));
     });
   }
 
@@ -98,6 +129,12 @@
     P.$("#mc-filtros", secao).innerHTML =
       `<button class="filtro" type="button" data-filtro="todas" aria-pressed="${filtro === "todas"}">Todas<span class="qtd">${marcas.length}</span></button>` +
       SITUACOES.map(([valor, nome]) => `<button class="filtro" type="button" data-filtro="${valor}" aria-pressed="${filtro === valor}">${nome}<span class="qtd">${conta(valor)}</span></button>`).join("");
+
+    // O botão de identificar nichos só aparece quando tem marca sem nicho
+    const semNicho = marcas.filter((m) => !m.nicho && !m.exemplo);
+    const botaoNichos = P.$("#mc-nichos-base", secao);
+    botaoNichos.hidden = !semNicho.length;
+    botaoNichos.title = `${P.plural(semNicho.length, "marca está", "marcas estão")} sem nicho`;
 
     const lista = filtradas();
     const corpo = P.$("#mc-lista", secao);
@@ -114,15 +151,16 @@
       const insta = P.arroba(m.instagram);
       const linkInsta = P.linkInstagram(m.instagram);
       const whats = P.linkWhats(m.telefone);
+      const numero = P.primeiroTelefone(m.telefone);
       return `<tr class="clicavel" data-id="${P.esc(m.id)}" tabindex="0">
+        <td class="curta">${m.nicho ? P.pilula(nomeNicho(m.nicho), corNicho(m.nicho)) : `<span class="mudo pequeno">sem nicho</span>`}</td>
         <td><b>${P.esc(m.nome || "Sem nome")}</b>${P.pilulaExemplo(m)}${m.origem === "site" ? ` <span class="pilula p-pessego" title="Chegou pelo formulário do site">site</span>` : ""}</td>
         <td class="curta">${linkInsta ? `<a class="link-tabela" href="${linkInsta}" target="_blank" rel="noopener">${P.esc(insta)}</a>` : ""}</td>
         <td class="curta">${m.email ? `<a class="link-tabela" href="mailto:${P.esc(m.email)}">${P.esc(m.email)}</a>` : ""}</td>
-        <td class="curta">${P.esc(m.telefone)}</td>
+        <td class="curta">${whats ? `<a class="botao" href="${whats}" target="_blank" rel="noopener" title="Abrir conversa com ${P.esc(numero)} no WhatsApp">${P.icone("whats", "ico-p")}WhatsApp</a>` : ""}</td>
         <td>${P.pilula(nomeSituacao(m.situacao), corSituacao(m.situacao))}</td>
         <td class="corta" title="${P.esc(m.obs)}">${P.esc(m.obs)}</td>
         <td class="curta">${P.dataBR(m.ultimo_contato)}</td>
-        <td class="acoes">${whats ? `<a class="botao" href="${whats}" target="_blank" rel="noopener" title="Abrir conversa no WhatsApp">${P.icone("whats", "ico-p")}WhatsApp</a>` : ""}</td>
       </tr>`;
     }).join("");
   }
@@ -134,9 +172,10 @@
       valores: m,
       campos: [
         { nome: "nome", rotulo: "Marca", tipo: "texto", obrigatorio: true, largo: true },
+        { nome: "nicho", rotulo: "Nicho", tipo: "texto", lista: NICHOS.map((n) => n[0]), ajuda: "Escolha um da lista ou escreva o seu." },
         { nome: "instagram", rotulo: "Instagram", tipo: "texto", ajuda: "Ex.: @marca" },
         { nome: "email", rotulo: "E-mail", tipo: "email" },
-        { nome: "telefone", rotulo: "Telefone", tipo: "tel", ajuda: "Com DDD. Ganha o botão de WhatsApp." },
+        { nome: "telefone", rotulo: "WhatsApp", tipo: "tel", ajuda: "Com DDD. Vira o botão de WhatsApp na tabela." },
         { nome: "situacao", rotulo: "Situação", tipo: "escolha", opcoes: SITUACOES.map(([v, n]) => [v, n]) },
         { nome: "ultimo_contato", rotulo: "Último contato", tipo: "data" },
         { nome: "obs", rotulo: "Observação", tipo: "texto-longo" }
@@ -170,6 +209,7 @@
   const DESTINOS = [
     ["ignorar", "Não importar"],
     ["nome", "Marca"],
+    ["nicho", "Nicho"],
     ["instagram", "Instagram"],
     ["email", "E-mail"],
     ["telefone", "Telefone"],
@@ -181,6 +221,7 @@
   // Palavras que costumam aparecer no cabeçalho de cada coluna
   const PALPITES = {
     nome: ["marca", "nome", "empresa", "cliente", "brand", "company", "razao"],
+    nicho: ["nicho", "segmento", "categoria", "area", "área", "ramo", "setor", "tipo de marca"],
     instagram: ["instagram", "insta", "arroba", "@", "perfil", "handle"],
     email: ["email", "e-mail", "mail", "contato de email"],
     telefone: ["telefone", "fone", "celular", "whats", "whatsapp", "phone", "tel"],
@@ -350,6 +391,7 @@
       </div>
       <label class="campo campo-marcar" style="margin-top:12px"><input type="checkbox" id="mc-pular" checked>Pular marcas que já estão na minha base (mesmo e-mail, @ ou nome)</label>
       <label class="campo campo-marcar"><input type="checkbox" id="mc-como-lead" checked>Quando a planilha não disser a situação, entrar como Lead</label>
+      <label class="campo campo-marcar"><input type="checkbox" id="mc-nichos" checked>Tentar descobrir o nicho pelo nome da marca quando a planilha não tiver essa coluna</label>
       <p class="erro-form" id="mc-erro-importar" role="alert" hidden></p>
       <div class="grupo-botoes" style="margin-top:14px">
         <button class="botao botao-principal" type="button" id="mc-confirmar">${P.icone("subir", "ico-p")}Importar ${P.plural(dados.length, "marca", "marcas")}</button>
@@ -377,6 +419,7 @@
     const { destinos, dados } = planilha;
     const pularRepetidas = P.$("#mc-pular").checked;
     const comoLead = P.$("#mc-como-lead").checked;
+    const adivinharNichos = P.$("#mc-nichos").checked;
     const erro = P.$("#mc-erro-importar");
     const coluna = (destino) => destinos.indexOf(destino);
 
@@ -400,13 +443,16 @@
       if (pularRepetidas && chaves.some((c) => jaExiste.has(c))) { repetidas++; return; }
       chaves.forEach((c) => jaExiste.add(c));
       const situacaoDaPlanilha = pegar("situacao");
+      const obs = pegar("obs").slice(0, 3000);
+      const nichoDaPlanilha = pegar("nicho").slice(0, 80);
       novas.push({
+        nicho: nichoDaPlanilha ? nomeNicho(nichoDaPlanilha) : (adivinharNichos ? adivinharNicho({ nome, instagram, obs, email }) : ""),
         nome,
         instagram: instagram.slice(0, 200),
         email,
         telefone: limparTelefone(pegar("telefone")),
         situacao: situacaoDaPlanilha ? limparSituacao(situacaoDaPlanilha) : (comoLead ? "lead" : "lead"),
-        obs: pegar("obs").slice(0, 3000),
+        obs,
         ultimo_contato: limparData(pegar("ultimo_contato")),
         origem: "admin",
         exemplo: false
@@ -442,11 +488,28 @@
     P.toast(partes.join(", ") + ".", falhas ? "erro" : "ok");
   }
 
+  // Preenche o nicho das marcas que já estão na base e ainda estão sem ele
+  async function identificarNichos() {
+    const semNicho = marcas.filter((m) => !m.nicho && !m.exemplo);
+    const palpites = semNicho.map((m) => ({ marca: m, nicho: adivinharNicho(m) })).filter((x) => x.nicho);
+    if (!palpites.length) {
+      P.toast("Não consegui adivinhar o nicho de nenhuma dessas marcas pelo nome. Dá para escolher clicando na linha.");
+      return;
+    }
+    const exemplos = palpites.slice(0, 5).map((x) => `${x.marca.nome}: ${x.nicho}`).join("\n");
+    if (!confirm(`Vou preencher o nicho de ${P.plural(palpites.length, "marca", "marcas")}, assim:\n\n${exemplos}${palpites.length > 5 ? "\n..." : ""}\n\nVocê pode mudar qualquer uma depois, clicando na linha. Pode seguir?`)) return;
+    const erros = (await Promise.all(palpites.map((x) => P.gravar("marcas", "atualizar", { nicho: x.nicho }, x.marca.id)))).filter(Boolean);
+    await carregar();
+    if (erros.length) { P.toast(erros[0], "erro"); return; }
+    const sobraram = semNicho.length - palpites.length;
+    P.toast(`${P.plural(palpites.length, "marca ganhou nicho", "marcas ganharam nicho")}${sobraram ? `, ${sobraram} ficaram sem` : ""}.`);
+  }
+
   function baixar() {
     const lista = filtradas();
     if (!lista.length) { P.toast("Não tem nenhuma marca para baixar com esse filtro."); return; }
     P.baixarCSV("marcas",
-      ["Marca", "Instagram", "E-mail", "Telefone", "Situação", "Observação", "Último contato", "Veio do site"],
-      lista.map((m) => [m.nome, P.arroba(m.instagram), m.email, m.telefone, nomeSituacao(m.situacao), m.obs, P.dataBR(m.ultimo_contato), m.origem === "site" ? "Sim" : "Não"]));
+      ["Nicho", "Marca", "Instagram", "E-mail", "WhatsApp", "Situação", "Observação", "Último contato", "Veio do site"],
+      lista.map((m) => [m.nicho, m.nome, P.arroba(m.instagram), m.email, m.telefone, nomeSituacao(m.situacao), m.obs, P.dataBR(m.ultimo_contato), m.origem === "site" ? "Sim" : "Não"]));
   }
 })();

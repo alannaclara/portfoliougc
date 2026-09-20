@@ -262,9 +262,18 @@
   };
 
   /* ---------- Links úteis ---------- */
+  // Quando a célula tem mais de um número ("(16) 99772-4745 (16) 99606-4655"), usa o primeiro
+  P.primeiroTelefone = (texto) => {
+    const t = String(texto || "");
+    const achados = t.match(/\(?\d{2}\)?[\s.-]?9?\d{4}[\s.-]?\d{4}/g);
+    if (achados && achados.length) return achados[0].trim();
+    const so = t.replace(/\D/g, "");
+    return so.length >= 10 ? so : "";
+  };
   P.linkWhats = (telefone) => {
-    let d = String(telefone || "").replace(/\D/g, "");
-    if (!d) return "";
+    let d = P.primeiroTelefone(telefone).replace(/\D/g, "");
+    if (d.length < 10) return "";
+    if (d.length > 13) d = d.slice(0, 13);
     if (d.length <= 11) d = "55" + d;
     return `https://wa.me/${d}`;
   };
