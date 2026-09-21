@@ -36,6 +36,15 @@
   let atual = null;      // o roteiro aberto na janela
   let moodboard = [];    // [{url, caminho, x, y, z, link}]
   let fotoEscolhida = -1;
+  let tokenNovo = "";    // o código do link de um roteiro que ainda não foi salvo
+
+  // Código embaralhado do link. 32 caracteres sorteados, impossível de adivinhar.
+  function gerarToken() {
+    const bytes = new Uint8Array(16);
+    if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(bytes);
+    else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+    return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
 
   const enderecoPublico = () => location.href.replace(/admin\/[^/]*$/, "") + "roteiro.html";
 
@@ -482,6 +491,8 @@
     atual = r;
     moodboard = r && Array.isArray(r.moodboard) ? JSON.parse(JSON.stringify(r.moodboard)) : [];
     fotoEscolhida = -1;
+    // Todo roteiro já nasce com o link dele, mesmo antes do primeiro Salvar
+    tokenNovo = r ? "" : gerarToken();
 
     $j("#rt-marca").value = r ? r.marca : "";
     $j("#rt-status").value = r ? r.status : "Rascunho";
@@ -517,8 +528,7 @@
 
   function desenharVisualizacao() {
     const alvo = $j("#rt-visu-texto");
-    if (!atual) { alvo.textContent = "Salve o roteiro para gerar o link da marca."; return; }
-    if (!atual.visto_em) { alvo.textContent = "Ainda não visualizado pela marca."; return; }
+    if (!atual || !atual.visto_em) { alvo.textContent = "Ainda não visualizado pela marca."; return; }
     const d = new Date(atual.visto_em);
     alvo.innerHTML = `<b>Visualizado ${P.esc(quando(atual.visto_em))}</b><br><span class="mudo">${P.esc(d.toLocaleString("pt-BR"))}${atual.visualizacoes > 1 ? `, ${P.plural(atual.visualizacoes, "vez", "vezes")}` : ""}</span>`;
   }
@@ -540,7 +550,8 @@
   }
 
   /* ---------- O link de aprovação ---------- */
-  const linkDoRoteiro = () => (atual && atual.token ? `${enderecoPublico()}?r=${atual.token}` : "");
+  const codigoDoRoteiro = () => (atual && atual.token) || tokenNovo || "";
+  const linkDoRoteiro = () => { const c = codigoDoRoteiro(); return c ? `${enderecoPublico()}?r=${c}` : ""; };
 
   function mostrarLink() {
     const caixa = $j("#rt-link-caixa");
@@ -548,9 +559,12 @@
     caixa.hidden = !link;
     if (!link) return;
     const ligado = $j("#rt-link-ligado").checked;
+    const salvo = !!atual;
     $j("#rt-link-texto").textContent = ligado ? link : "Link desligado. A marca vê uma página dizendo que o link não está disponível.";
-    $j("#rt-copiar-link").disabled = !ligado;
-    $j("#rt-abrir-link").disabled = !ligado;
+    // Antes do primeiro Salvar o link já existe, mas ainda não abre nada
+    $j("#rt-link-aviso").hidden = salvo;
+    $j("#rt-copiar-link").disabled = !ligado || !salvo;
+    $j("#rt-abrir-link").disabled = !ligado || !salvo;
   }
 
   async function copiarLink() {
@@ -728,7 +742,7 @@
     botao.disabled = true;
     let erro;
     if (atual) erro = await P.gravar("roteiros", "atualizar", dados, atual.id);
-    else erro = await P.gravar("roteiros", "inserir", dados);
+    else erro = await P.gravar("roteiros", "inserir", { ...dados, token: tokenNovo || gerarToken() });
     botao.disabled = false;
     if (erro) { P.toast(erro.replace("banco.sql", "roteiro.sql"), "erro"); return; }
     const eraNovo = !atual;
@@ -831,8 +845,9 @@
       if (!confirm(`Vou criar ${P.plural(escolhidas.length, "roteiro novo", "roteiros novos")}, um para cada marca escolhida. Pode ir?`)) return;
       botao.disabled = true;
       botao.textContent = "Gerando...";
+      // Cada cópia ganha o link dela, nunca o mesmo link de outra
       const copias = escolhidas.map((nome) => {
-        const c = { ...d, marca: nome };
+        const c = { ...d, marca: nome, token: gerarToken() };
         delete c.atualizado_em;
         return c;
       });
@@ -947,6 +962,7 @@
             <label class="rt-rotulo">Link de aprovação</label>
             <label class="rt-check"><input type="checkbox" id="rt-link-ligado" checked> Link ligado</label>
             <p class="rt-link-texto" id="rt-link-texto"></p>
+            <div class="aviso-suave" id="rt-link-aviso" hidden style="margin-top:0">${P.icone("alerta", "ico-p")}<span>Este já é o link deste roteiro. Ele começa a funcionar assim que você clicar em <b>Salvar</b>.</span></div>
             <div class="grupo-botoes">
               <button class="botao" type="button" id="rt-copiar-link">${P.icone("baixar", "ico-p")}Copiar link</button>
               <button class="botao" type="button" id="rt-abrir-link">${P.icone("olho", "ico-p")}Ver como a marca vê</button>
