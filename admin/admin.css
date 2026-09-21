@@ -376,6 +376,13 @@ tr.arrastando .alca{cursor:grabbing}
 .rt-titulo:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px var(--cor-marca)}
 .janela-roteiro .janela-corpo{display:grid;gap:14px}
 .rt-linha3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.rt-linha2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.rt-dica{margin-top:12px;padding:11px 13px;border-radius:var(--raio-sm);background:var(--azul-bem-suave);font-size:12.5px;line-height:1.6;display:grid;gap:4px}
+.rt-dica b{font-weight:700}
+.rt-coment{padding:10px 12px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:#fff}
+.rt-coment+.rt-coment{margin-top:8px}
+.rt-coment-topo{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rt-coment-texto{margin-top:4px;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
 .janela-roteiro .campo>label,.rt-rotulo{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-2)}
 .rt-rotulo .mudo{text-transform:none;letter-spacing:0;font-weight:500;margin-left:6px}
 .rt-visu{display:flex;align-items:flex-start;gap:6px;min-height:36px;font-size:12.5px;line-height:1.45}
@@ -444,7 +451,7 @@ tr.arrastando .alca{cursor:grabbing}
 .sc-hex{flex:1;min-width:0;min-height:32px;padding:5px 9px;border:1px solid var(--linha-forte);border-radius:8px;background:#fff;font-size:13px;text-transform:uppercase}
 
 @media (max-width:860px){
-  .rt-linha3{grid-template-columns:minmax(0,1fr)}
+  .rt-linha3,.rt-linha2{grid-template-columns:minmax(0,1fr)}
   .rt-editor{min-height:200px}
   .rt-palco{height:260px}
 }

@@ -17,6 +17,7 @@
   const corStatus = (s) => (STATUS.find((x) => x[0] === s) || [0, "cinza"])[1];
 
   const CATEGORIAS = ["Conteúdo para o meu perfil", "Conteúdo UGC", "Publicidade"];
+  const FORMATOS = ["Reels", "Collab", "Carrossel", "TikTok", "Anúncio"];
   const FONTES = [
     ["", "Fonte do painel"],
     ["Plus Jakarta Sans, sans-serif", "Plus Jakarta Sans"],
@@ -31,6 +32,7 @@
   let roteiros = [];
   let campanhas = [];
   let marcasBase = [];
+  let comentarios = [];
   let busca = "";
   let filtro = "todos";
   let atual = null;      // o roteiro aberto na janela
@@ -286,15 +288,17 @@
   async function carregar() {
     const avisos = P.$(".avisos", secao);
     P.limparAvisos(avisos);
-    const [rr, rc, rm] = await Promise.all([
+    const [rr, rc, rm, rk] = await Promise.all([
       P.lerSeguro("roteiros", (q) => q.order("criado_em", { ascending: false })),
       P.ler("campanhas"),
-      P.ler("marcas")
+      P.ler("marcas"),
+      P.ler("roteiro_comentarios")
     ]);
     if (rr.erro) P.avisar(avisos, rr.erro.replace("banco.sql", "roteiro.sql"));
     roteiros = rr.dados;
     campanhas = rc.dados;
     marcasBase = rm.dados;
+    comentarios = rk.erro ? [] : rk.dados;
     desenharLista();
   }
 
@@ -325,15 +329,17 @@
     alvo.innerHTML = `<div class="rt-grade">${lista.map((r) => {
       const campanha = campanhas.find((c) => c.id === r.campanha_id);
       const fotos = Array.isArray(r.moodboard) ? r.moodboard.length : 0;
+      const recados = comentarios.filter((c) => String(c.roteiro_id) === String(r.id)).length;
       return `<article class="rt-cartao" data-id="${P.esc(r.id)}" tabindex="0" role="button" style="${r.cor_ativa ? `--cor-marca:${P.esc(r.cor)}` : ""}">
         <span class="rt-fita${r.cor_ativa ? " rt-fita-marca" : ""}" aria-hidden="true"></span>
         <div class="rt-cartao-topo">
           <b>${P.esc(personalizar(r.marca, r.marca) || "Sem marca")}</b>
           ${P.pilula(r.status, corStatus(r.status))}
         </div>
-        <p class="mudo pequeno">${[r.produto, r.categoria].filter(Boolean).map(P.esc).join(" · ") || "Sem produto nem categoria"}</p>
+        <p class="mudo pequeno">${[r.produto, r.formato, r.categoria].filter(Boolean).map(P.esc).join(" · ") || "Sem produto nem categoria"}</p>
         <div class="rt-cartao-pes">
           ${campanha ? `<span class="pilula p-ciano" title="Trabalho vinculado">${P.esc(campanha.campanha || campanha.cliente)}</span>` : ""}
+          ${recados ? `<span class="pilula p-pessego" title="A marca comentou">${P.plural(recados, "comentário", "comentários")}</span>` : ""}
           ${fotos ? `<span class="mudo pequeno">${P.plural(fotos, "foto", "fotos")}</span>` : ""}
           <span class="mudo pequeno empurra">${r.visto_em ? `Visto ${P.esc(quando(r.visto_em))}` : "Ainda não visto"}</span>
         </div>
@@ -498,6 +504,8 @@
     $j("#rt-status").value = r ? r.status : "Rascunho";
     $j("#rt-produto").value = r ? r.produto : "";
     $j("#rt-categoria").value = r ? r.categoria : "";
+    $j("#rt-formato").value = (r && r.formato) || "";
+    $j("#rt-ideia").value = (r && r.ideia) || "";
     $j("#rt-dmin").value = r ? r.duracao_min : "";
     $j("#rt-dmax").value = r ? r.duracao_max : "";
     $j("#rt-campanha").innerHTML = opcoesDeCampanha(r ? r.campanha_id : "");
@@ -515,6 +523,7 @@
     desenharVisualizacao();
     desenharMoodboard();
     mostrarLink();
+    carregarComentarios();
 
     const janela = P.$("#janela-roteiro");
     if (typeof janela.showModal === "function") janela.showModal(); else janela.setAttribute("open", "");
@@ -533,6 +542,24 @@
     alvo.innerHTML = `<b>Visualizado ${P.esc(quando(atual.visto_em))}</b><br><span class="mudo">${P.esc(d.toLocaleString("pt-BR"))}${atual.visualizacoes > 1 ? `, ${P.plural(atual.visualizacoes, "vez", "vezes")}` : ""}</span>`;
   }
 
+  /* ---------- Comentários que a marca deixou no link ---------- */
+  async function carregarComentarios() {
+    const bloco = $j("#rt-coment-bloco");
+    if (!atual) { bloco.hidden = true; return; }
+    const r = await P.ler("roteiro_comentarios", (q) => q.eq("roteiro_id", atual.id).order("criado_em", { ascending: false }));
+    if (r.erro || !r.dados.length) { bloco.hidden = true; return; }
+    bloco.hidden = false;
+    $j("#rt-coment-conta").textContent = P.plural(r.dados.length, "comentário", "comentários");
+    $j("#rt-coment-lista").innerHTML = r.dados.map((c) => `
+      <article class="rt-coment">
+        <div class="rt-coment-topo">
+          <b>${P.esc(c.nome || "Sem nome")}</b>
+          <span class="mudo pequeno">${P.esc(quando(c.criado_em))}</span>
+        </div>
+        <p class="rt-coment-texto">${P.esc(c.texto)}</p>
+      </article>`).join("");
+  }
+
   async function conferirVisualizacao() {
     if (!atual) { P.toast("Salve o roteiro primeiro."); return; }
     const botao = $j("#rt-recarregar");
@@ -546,6 +573,7 @@
     desenharVisualizacao();
     const novo = roteiros.find((x) => x.id === atual.id);
     if (novo) { novo.visto_em = atual.visto_em; novo.visualizacoes = atual.visualizacoes; }
+    await carregarComentarios();
     P.toast(atual.visto_em ? (antes === atual.visto_em ? "Sem novidade desde a última vez." : "A marca abriu o roteiro.") : "A marca ainda não abriu.");
   }
 
@@ -725,6 +753,8 @@
       cor_ativa: $j("#rt-cor-ativa").checked,
       produto: $j("#rt-produto").value.trim().slice(0, 300),
       categoria: $j("#rt-categoria").value.trim().slice(0, 200),
+      formato: $j("#rt-formato").value,
+      ideia: $j("#rt-ideia").value.trim().slice(0, 4000),
       duracao_min: $j("#rt-dmin").value.trim().slice(0, 40),
       duracao_max: $j("#rt-dmax").value.trim().slice(0, 40),
       campanha_id: $j("#rt-campanha").value || null,
@@ -906,10 +936,23 @@
             </div>
           </div>
 
+          <div class="rt-linha2">
+            <div class="campo">
+              <label for="rt-categoria">Categoria</label>
+              <input id="rt-categoria" type="text" list="rt-categorias" placeholder="Ex: Conteúdo para o meu perfil" maxlength="200">
+              <datalist id="rt-categorias">${CATEGORIAS.map((c) => `<option value="${P.esc(c)}">`).join("")}</datalist>
+            </div>
+            <div class="campo">
+              <label for="rt-formato">Formato de conteúdo</label>
+              <select id="rt-formato"><option value="">Escolher</option>${FORMATOS.map((f) => `<option value="${P.esc(f)}">${P.esc(f)}</option>`).join("")}</select>
+              <span class="campo-ajuda">Aparece na etiqueta do cabeçalho, junto com a duração.</span>
+            </div>
+          </div>
+
           <div class="campo">
-            <label for="rt-categoria">Categoria</label>
-            <input id="rt-categoria" type="text" list="rt-categorias" placeholder="Ex: Conteúdo para o meu perfil" maxlength="200">
-            <datalist id="rt-categorias">${CATEGORIAS.map((c) => `<option value="${P.esc(c)}">`).join("")}</datalist>
+            <label for="rt-ideia">Ideia de conteúdo</label>
+            <textarea id="rt-ideia" rows="4" maxlength="4000" placeholder="Um resumo curto do objetivo desta campanha. Ex: mostrar a textura do produto e fechar com urgência para as novas vagas."></textarea>
+            <span class="campo-ajuda">Este resumo abre a página que a marca recebe. Se escrever uma linha começando com <b>Detalhes:</b>, ela vira uma etiqueta separada, como na sua referência.</span>
           </div>
 
           <div class="rt-bloco">
@@ -936,6 +979,13 @@
             </div>
             <div class="rt-editor vazio" id="rt-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Texto do roteiro" data-dica="Escreva seu roteiro aqui... gancho, desenvolvimento, CTA"></div>
             <p class="campo-ajuda">A marca vê isso no link de aprovação. Onde você escrever <b>{{marca}}</b>, entra o nome da marca sozinho.</p>
+            <div class="rt-dica">
+              <b>Como virar cenas na página da marca</b>
+              <p>Comece cada bloco com uma linha em <b>negrito</b>, por exemplo <b>GANCHO</b>, <b>PROBLEMA</b>, <b>SOLUÇÃO</b>, <b>CTA</b>. Cada bloco desses vira uma cena numerada.</p>
+              <p>Se escrever um tempo nessa mesma linha, como <b>0-5s</b>, ele aparece no canto direito da cena.</p>
+              <p>Dentro do bloco, linhas começando com <b>Narração:</b>, <b>Cena:</b> ou <b>Detalhes:</b> viram as etiquetas pequenas.</p>
+              <p class="mudo">Sem nenhuma linha em negrito, a página mostra o roteiro inteiro num bloco só.</p>
+            </div>
           </div>
 
           <div class="rt-bloco rt-bloco-mood">
@@ -956,6 +1006,11 @@
               </div>
               <span class="campo-ajuda">No link de aprovação, a marca clica na foto e vai direto para o produto.</span>
             </div>
+          </div>
+
+          <div class="rt-bloco" id="rt-coment-bloco" hidden>
+            <label class="rt-rotulo">Comentários da marca <span class="mudo pequeno" id="rt-coment-conta"></span></label>
+            <div id="rt-coment-lista"></div>
           </div>
 
           <div class="rt-link-caixa" id="rt-link-caixa" hidden>

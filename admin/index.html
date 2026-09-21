@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=12">
+<link rel="stylesheet" href="admin.css?v=13">
 </head>
 <!-- A página fica escondida até o script confirmar que você está logada -->
 <body hidden>
@@ -143,8 +143,8 @@
 
 <!-- Supabase, conexão e biblioteca do checklist -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
-<script src="../js/banco.js?v=12"></script>
-<script src="../js/biblioteca.js?v=12"></script>
+<script src="../js/banco.js?v=13"></script>
+<script src="../js/biblioteca.js?v=13"></script>
 
 <!-- PRIMEIRA COISA: conferir a sessão. Sem sessão, vai pro login. -->
 <script>
@@ -172,14 +172,14 @@ window.PAINEL_PRONTO = (async function conferirSessao() {
 </script>
 
 <!-- O painel em si, dividido por aba -->
-<script src="nucleo.js?v=12"></script>
-<script src="portfolio.js?v=12"></script>
-<script src="marcas.js?v=12"></script>
-<script src="prospeccao.js?v=12"></script>
-<script src="roteiro.js?v=12"></script>
-<script src="calendario.js?v=12"></script>
-<script src="campanhas.js?v=12"></script>
-<script src="checklist.js?v=12"></script>
+<script src="nucleo.js?v=13"></script>
+<script src="portfolio.js?v=13"></script>
+<script src="marcas.js?v=13"></script>
+<script src="prospeccao.js?v=13"></script>
+<script src="roteiro.js?v=13"></script>
+<script src="calendario.js?v=13"></script>
+<script src="campanhas.js?v=13"></script>
+<script src="checklist.js?v=13"></script>
 <script>
 // Só mostra a página depois que a sessão foi conferida
 window.PAINEL_PRONTO.then((sessao) => { if (sessao) Painel.iniciar(sessao); });
