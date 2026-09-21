@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Esta página nunca entra no Google nem aparece no site. Só quem tem o link abre. -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Roteiro</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a7ebf2'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='40' fill='%23173b43'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --creme:#f3eee9; --papel:#fbf8f5; --tinta:#173b43; --tinta-2:#5b5650;
+  --marca:#a7ebf2; --linha:rgba(23,59,67,.14); --linha-forte:rgba(23,59,67,.24);
+  --raio:16px; --fonte:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--creme);color:var(--tinta);font:15px/1.6 var(--fonte);-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+h1,h2,h3,p{margin:0}
+a{color:inherit}
+.embrulho{max-width:760px;margin:0 auto;padding:28px 18px 80px}
+
+/* Capa */
+.capa{position:relative;overflow:hidden;padding:30px 28px;border-radius:var(--raio);background:var(--tinta);color:#fff}
+.capa::after{content:"";position:absolute;right:-70px;top:-90px;width:240px;height:240px;border-radius:50%;background:var(--marca);opacity:.22}
+.capa-selo{position:relative;z-index:1;display:inline-block;padding:4px 12px;border-radius:999px;background:var(--marca);color:var(--tinta);font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.capa h1{position:relative;z-index:1;margin-top:12px;font-family:"Fraunces",Georgia,serif;font-size:clamp(28px,6vw,42px);line-height:1.1;font-weight:600}
+.capa p{position:relative;z-index:1;margin-top:8px;font-size:14px;color:rgba(255,255,255,.85)}
+.capa-de{position:relative;z-index:1;margin-top:18px;font-size:13px;color:rgba(255,255,255,.9)}
+
+/* Fichinha */
+.fichas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+.ficha{padding:12px 14px;border:1px solid var(--linha);border-left:4px solid var(--marca);border-radius:12px;background:var(--papel)}
+.ficha span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-2)}
+.ficha b{display:block;margin-top:3px;font-size:15px;overflow-wrap:anywhere}
+
+/* Blocos */
+.bloco{margin-top:22px;padding:22px 24px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
+.bloco>h2{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-2);margin-bottom:14px}
+.texto{font-size:16px;line-height:1.75;overflow-wrap:anywhere}
+.texto ul{list-style:none;padding-left:20px}
+.texto ul li::before{content:"- ";font-weight:700}
+.texto ol{padding-left:26px}
+.texto li{margin:3px 0}
+.texto a{color:#17606b;text-decoration:underline;text-underline-offset:3px}
+.texto p,.texto div{margin:0 0 10px}
+
+/* Moodboard */
+.palco{position:relative;height:340px;border-radius:12px;background:var(--creme);overflow:hidden}
+.pedaco{position:absolute;width:112px;height:112px;border-radius:12px;overflow:hidden;box-shadow:0 8px 20px -10px rgba(23,59,67,.6),0 0 0 3px #fff;text-decoration:none;display:block}
+.pedaco img{width:100%;height:100%;object-fit:cover;display:block}
+a.pedaco{transition:transform .15s}
+a.pedaco:hover,a.pedaco:focus-visible{transform:scale(1.06);z-index:999!important}
+a.pedaco::after{content:"";position:absolute;right:5px;bottom:5px;width:20px;height:20px;border-radius:50%;background:var(--tinta) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a7ebf2' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E") center/13px no-repeat}
+.legenda{margin-top:12px;font-size:12.5px;color:var(--tinta-2)}
+
+.rodape{margin-top:28px;text-align:center;font-size:12.5px;color:var(--tinta-2)}
+.aviso{max-width:520px;margin:12vh auto;padding:30px 26px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);text-align:center}
+.aviso h1{font-family:"Fraunces",Georgia,serif;font-size:26px;font-weight:600;margin-bottom:10px}
+.aviso p{color:var(--tinta-2);font-size:14px}
+.carregando{padding:14vh 20px;text-align:center;color:var(--tinta-2)}
+@media (max-width:640px){
+  .capa{padding:24px 20px}
+  .bloco{padding:18px}
+  .palco{height:290px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="tela"><p class="carregando">Abrindo o roteiro...</p></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+<script src="js/banco.js?v=10"></script>
+<script>
+(function () {
+  "use strict";
+  const tela = document.getElementById("tela");
+  const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+
+  function avisar(titulo, texto) {
+    tela.innerHTML = `<div class="aviso"><h1>${esc(titulo)}</h1><p>${esc(texto)}</p></div>`;
+  }
+
+  /* ---------- Limpeza do texto ----------
+     O roteiro vem do painel, mas mesmo assim eu só deixo passar
+     formatação de texto. Nada de script, nada de imagem de fora. */
+  const TAGS_OK = ["B", "STRONG", "I", "EM", "U", "S", "STRIKE", "SPAN", "DIV", "P", "BR", "UL", "OL", "LI", "A", "FONT", "H1", "H2", "H3", "BLOCKQUOTE"];
+  const ESTILOS_OK = ["color", "background-color", "font-weight", "font-style", "text-decoration", "text-align", "font-family", "font-size"];
+
+  function limparHtml(sujo) {
+    const caixa = document.createElement("div");
+    caixa.innerHTML = String(sujo || "");
+    const revisar = (no) => {
+      Array.from(no.children).forEach((filho) => {
+        if (!TAGS_OK.includes(filho.tagName)) { filho.replaceWith(document.createTextNode(filho.textContent || "")); return; }
+        Array.from(filho.attributes).forEach((a) => {
+          const nome = a.name.toLowerCase();
+          if (nome === "style") {
+            const limpo = a.value.split(";").map((p) => p.trim()).filter((p) => {
+              const prop = p.split(":")[0].trim().toLowerCase();
+              return ESTILOS_OK.includes(prop) && !/url\s*\(|expression|javascript:/i.test(p);
+            }).join("; ");
+            if (limpo) filho.setAttribute("style", limpo); else filho.removeAttribute("style");
+            return;
+          }
+          if (filho.tagName === "A" && nome === "href") {
+            if (!/^(https?:|mailto:)/i.test(a.value.trim())) filho.removeAttribute("href");
+            else { filho.setAttribute("target", "_blank"); filho.setAttribute("rel", "noopener noreferrer"); }
+            return;
+          }
+          if (filho.tagName === "FONT" && ["size", "color", "face"].includes(nome)) return;
+          if (nome === "target" || nome === "rel") return;
+          filho.removeAttribute(a.name);
+        });
+        revisar(filho);
+      });
+    };
+    revisar(caixa);
+    return caixa.innerHTML;
+  }
+
+  const personalizar = (t, marca) => {
+    const completo = String(marca || "").trim();
+    const primeiro = completo.split(/\s+/)[0] || completo;
+    return String(t || "").replace(/\{\{\s*marca\s*\}\}/gi, completo).replace(/\{\{\s*nome\s*\}\}/gi, primeiro);
+  };
+
+  const imagemSegura = (u) => /^https:\/\//i.test(String(u || "").trim());
+  const linkSeguro = (u) => /^https?:\/\//i.test(String(u || "").trim());
+
+  function desenhar(d) {
+    const marca = String(d.marca || "").trim() || "Seu roteiro";
+    const cor = /^#[0-9a-f]{3,8}$/i.test(String(d.cor || "")) ? d.cor : "";
+    if (cor) document.documentElement.style.setProperty("--marca", cor);
+    document.title = `Roteiro ${marca}`;
+
+    const duracao = [d.duracao_min, d.duracao_max].filter(Boolean).join(" a ");
+    const fichas = [
+      ["Produto", d.produto],
+      ["Categoria", d.categoria],
+      ["Duração prevista", duracao],
+      ["Situação", d.status]
+    ].filter((f) => f[1]);
+
+    const fotos = Array.isArray(d.moodboard) ? d.moodboard.filter((f) => imagemSegura(f.url)) : [];
+    const quando = d.atualizado_em ? new Date(d.atualizado_em) : null;
+
+    tela.innerHTML = `
+      <div class="embrulho">
+        <header class="capa">
+          <span class="capa-selo">Roteiro para aprovação</span>
+          <h1>${esc(marca)}</h1>
+          ${d.produto ? `<p>${esc(d.produto)}</p>` : ""}
+          <p class="capa-de">Enviado por Alanna Clara, criadora de conteúdo UGC</p>
+        </header>
+
+        ${fichas.length ? `<div class="fichas">${fichas.map(([r, v]) => `<div class="ficha"><span>${esc(r)}</span><b>${esc(v)}</b></div>`).join("")}</div>` : ""}
+
+        <section class="bloco">
+          <h2>Roteiro</h2>
+          <div class="texto" id="texto"></div>
+        </section>
+
+        ${fotos.length ? `
+        <section class="bloco">
+          <h2>Moodboard</h2>
+          <div class="palco">${fotos.map((f, i) => {
+            const estilo = `left:${num(f.x)}%;top:${num(f.y)}%;z-index:${num(f.z) || i + 1}`;
+            const img = `<img src="${esc(f.url)}" alt="Referência ${i + 1}" loading="lazy" referrerpolicy="no-referrer">`;
+            return linkSeguro(f.link)
+              ? `<a class="pedaco" style="${estilo}" href="${esc(f.link)}" target="_blank" rel="noopener noreferrer nofollow" title="Ver o produto">${img}</a>`
+              : `<div class="pedaco" style="${estilo}">${img}</div>`;
+          }).join("")}</div>
+          ${fotos.some((f) => linkSeguro(f.link)) ? `<p class="legenda">As fotos com a setinha no canto levam para o produto.</p>` : ""}
+        </section>` : ""}
+
+        <p class="rodape">
+          ${quando ? `Atualizado em ${esc(quando.toLocaleDateString("pt-BR"))} às ${esc(quando.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }))}.<br>` : ""}
+          Qualquer ajuste, é só responder no e-mail ou no WhatsApp que a gente combina.
+        </p>
+      </div>`;
+
+    document.getElementById("texto").innerHTML =
+      limparHtml(personalizar(d.roteiro, marca)) || `<p style="color:var(--tinta-2)">O roteiro ainda está sendo escrito.</p>`;
+  }
+
+  (async function abrir() {
+    const codigo = new URLSearchParams(location.search).get("r") || "";
+    if (!codigo) { avisar("Link incompleto", "Falta o código do roteiro no endereço. Peça o link de novo para a Alanna."); return; }
+    if (!window.banco) { avisar("Sem conexão", "Não consegui conectar agora. Confira a sua internet e recarregue a página."); return; }
+    try {
+      const { data, error } = await banco.rpc("abrir_roteiro", { p_token: codigo });
+      if (error) throw error;
+      if (!data) { avisar("Este link não está disponível", "Ele pode ter sido desligado ou o endereço pode estar incompleto. Peça um link novo para a Alanna."); return; }
+      desenhar(data);
+    } catch (e) {
+      avisar("Não consegui abrir agora", "Tente recarregar a página em alguns instantes.");
+    }
+  })();
+})();
+</script>
+</body>
+</html>
