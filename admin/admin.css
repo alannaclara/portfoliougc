@@ -385,6 +385,9 @@ tr.arrastando .alca{cursor:grabbing}
 .rt-cor{display:flex;align-items:center;gap:10px;min-height:36px}
 .rt-check{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-2);cursor:pointer}
 .rt-check input{width:16px;height:16px;accent-color:var(--tinta)}
+/* A caixinha de marcar não ganha o retângulo azul que os campos de texto ganham */
+.campo input[type="checkbox"]:focus,.rt-check input:focus,.campo-marcar input:focus,.tabela input[type="checkbox"]:focus{box-shadow:none;outline:none;border-color:transparent}
+.campo input[type="checkbox"]:focus-visible,.rt-check input:focus-visible,.campo-marcar input:focus-visible,.tabela input[type="checkbox"]:focus-visible{outline:2px solid var(--tinta-2);outline-offset:2px}
 .rt-bolinha{width:26px;height:26px;flex:none;border:1px solid var(--linha-forte);border-radius:50%;background:var(--azul);cursor:pointer;box-shadow:0 1px 3px rgba(23,59,67,.2)}
 .rt-bolinha:disabled{opacity:.35;cursor:default}
 .rt-duracao{display:flex;align-items:center;gap:8px}

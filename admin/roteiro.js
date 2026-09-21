@@ -143,7 +143,9 @@
         <input class="sc-hex" type="text" maxlength="7" spellcheck="false" aria-label="Código hex da cor">
         <button class="botao botao-icone sc-pipeta" type="button" title="Pegar uma cor da tela" aria-label="Pegar uma cor da tela">${P.icone("pipeta")}</button>
       </div>`;
-    document.body.appendChild(caixa);
+    // Tem que nascer DENTRO da janela aberta. Nascendo fora, ele aparece
+    // atrás dela e não aceita clique nenhum.
+    (botao.closest("dialog") || document.body).appendChild(caixa);
 
     const area = P.$(".sc-area", caixa);
     const bolinha = P.$(".sc-bolinha", caixa);
@@ -205,24 +207,29 @@
       } catch (e) { /* cancelou */ }
     });
 
-    const caixaBotao = botao.getBoundingClientRect();
-    caixa.style.left = `${Math.max(8, Math.min(window.innerWidth - 250, caixaBotao.left - 100))}px`;
-    caixa.style.top = `${Math.min(window.innerHeight - 300, caixaBotao.bottom + 8)}px`;
+    // Fica encostado no botão, sem passar da borda da tela
+    const c = botao.getBoundingClientRect();
+    const largura = 232, altura = 268;
+    caixa.style.left = `${Math.max(8, Math.min(window.innerWidth - largura - 8, c.left + c.width / 2 - largura / 2))}px`;
+    caixa.style.top = `${c.bottom + 8 + altura > window.innerHeight ? Math.max(8, c.top - altura - 8) : c.bottom + 8}px`;
     desenhar(false);
 
-    const foraDaCaixa = (e) => { if (!caixa.contains(e.target) && e.target !== botao) fecharSeletorDeCor(); };
+    const foraDaCaixa = (e) => { if (!caixa.contains(e.target) && e.target !== botao && !botao.contains(e.target)) fecharSeletorDeCor(); };
     const aoTeclar = (e) => { if (e.key === "Escape") { e.stopPropagation(); fecharSeletorDeCor(); } };
+    const aoRolar = (e) => { if (!caixa.contains(e.target)) fecharSeletorDeCor(); };
     setTimeout(() => {
       document.addEventListener("pointerdown", foraDaCaixa, true);
       document.addEventListener("keydown", aoTeclar, true);
+      document.addEventListener("scroll", aoRolar, true);
     }, 0);
-    seletor = { caixa, foraDaCaixa, aoTeclar };
+    seletor = { caixa, foraDaCaixa, aoTeclar, aoRolar };
     area.focus();
   }
   function fecharSeletorDeCor() {
     if (!seletor) return;
     document.removeEventListener("pointerdown", seletor.foraDaCaixa, true);
     document.removeEventListener("keydown", seletor.aoTeclar, true);
+    document.removeEventListener("scroll", seletor.aoRolar, true);
     seletor.caixa.remove();
     seletor = null;
   }
