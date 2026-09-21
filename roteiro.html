@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -7,67 +7,116 @@
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
 <title>Roteiro</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a7ebf2'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='40' fill='%23173b43'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f3eee9'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='40' fill='%23173b43'%3EA%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --creme:#f3eee9; --papel:#fbf8f5; --tinta:#173b43; --tinta-2:#5b5650;
-  --marca:#a7ebf2; --linha:rgba(23,59,67,.14); --linha-forte:rgba(23,59,67,.24);
-  --raio:16px; --fonte:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --creme:#f3eee9;          /* o fundo claro do portfólio */
+  --papel:#fbf8f5;
+  --tinta:#173b43;
+  --tinta-2:#5b5650;
+  --marca:#173b43;          /* trocada pela cor que ela escolhe no formulário */
+  --sobre-marca:#ffffff;    /* texto por cima da cor da marca, calculado no script */
+  --linha:rgba(23,59,67,.14);
+  --raio:16px;
+  --serifa:"Fraunces",Georgia,"Times New Roman",serif;
+  --fonte:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--creme);color:var(--tinta);font:15px/1.6 var(--fonte);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--creme);color:var(--tinta);font:15px/1.65 var(--fonte);-webkit-font-smoothing:antialiased}
 [hidden]{display:none!important}
 h1,h2,h3,p{margin:0}
 a{color:inherit}
-.embrulho{max-width:760px;margin:0 auto;padding:28px 18px 80px}
+:focus-visible{outline:2px solid var(--marca);outline-offset:3px;border-radius:4px}
+.pagina{max-width:760px;margin:0 auto;padding:26px 18px 70px}
 
-/* Capa */
-.capa{position:relative;overflow:hidden;padding:30px 28px;border-radius:var(--raio);background:var(--tinta);color:#fff}
-.capa::after{content:"";position:absolute;right:-70px;top:-90px;width:240px;height:240px;border-radius:50%;background:var(--marca);opacity:.22}
-.capa-selo{position:relative;z-index:1;display:inline-block;padding:4px 12px;border-radius:999px;background:var(--marca);color:var(--tinta);font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
-.capa h1{position:relative;z-index:1;margin-top:12px;font-family:"Fraunces",Georgia,serif;font-size:clamp(28px,6vw,42px);line-height:1.1;font-weight:600}
-.capa p{position:relative;z-index:1;margin-top:8px;font-size:14px;color:rgba(255,255,255,.85)}
-.capa-de{position:relative;z-index:1;margin-top:18px;font-size:13px;color:rgba(255,255,255,.9)}
+/* ---------- Cabeçalho ---------- */
+.capa{padding:30px 32px 32px;border-radius:var(--raio);background:var(--marca);color:var(--sobre-marca)}
+.capa-linha{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.assinatura{font-family:var(--serifa);font-style:italic;font-weight:600;font-size:17px}
+.etiqueta{font-size:10.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;opacity:.82}
+.capa h1{margin-top:18px;font-family:var(--serifa);font-style:italic;font-weight:600;font-size:clamp(27px,5.6vw,44px);line-height:1.08;letter-spacing:-.01em}
+.capa-sub{margin-top:10px;font-size:14px;opacity:.85}
+.capa-pilula{display:inline-block;margin-top:18px;padding:6px 13px;border-radius:7px;background:rgba(0,0,0,.24);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.capa.clara .capa-pilula{background:rgba(255,255,255,.55)}
 
-/* Fichinha */
-.fichas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
-.ficha{padding:12px 14px;border:1px solid var(--linha);border-left:4px solid var(--marca);border-radius:12px;background:var(--papel)}
-.ficha span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-2)}
-.ficha b{display:block;margin-top:3px;font-size:15px;overflow-wrap:anywhere}
+/* ---------- Seções ---------- */
+.secao{margin-top:34px}
+.titulo-secao{display:flex;align-items:center;gap:14px;margin-bottom:14px;font-size:10.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--tinta-2)}
+.titulo-secao::after{content:"";flex:1;height:1px;background:var(--linha)}
+.cartao{padding:22px 24px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
 
-/* Blocos */
-.bloco{margin-top:22px;padding:22px 24px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
-.bloco>h2{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-2);margin-bottom:14px}
-.texto{font-size:16px;line-height:1.75;overflow-wrap:anywhere}
-.texto ul{list-style:none;padding-left:20px}
-.texto ul li::before{content:"- ";font-weight:700}
-.texto ol{padding-left:26px}
-.texto li{margin:3px 0}
-.texto a{color:#17606b;text-decoration:underline;text-underline-offset:3px}
+/* ---------- Texto e etiquetas pequenas ---------- */
+.texto{font-size:15.5px;line-height:1.75;overflow-wrap:anywhere}
 .texto p,.texto div{margin:0 0 10px}
+.texto p:last-child{margin-bottom:0}
+.texto ul{list-style:none;padding-left:20px;margin:8px 0}
+.texto ul li::before{content:"- ";font-weight:700}
+.texto ol{padding-left:26px;margin:8px 0}
+.texto li{margin:3px 0}
+.texto a{color:var(--marca);text-decoration:underline;text-underline-offset:3px;font-weight:600}
+.rotulado+.rotulado{margin-top:16px}
+.rotulo{display:block;margin-bottom:4px;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-2)}
+.rotulado.fraco .texto{color:var(--tinta-2);font-size:14.5px}
 
-/* Moodboard */
-.palco{position:relative;height:340px;border-radius:12px;background:var(--creme);overflow:hidden}
-.pedaco{position:absolute;width:112px;height:112px;border-radius:12px;overflow:hidden;box-shadow:0 8px 20px -10px rgba(23,59,67,.6),0 0 0 3px #fff;text-decoration:none;display:block}
+/* ---------- Moodboard ---------- */
+.palco{position:relative;height:360px;border-radius:var(--raio);overflow:hidden}
+.pedaco{position:absolute;width:118px;height:118px;border-radius:10px;overflow:hidden;display:block;
+  box-shadow:0 10px 24px -12px rgba(23,59,67,.55),0 0 0 4px var(--papel)}
 .pedaco img{width:100%;height:100%;object-fit:cover;display:block}
-a.pedaco{transition:transform .15s}
-a.pedaco:hover,a.pedaco:focus-visible{transform:scale(1.06);z-index:999!important}
-a.pedaco::after{content:"";position:absolute;right:5px;bottom:5px;width:20px;height:20px;border-radius:50%;background:var(--tinta) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a7ebf2' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E") center/13px no-repeat}
-.legenda{margin-top:12px;font-size:12.5px;color:var(--tinta-2)}
+a.pedaco{cursor:pointer;transition:transform .25s ease,box-shadow .25s ease}
+a.pedaco:hover,a.pedaco:focus-visible{transform:scale(1.16);z-index:999!important;
+  box-shadow:0 22px 44px -14px rgba(23,59,67,.7),0 0 0 4px var(--papel)}
+/* a bolinha e a setinha, sempre legíveis: o círculo usa a cor da marca e a
+   seta usa a mesma cor de texto que o cabeçalho calculou */
+a.pedaco::before{content:"";position:absolute;right:6px;bottom:6px;width:21px;height:21px;border-radius:50%;background:var(--marca)}
+a.pedaco::after{content:"";position:absolute;right:6px;bottom:6px;width:21px;height:21px;background:var(--sobre-marca);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E") center/12px no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7M8 7h9v9'/%3E%3C/svg%3E") center/12px no-repeat}
+.legenda{margin-top:10px;font-size:12.5px;color:var(--tinta-2);text-align:center}
 
-.rodape{margin-top:28px;text-align:center;font-size:12.5px;color:var(--tinta-2)}
-.aviso{max-width:520px;margin:12vh auto;padding:30px 26px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);text-align:center}
-.aviso h1{font-family:"Fraunces",Georgia,serif;font-size:26px;font-weight:600;margin-bottom:10px}
+/* ---------- Cenas ---------- */
+.cena{padding:22px 24px 24px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
+.cena+.cena{margin-top:14px}
+.cena-topo{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cena-num{font-family:var(--serifa);font-weight:600;font-size:30px;line-height:1;color:var(--tinta);opacity:.3;letter-spacing:-.02em}
+.cena-palavra{margin-left:-6px;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-2)}
+.cena-tag{padding:3px 9px;border-radius:5px;background:var(--marca);color:var(--sobre-marca);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
+.cena-tempo{margin-left:auto;font-size:12px;color:var(--tinta-2);white-space:nowrap}
+.cena-sub{margin-top:12px;font-family:var(--serifa);font-style:italic;font-weight:600;font-size:19px}
+.cena-corpo{margin-top:14px}
+
+/* ---------- Comentário ---------- */
+.comentar h2{font-family:var(--serifa);font-style:italic;font-weight:600;font-size:22px}
+.comentar>p{margin-top:5px;font-size:14px;color:var(--tinta-2)}
+.comentar label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.comentar input,.comentar textarea{width:100%;margin-top:12px;padding:12px 14px;border:1px solid var(--linha);border-radius:10px;background:#fff;color:var(--tinta);font:15px/1.6 var(--fonte)}
+.comentar textarea{min-height:110px;resize:vertical}
+.comentar input:focus,.comentar textarea:focus{outline:none;border-color:var(--marca);box-shadow:0 0 0 3px color-mix(in srgb,var(--marca) 22%,transparent)}
+.botao-enviar{margin-top:14px;padding:13px 22px;border:0;border-radius:9px;background:var(--marca);color:var(--sobre-marca);font:700 11px/1 var(--fonte);letter-spacing:.17em;text-transform:uppercase;cursor:pointer}
+.botao-enviar:hover{filter:brightness(1.12)}
+.botao-enviar:disabled{opacity:.55;cursor:default}
+.recado{margin-top:12px;padding:11px 14px;border-radius:10px;background:var(--creme);font-size:13.5px}
+.recado.ruim{background:#fbe0da;color:#9a2c16}
+
+/* ---------- Rodapé ---------- */
+.rodape{margin-top:36px;text-align:center}
+.rodape .assinatura{font-size:20px}
+.rodape p{margin-top:6px;font-size:12.5px;color:var(--tinta-2)}
+
+.aviso{max-width:520px;margin:12vh auto;padding:32px 26px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);text-align:center}
+.aviso h1{font-family:var(--serifa);font-style:italic;font-weight:600;font-size:26px;margin-bottom:10px}
 .aviso p{color:var(--tinta-2);font-size:14px}
 .carregando{padding:14vh 20px;text-align:center;color:var(--tinta-2)}
+
 @media (max-width:640px){
-  .capa{padding:24px 20px}
-  .bloco{padding:18px}
-  .palco{height:290px}
+  .capa{padding:24px 20px 26px}
+  .cartao,.cena{padding:18px}
+  .palco{height:300px}
+  .pedaco{width:96px;height:96px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -77,25 +126,26 @@ a.pedaco::after{content:"";position:absolute;right:5px;bottom:5px;width:20px;hei
 <div id="tela"><p class="carregando">Abrindo o roteiro...</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
-<script src="js/banco.js?v=10"></script>
+<script src="js/banco.js?v=13"></script>
 <script>
 (function () {
   "use strict";
   const tela = document.getElementById("tela");
   const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+  let codigo = "";
 
-  function avisar(titulo, texto) {
-    tela.innerHTML = `<div class="aviso"><h1>${esc(titulo)}</h1><p>${esc(texto)}</p></div>`;
-  }
+  const avisar = (titulo, texto) => { tela.innerHTML = `<div class="aviso"><h1>${esc(titulo)}</h1><p>${esc(texto)}</p></div>`; };
 
-  /* ---------- Limpeza do texto ----------
-     O roteiro vem do painel, mas mesmo assim eu só deixo passar
-     formatação de texto. Nada de script, nada de imagem de fora. */
+  /* =====================================================================
+     LIMPEZA
+     O roteiro vem do painel, mas mesmo assim só deixo passar formatação
+     de texto. Nada de script, nada de imagem de fora.
+     ===================================================================== */
   const TAGS_OK = ["B", "STRONG", "I", "EM", "U", "S", "STRIKE", "SPAN", "DIV", "P", "BR", "UL", "OL", "LI", "A", "FONT", "H1", "H2", "H3", "BLOCKQUOTE"];
   const ESTILOS_OK = ["color", "background-color", "font-weight", "font-style", "text-decoration", "text-align", "font-family", "font-size"];
 
-  function limparHtml(sujo) {
+  function limpar(sujo) {
     const caixa = document.createElement("div");
     caixa.innerHTML = String(sujo || "");
     const revisar = (no) => {
@@ -104,11 +154,11 @@ a.pedaco::after{content:"";position:absolute;right:5px;bottom:5px;width:20px;hei
         Array.from(filho.attributes).forEach((a) => {
           const nome = a.name.toLowerCase();
           if (nome === "style") {
-            const limpo = a.value.split(";").map((p) => p.trim()).filter((p) => {
+            const ok = a.value.split(";").map((p) => p.trim()).filter((p) => {
               const prop = p.split(":")[0].trim().toLowerCase();
               return ESTILOS_OK.includes(prop) && !/url\s*\(|expression|javascript:/i.test(p);
             }).join("; ");
-            if (limpo) filho.setAttribute("style", limpo); else filho.removeAttribute("style");
+            if (ok) filho.setAttribute("style", ok); else filho.removeAttribute("style");
             return;
           }
           if (filho.tagName === "A" && nome === "href") {
@@ -124,7 +174,7 @@ a.pedaco::after{content:"";position:absolute;right:5px;bottom:5px;width:20px;hei
       });
     };
     revisar(caixa);
-    return caixa.innerHTML;
+    return caixa;
   }
 
   const personalizar = (t, marca) => {
@@ -136,42 +186,193 @@ a.pedaco::after{content:"";position:absolute;right:5px;bottom:5px;width:20px;hei
   const imagemSegura = (u) => /^https:\/\//i.test(String(u || "").trim());
   const linkSeguro = (u) => /^https?:\/\//i.test(String(u || "").trim());
 
+  /* ---------- Cor da marca: decide se o texto por cima fica branco ou escuro ---------- */
+  function corDaMarca(hex) {
+    const h = String(hex || "").replace("#", "").trim();
+    const c = h.length === 3 ? h.split("").map((x) => x + x).join("") : h;
+    if (!/^[0-9a-f]{6}$/i.test(c)) return null;
+    const canal = (i) => {
+      let v = parseInt(c.slice(i, i + 2), 16) / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    const luz = 0.2126 * canal(0) + 0.7152 * canal(2) + 0.0722 * canal(4);
+    return { hex: "#" + c.toLowerCase(), clara: luz > 0.42 };
+  }
+
+  /* =====================================================================
+     LEITURA DO ROTEIRO
+     Cada linha em negrito começa uma cena. Linhas "Narração:", "Cena:",
+     "Detalhes:" viram etiquetas pequenas.
+     ===================================================================== */
+  const TEMPO = /\d{1,3}\s*(?:s|seg|segundos)?\s*(?:a|à|até|-|–|—|\/)\s*\d{1,3}\s*(?:s|seg|segundos)?|\d{1,3}\s*(?:s|seg|segundos)\b/i;
+  const ROTULO = /^\s*([A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ ]{1,22}):\s*/;
+
+  // Junta só o texto que está em negrito dentro de uma linha
+  function textoEmNegrito(no) {
+    let saida = "";
+    Array.from(no.childNodes).forEach((n) => {
+      if (n.nodeType === 3) return;
+      if (n.nodeType !== 1) return;
+      const estilo = (n.getAttribute && n.getAttribute("style")) || "";
+      if (n.tagName === "B" || n.tagName === "STRONG" || /font-weight:\s*(bold|[6-9]00)/i.test(estilo)) saida += n.textContent;
+      else saida += textoEmNegrito(n);
+    });
+    return saida;
+  }
+
+  const semEspacos = (t) => String(t || "").replace(/\s+/g, "");
+
+  function ehTituloDeCena(el) {
+    const todo = el.textContent.trim();
+    if (!todo || todo.length > 80) return false;
+    if (/^H[1-3]$/.test(el.tagName)) return true;
+    if (el.tagName === "LI") return false;
+    const negrito = textoEmNegrito(el).trim();
+    if (!negrito) return false;
+    if (semEspacos(negrito) === semEspacos(todo)) return true;
+    // Aceita também "GANCHO 0-5s", onde só a palavra está em negrito
+    const resto = todo.replace(negrito, " ");
+    const semTempo = resto.replace(TEMPO, " ");
+    return semEspacos(semTempo).replace(/[()·|,.\-–—:/]/g, "") === "";
+  }
+
+  // Quebra o conteúdo limpo em linhas de primeiro nível
+  function linhasDe(caixa) {
+    const filhos = Array.from(caixa.children);
+    if (!filhos.length && caixa.textContent.trim()) {
+      const p = document.createElement("p");
+      p.innerHTML = caixa.innerHTML;
+      return [p];
+    }
+    const saida = [];
+    filhos.forEach((f) => {
+      if (f.tagName === "UL" || f.tagName === "OL") { saida.push(f); return; }
+      // um <div> que só embrulha outros blocos vira as linhas de dentro
+      if (f.tagName === "DIV" && f.children.length && Array.from(f.children).every((x) => ["P", "DIV", "UL", "OL"].includes(x.tagName))) {
+        linhasDe(f).forEach((l) => saida.push(l));
+        return;
+      }
+      saida.push(f);
+    });
+    return saida;
+  }
+
+  function separarCenas(caixa) {
+    const linhas = linhasDe(caixa);
+    const cenas = [];
+    let atual = null;
+    let solta = null; // tudo que vem antes da primeira cena fica junto, num bloco só
+    linhas.forEach((linha) => {
+      if (ehTituloDeCena(linha)) {
+        solta = null;
+        const bruto = linha.textContent.trim();
+        const achado = bruto.match(TEMPO);
+        const tempo = achado ? achado[0].trim() : "";
+        const etiqueta = bruto.replace(TEMPO, " ").replace(/[\s()·|,.\-–—:/]+$/g, "").replace(/^[\s()·|,.\-–—:/]+/g, "").trim();
+        atual = { etiqueta: etiqueta || bruto, tempo, linhas: [] };
+        cenas.push(atual);
+        return;
+      }
+      if (!linha.textContent.trim() && !linha.querySelector("li")) return;
+      if (atual) { atual.linhas.push(linha); return; }
+      if (!solta) { solta = { etiqueta: "", tempo: "", linhas: [], solta: true }; cenas.push(solta); }
+      solta.linhas.push(linha);
+    });
+    return cenas;
+  }
+
+  // Monta o corpo de uma cena, virando "Narração:" em etiqueta pequena
+  function corpoDaCena(linhas, semSubtitulo) {
+    let subtitulo = semSubtitulo ? "x" : "";
+    const partes = [];
+    linhas.forEach((linha) => {
+      const bruto = linha.textContent.trim();
+      const achado = linha.tagName === "P" || linha.tagName === "DIV" ? bruto.match(ROTULO) : null;
+      if (achado) {
+        const copia = linha.cloneNode(true);
+        tirarComeco(copia, achado[0].length);
+        partes.push(`<div class="rotulado"><span class="rotulo">${esc(achado[1].trim())}</span><div class="texto">${copia.innerHTML}</div></div>`);
+        return;
+      }
+      if (!subtitulo && !partes.length && bruto && bruto.length <= 60 && linha.tagName !== "UL" && linha.tagName !== "OL") {
+        subtitulo = bruto;
+        return;
+      }
+      partes.push(`<div class="texto">${linha.outerHTML}</div>`);
+    });
+    return { subtitulo: semSubtitulo ? "" : subtitulo, html: partes.join("") };
+  }
+
+  // Tira os primeiros N caracteres de texto de um elemento, mantendo a formatação do resto
+  function tirarComeco(el, quantos) {
+    let falta = quantos;
+    const andar = (no) => {
+      Array.from(no.childNodes).forEach((n) => {
+        if (falta <= 0) return;
+        if (n.nodeType === 3) {
+          const t = n.textContent;
+          if (t.length <= falta) { falta -= t.length; n.textContent = ""; }
+          else { n.textContent = t.slice(falta); falta = 0; }
+        } else if (n.nodeType === 1) andar(n);
+      });
+    };
+    andar(el);
+  }
+
+  /* ---------- A ideia de conteúdo, que é texto simples ---------- */
+  function blocosDaIdeia(texto) {
+    return String(texto || "").split(/\n{1,}/).map((l) => l.trim()).filter(Boolean).map((linha) => {
+      const achado = linha.match(ROTULO);
+      if (achado) return `<div class="rotulado"><span class="rotulo">${esc(achado[1].trim())}</span><div class="texto"><p>${esc(linha.slice(achado[0].length))}</p></div></div>`;
+      return `<div class="rotulado"><div class="texto"><p>${esc(linha)}</p></div></div>`;
+    }).join("");
+  }
+
+  /* =====================================================================
+     DESENHAR A PÁGINA
+     ===================================================================== */
   function desenhar(d) {
-    const marca = String(d.marca || "").trim() || "Seu roteiro";
-    const cor = /^#[0-9a-f]{3,8}$/i.test(String(d.cor || "")) ? d.cor : "";
-    if (cor) document.documentElement.style.setProperty("--marca", cor);
-    document.title = `Roteiro ${marca}`;
+    const marca = String(d.marca || "").trim();
+    const produto = personalizar(String(d.produto || "").trim(), marca);
+    const cor = corDaMarca(d.cor);
+    if (cor) {
+      document.documentElement.style.setProperty("--marca", cor.hex);
+      document.documentElement.style.setProperty("--sobre-marca", cor.clara ? "#173b43" : "#ffffff");
+    }
+    document.title = `Roteiro ${marca || produto || ""}`.trim();
 
     const duracao = [d.duracao_min, d.duracao_max].filter(Boolean).join(" a ");
-    const fichas = [
-      ["Produto", d.produto],
-      ["Categoria", d.categoria],
-      ["Duração prevista", duracao],
-      ["Situação", d.status]
-    ].filter((f) => f[1]);
+    const selo = [d.formato, duracao].filter(Boolean).join(" · ");
+    const titulo = [produto, marca].filter(Boolean).join(" - ");
 
     const fotos = Array.isArray(d.moodboard) ? d.moodboard.filter((f) => imagemSegura(f.url)) : [];
+    const caixa = limpar(personalizar(d.roteiro, marca));
+    const cenas = separarCenas(caixa);
+    const cenasDeVerdade = cenas.filter((c) => !c.solta);
     const quando = d.atualizado_em ? new Date(d.atualizado_em) : null;
 
     tela.innerHTML = `
-      <div class="embrulho">
-        <header class="capa">
-          <span class="capa-selo">Roteiro para aprovação</span>
-          <h1>${esc(marca)}</h1>
-          ${d.produto ? `<p>${esc(d.produto)}</p>` : ""}
-          <p class="capa-de">Enviado por Alanna Clara, criadora de conteúdo UGC</p>
+      <div class="pagina">
+
+        <header class="capa${cor && cor.clara ? " clara" : ""}">
+          <div class="capa-linha">
+            <span class="assinatura">Alanna Clara</span>
+            <span class="etiqueta">Roteiro para aprovação</span>
+          </div>
+          <h1>${esc(titulo || "Roteiro")}</h1>
+          ${d.categoria ? `<p class="capa-sub">${esc(d.categoria)}</p>` : ""}
+          ${selo ? `<span class="capa-pilula">${esc(selo)}</span>` : ""}
         </header>
 
-        ${fichas.length ? `<div class="fichas">${fichas.map(([r, v]) => `<div class="ficha"><span>${esc(r)}</span><b>${esc(v)}</b></div>`).join("")}</div>` : ""}
-
-        <section class="bloco">
-          <h2>Roteiro</h2>
-          <div class="texto" id="texto"></div>
-        </section>
+        ${d.ideia ? `
+        <section class="secao">
+          <h2 class="titulo-secao">Ideia de conteúdo</h2>
+          <div class="cartao">${blocosDaIdeia(personalizar(d.ideia, marca))}</div>
+        </section>` : ""}
 
         ${fotos.length ? `
-        <section class="bloco">
-          <h2>Moodboard</h2>
+        <section class="secao">
+          <h2 class="titulo-secao">Moodboard geral</h2>
           <div class="palco">${fotos.map((f, i) => {
             const estilo = `left:${num(f.x)}%;top:${num(f.y)}%;z-index:${num(f.z) || i + 1}`;
             const img = `<img src="${esc(f.url)}" alt="Referência ${i + 1}" loading="lazy" referrerpolicy="no-referrer">`;
@@ -179,21 +380,85 @@ a.pedaco::after{content:"";position:absolute;right:5px;bottom:5px;width:20px;hei
               ? `<a class="pedaco" style="${estilo}" href="${esc(f.link)}" target="_blank" rel="noopener noreferrer nofollow" title="Ver o produto">${img}</a>`
               : `<div class="pedaco" style="${estilo}">${img}</div>`;
           }).join("")}</div>
-          ${fotos.some((f) => linkSeguro(f.link)) ? `<p class="legenda">As fotos com a setinha no canto levam para o produto.</p>` : ""}
+          ${fotos.some((f) => linkSeguro(f.link)) ? `<p class="legenda">As fotos com a setinha levam para o produto. Passe o cursor por cima.</p>` : ""}
         </section>` : ""}
 
-        <p class="rodape">
-          ${quando ? `Atualizado em ${esc(quando.toLocaleDateString("pt-BR"))} às ${esc(quando.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }))}.<br>` : ""}
-          Qualquer ajuste, é só responder no e-mail ou no WhatsApp que a gente combina.
-        </p>
+        ${cenas.length ? `
+        <section class="secao">
+          <h2 class="titulo-secao">${cenasDeVerdade.length ? `Cenas · ${cenasDeVerdade.length}` : "Roteiro"}</h2>
+          ${cenas.map((c, i) => desenharCena(c, cenasDeVerdade.indexOf(c) + 1)).join("")}
+        </section>` : ""}
+
+        <section class="secao">
+          <div class="cartao comentar" id="comentar">
+            <h2>Deixar um comentário</h2>
+            <p>Alguma observação sobre o roteiro? Escreve aqui que eu recebo.</p>
+            <label for="c-nome">Seu nome</label>
+            <input id="c-nome" type="text" maxlength="120" placeholder="Seu nome (opcional)" autocomplete="name">
+            <label for="c-texto">Seu comentário</label>
+            <textarea id="c-texto" maxlength="4000" placeholder="Escreva seu comentário..."></textarea>
+            <button class="botao-enviar" type="button" id="c-enviar">Enviar comentário</button>
+            <p class="recado" id="c-recado" hidden></p>
+          </div>
+        </section>
+
+        <footer class="rodape">
+          <p class="assinatura">Alanna Clara</p>
+          <p>Dúvidas ou ajustes? É só responder a mensagem que te mandou esse link.</p>
+          ${quando ? `<p>Roteiro atualizado em ${esc(quando.toLocaleDateString("pt-BR"))} às ${esc(quando.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }))}.</p>` : ""}
+        </footer>
       </div>`;
 
-    document.getElementById("texto").innerHTML =
-      limparHtml(personalizar(d.roteiro, marca)) || `<p style="color:var(--tinta-2)">O roteiro ainda está sendo escrito.</p>`;
+    ligarComentario();
   }
 
+  function desenharCena(c, numero) {
+    const corpo = corpoDaCena(c.linhas, c.solta);
+    if (c.solta) return `<div class="cena">${corpo.html}</div>`;
+    return `<article class="cena">
+      <div class="cena-topo">
+        <span class="cena-num">${String(numero).padStart(2, "0")}</span>
+        <span class="cena-palavra">Cena</span>
+        ${c.etiqueta ? `<span class="cena-tag">${esc(c.etiqueta)}</span>` : ""}
+        ${c.tempo ? `<span class="cena-tempo">${esc(c.tempo)}</span>` : ""}
+      </div>
+      ${corpo.subtitulo ? `<p class="cena-sub">${esc(corpo.subtitulo)}</p>` : ""}
+      ${corpo.html ? `<div class="cena-corpo">${corpo.html}</div>` : ""}
+    </article>`;
+  }
+
+  /* ---------- Enviar o comentário ---------- */
+  function ligarComentario() {
+    const botao = document.getElementById("c-enviar");
+    const recado = document.getElementById("c-recado");
+    const mostrar = (texto, ruim) => {
+      recado.textContent = texto;
+      recado.className = "recado" + (ruim ? " ruim" : "");
+      recado.hidden = false;
+    };
+    botao.addEventListener("click", async () => {
+      const nome = document.getElementById("c-nome").value.trim();
+      const texto = document.getElementById("c-texto").value.trim();
+      if (texto.length < 2) { mostrar("Escreva o seu comentário antes de enviar.", true); return; }
+      botao.disabled = true;
+      botao.textContent = "Enviando...";
+      try {
+        const { data, error } = await banco.rpc("comentar_roteiro", { p_token: codigo, p_nome: nome, p_texto: texto });
+        if (error) throw error;
+        if (data === false) { mostrar("Não consegui enviar agora. Tente de novo daqui a pouco.", true); botao.disabled = false; botao.textContent = "Enviar comentário"; return; }
+        document.getElementById("comentar").innerHTML =
+          `<h2>Comentário enviado</h2><p>Obrigada! A Alanna já recebeu o que você escreveu e vai te responder.</p>`;
+      } catch (e) {
+        mostrar("Não consegui enviar agora. Confira a sua internet e tente de novo.", true);
+        botao.disabled = false;
+        botao.textContent = "Enviar comentário";
+      }
+    });
+  }
+
+  /* ---------- Começo ---------- */
   (async function abrir() {
-    const codigo = new URLSearchParams(location.search).get("r") || "";
+    codigo = new URLSearchParams(location.search).get("r") || "";
     if (!codigo) { avisar("Link incompleto", "Falta o código do roteiro no endereço. Peça o link de novo para a Alanna."); return; }
     if (!window.banco) { avisar("Sem conexão", "Não consegui conectar agora. Confira a sua internet e recarregue a página."); return; }
     try {
