@@ -356,6 +356,96 @@ tr.arrastando .alca{cursor:grabbing}
 .prosp-resumo-ok{font-size:14px;font-weight:700;color:var(--verde)}
 .prosp-resumo{margin-top:14px}
 
+/* =========================================================
+   ABA ROTEIRO
+   ========================================================= */
+.rt-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.rt-cartao{position:relative;overflow:hidden;padding:14px 16px 14px 18px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);cursor:pointer;transition:transform .15s,box-shadow .15s}
+.rt-cartao:hover{transform:translateY(-2px);box-shadow:var(--sombra)}
+.rt-fita{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--linha-forte)}
+.rt-fita-marca{background:var(--cor-marca,var(--azul))}
+.rt-cartao-topo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.rt-cartao-topo b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rt-cartao-pes{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+
+/* ---------- A janela do roteiro ---------- */
+.janela-roteiro{width:min(1000px,calc(100vw - 24px));--cor-marca:var(--azul)}
+.rt-topo{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--linha);background:var(--papel)}
+.rt-titulo{flex:1;min-width:0;min-height:42px;padding:8px 14px;border:1px solid var(--linha-forte);border-radius:var(--raio-sm);background:#fff;font-size:16px;font-weight:700}
+.rt-titulo::placeholder{font-weight:700;color:var(--tinta-2);opacity:.75}
+.rt-titulo:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px var(--cor-marca)}
+.janela-roteiro .janela-corpo{display:grid;gap:14px}
+.rt-linha3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.janela-roteiro .campo>label,.rt-rotulo{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-2)}
+.rt-rotulo .mudo{text-transform:none;letter-spacing:0;font-weight:500;margin-left:6px}
+.rt-visu{display:flex;align-items:flex-start;gap:6px;min-height:36px;font-size:12.5px;line-height:1.45}
+.rt-visu #rt-visu-texto{flex:1;min-width:0}
+#rt-recarregar.girando .ico{animation:rt-girar .8s linear infinite}
+@keyframes rt-girar{to{transform:rotate(360deg)}}
+.rt-cor{display:flex;align-items:center;gap:10px;min-height:36px}
+.rt-check{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-2);cursor:pointer}
+.rt-check input{width:16px;height:16px;accent-color:var(--tinta)}
+.rt-bolinha{width:26px;height:26px;flex:none;border:1px solid var(--linha-forte);border-radius:50%;background:var(--azul);cursor:pointer;box-shadow:0 1px 3px rgba(23,59,67,.2)}
+.rt-bolinha:disabled{opacity:.35;cursor:default}
+.rt-duracao{display:flex;align-items:center;gap:8px}
+.rt-duracao input{min-width:0}
+
+.rt-bloco{padding:14px;border:1px solid var(--linha);border-left:4px solid var(--cor-marca,var(--azul));border-radius:var(--raio);background:var(--creme)}
+.rt-bloco .campo-ajuda{margin-top:8px}
+.rt-barra{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:10px 0}
+.rt-bt{min-height:30px;min-width:30px;padding:3px 9px;border:1px solid var(--linha-forte);border-radius:8px;background:var(--papel);font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.rt-bt:hover{background:#fff;border-color:var(--tinta)}
+.rt-bt-cor .rt-letra{border-bottom:3px solid var(--tinta);line-height:1.1}
+.rt-bt-destaque{background:linear-gradient(to bottom,var(--papel) 60%,#fff3a3 60%)}
+.rt-sel{min-height:30px;padding:3px 8px;border:1px solid var(--linha-forte);border-radius:8px;background:var(--papel);font-size:12.5px;max-width:150px}
+.rt-sep{width:1px;height:20px;background:var(--linha-forte);margin:0 2px}
+.rt-editor{min-height:230px;max-height:50vh;overflow-y:auto;padding:14px 16px;border:1px solid var(--linha-forte);border-radius:var(--raio-sm);background:#fff;font-size:14px;line-height:1.7}
+.rt-editor:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px var(--cor-marca)}
+.rt-editor.vazio::before{content:attr(data-dica);color:var(--tinta-2);opacity:.8;pointer-events:none}
+.rt-editor ul{list-style:none;padding-left:20px}
+.rt-editor ul li::before{content:"- ";font-weight:700}
+.rt-editor ol{padding-left:26px}
+.rt-editor li{margin:2px 0}
+.rt-editor a{color:var(--ciano);text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- Moodboard ---------- */
+.rt-palco{position:relative;height:320px;margin-top:10px;border:1px dashed var(--linha-forte);border-radius:var(--raio-sm);background:#fff;overflow:hidden;touch-action:none}
+.rt-palco-vazio{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;font-size:13px;color:var(--tinta-2)}
+.rt-foto{position:absolute;width:112px;height:112px;border-radius:12px;overflow:hidden;background:var(--creme-2);box-shadow:0 8px 20px -10px rgba(23,59,67,.6),0 0 0 3px #fff;cursor:grab;touch-action:none}
+.rt-foto img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.rt-foto.arrastando{cursor:grabbing;box-shadow:0 16px 34px -12px rgba(23,59,67,.7),0 0 0 3px #fff}
+.rt-foto.escolhida{box-shadow:0 8px 20px -10px rgba(23,59,67,.6),0 0 0 3px var(--tinta)}
+.rt-foto-selo{position:absolute;right:5px;bottom:5px;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:var(--tinta);color:var(--azul)}
+.rt-foto-painel{margin-top:12px;padding:12px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel)}
+.rt-foto-painel label{display:block;font-size:12px;font-weight:600;margin-bottom:6px}
+.rt-foto-linha{display:flex;flex-wrap:wrap;gap:8px}
+.rt-foto-linha input{flex:1 1 220px;min-width:0;min-height:34px;padding:6px 10px;border:1px solid var(--linha-forte);border-radius:var(--raio-sm);background:#fff}
+
+/* ---------- Link de aprovação ---------- */
+.rt-link-caixa{display:grid;gap:8px;padding:14px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--azul-bem-suave)}
+.rt-link-texto{padding:8px 10px;border:1px solid var(--linha-forte);border-radius:var(--raio-sm);background:#fff;font-size:12px;overflow-wrap:anywhere}
+
+/* ---------- Seletor de cor ---------- */
+.seletor-cor{position:fixed;z-index:300;width:230px;padding:12px;border:1px solid var(--linha-forte);border-radius:var(--raio);background:var(--papel);box-shadow:0 24px 50px -20px rgba(23,59,67,.6)}
+.sc-abas{display:flex;gap:14px;margin-bottom:10px;border-bottom:1px solid var(--linha)}
+.sc-aba{padding-bottom:6px;font-size:12px;font-weight:600;color:var(--tinta-2)}
+.sc-aba.ativa{color:var(--tinta);box-shadow:inset 0 -2px 0 var(--tinta)}
+.sc-area{position:relative;height:130px;border-radius:8px;cursor:crosshair;touch-action:none}
+.sc-area:focus-visible{outline:2px solid var(--tinta);outline-offset:3px}
+.sc-bolinha{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.45);pointer-events:none}
+.sc-matiz{margin-top:10px}
+.sc-matiz input{width:100%;height:12px;-webkit-appearance:none;appearance:none;border-radius:99px;background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+.sc-matiz input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border:2px solid #fff;border-radius:50%;background:transparent;box-shadow:0 0 0 1px rgba(0,0,0,.45);cursor:pointer}
+.sc-matiz input::-moz-range-thumb{width:12px;height:12px;border:2px solid #fff;border-radius:50%;background:transparent;box-shadow:0 0 0 1px rgba(0,0,0,.45);cursor:pointer}
+.sc-baixo{display:flex;align-items:center;gap:6px;margin-top:10px}
+.sc-hex{flex:1;min-width:0;min-height:32px;padding:5px 9px;border:1px solid var(--linha-forte);border-radius:8px;background:#fff;font-size:13px;text-transform:uppercase}
+
+@media (max-width:860px){
+  .rt-linha3{grid-template-columns:minmax(0,1fr)}
+  .rt-editor{min-height:200px}
+  .rt-palco{height:260px}
+}
+
 /* ---------- Tela de espera e erro geral ---------- */
 .tela-cheia{min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}
 

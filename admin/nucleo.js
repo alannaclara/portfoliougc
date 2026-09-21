@@ -288,6 +288,7 @@
     portfolio: "Portfólio",
     marcas: "Marcas",
     prospeccao: "Prospecção",
+    roteiro: "Roteiro",
     calendario: "Calendário",
     campanhas: "Campanhas",
     checklist: "Checklist portfólio"

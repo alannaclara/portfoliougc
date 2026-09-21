@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=9">
+<link rel="stylesheet" href="admin.css?v=10">
 </head>
 <!-- A página fica escondida até o script confirmar que você está logada -->
 <body hidden>
@@ -43,6 +43,13 @@
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></symbol>
   <symbol id="i-carta" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3 7l9 6 9-6"/></symbol>
   <symbol id="i-expandir" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></symbol>
+  <symbol id="i-roteiro" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></symbol>
+  <symbol id="i-recarregar" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-pipeta" viewBox="0 0 24 24"><path d="M18 3.5a2.1 2.1 0 0 1 3 3l-2.4 2.4 1 1-2 2-1-1L9 18.5 5 20l1.5-4 7.6-7.6-1-1 2-2 1 1z"/></symbol>
+  <symbol id="i-caneta" viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M6 16l9.5-9.5a2.1 2.1 0 0 1 3 3L9 19H6z"/></symbol>
+  <symbol id="i-al-esq" viewBox="0 0 24 24"><path d="M4 6h16M4 11h10M4 16h14M4 21h8"/></symbol>
+  <symbol id="i-al-centro" viewBox="0 0 24 24"><path d="M4 6h16M7 11h10M5 16h14M8 21h8"/></symbol>
+  <symbol id="i-al-dir" viewBox="0 0 24 24"><path d="M4 6h16M10 11h10M6 16h14M12 21h8"/></symbol>
 </svg>
 
 <div class="app">
@@ -61,6 +68,7 @@
       </div>
       <div class="menu-grupo">
         <p class="menu-rotulo">Minha rotina</p>
+        <a class="menu-item" href="#roteiro" data-aba="roteiro"><svg class="ico"><use href="#i-roteiro"/></svg>Roteiro</a>
         <a class="menu-item" href="#calendario" data-aba="calendario"><svg class="ico"><use href="#i-calendario"/></svg>Calendário</a>
         <a class="menu-item" href="#campanhas" data-aba="campanhas"><svg class="ico"><use href="#i-campanhas"/></svg>Campanhas</a>
         <a class="menu-item" href="#checklist" data-aba="checklist"><svg class="ico"><use href="#i-checklist"/></svg>Checklist</a>
@@ -92,6 +100,7 @@
       <section class="aba" id="aba-portfolio" hidden></section>
       <section class="aba" id="aba-marcas" hidden></section>
       <section class="aba" id="aba-prospeccao" hidden></section>
+      <section class="aba" id="aba-roteiro" hidden></section>
       <section class="aba" id="aba-calendario" hidden></section>
       <section class="aba" id="aba-campanhas" hidden></section>
       <section class="aba" id="aba-checklist" hidden></section>
@@ -127,12 +136,15 @@
   <div class="janela-corpo" id="janela-ver-corpo"></div>
 </dialog>
 
+<!-- Janela do roteiro. O conteúdo é montado pelo roteiro.js -->
+<dialog class="janela janela-roteiro" id="janela-roteiro" aria-labelledby="rt-titulo-janela"></dialog>
+
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <!-- Supabase, conexão e biblioteca do checklist -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
-<script src="../js/banco.js?v=9"></script>
-<script src="../js/biblioteca.js?v=9"></script>
+<script src="../js/banco.js?v=10"></script>
+<script src="../js/biblioteca.js?v=10"></script>
 
 <!-- PRIMEIRA COISA: conferir a sessão. Sem sessão, vai pro login. -->
 <script>
@@ -160,13 +172,14 @@ window.PAINEL_PRONTO = (async function conferirSessao() {
 </script>
 
 <!-- O painel em si, dividido por aba -->
-<script src="nucleo.js?v=9"></script>
-<script src="portfolio.js?v=9"></script>
-<script src="marcas.js?v=9"></script>
-<script src="prospeccao.js?v=9"></script>
-<script src="calendario.js?v=9"></script>
-<script src="campanhas.js?v=9"></script>
-<script src="checklist.js?v=9"></script>
+<script src="nucleo.js?v=10"></script>
+<script src="portfolio.js?v=10"></script>
+<script src="marcas.js?v=10"></script>
+<script src="prospeccao.js?v=10"></script>
+<script src="roteiro.js?v=10"></script>
+<script src="calendario.js?v=10"></script>
+<script src="campanhas.js?v=10"></script>
+<script src="checklist.js?v=10"></script>
 <script>
 // Só mostra a página depois que a sessão foi conferida
 window.PAINEL_PRONTO.then((sessao) => { if (sessao) Painel.iniciar(sessao); });
