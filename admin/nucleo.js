@@ -292,7 +292,8 @@
     transcricao: "Transcrições",
     calendario: "Calendário",
     campanhas: "Campanhas",
-    checklist: "Checklist portfólio"
+    checklist: "Checklist portfólio",
+    automacoes: "Automações"
   };
 
   async function irPara(aba) {
