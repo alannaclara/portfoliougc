@@ -495,3 +495,76 @@ tr.arrastando .alca{cursor:grabbing}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;animation:none!important}
 }
+
+/* =========================================================
+   ABA TRANSCRIÇÕES
+   ========================================================= */
+.tr-capa{position:relative;overflow:hidden;margin-bottom:14px;padding:20px 24px;border-radius:var(--raio);background:linear-gradient(130deg,#173b43 0%,#22626d 55%,#3d9aa4 100%);color:#fff}
+.tr-capa::after{content:"";position:absolute;right:-60px;top:-80px;width:230px;height:230px;border-radius:50%;background:rgba(167,235,242,.16);pointer-events:none}
+.tr-capa-texto{position:relative;z-index:1;max-width:620px}
+.tr-selo{display:grid;place-items:center;width:36px;height:36px;margin-bottom:10px;border-radius:11px;background:rgba(167,235,242,.9);color:#173b43}
+.tr-capa h2{font-size:19px;font-weight:700}
+.tr-capa p{margin-top:5px;font-size:13.5px;line-height:1.6;color:rgba(255,255,255,.88)}
+
+.tr-linha{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}
+.tr-campo-link{flex:1 1 320px;min-width:0;display:block}
+.tr-campo-link input{width:100%;min-height:38px;padding:7px 12px;border:1px solid var(--linha-forte);border-radius:var(--raio-sm);background:#fff;font-size:14px}
+.tr-campo-link input:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px var(--azul)}
+.tr-linha .selecao{min-height:38px}
+.tr-linha .botao{min-height:38px}
+
+.tr-aviso{margin-bottom:14px;padding:12px 14px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);font-size:13.5px;line-height:1.6}
+.tr-aviso:empty{display:none}
+.tr-aviso b{display:flex;align-items:center;gap:7px;font-weight:700}
+.tr-aviso p{margin-top:4px}
+.tr-aviso .grupo-botoes{margin-top:10px}
+.tr-aviso-info{background:var(--azul-bem-suave);border-color:var(--azul-suave)}
+.tr-aviso-ok{background:var(--verde-fundo);border-color:rgba(29,101,50,.25);color:var(--verde)}
+.tr-aviso-erro{background:var(--vermelho-fundo);border-color:rgba(154,44,22,.25);color:var(--vermelho)}
+.tr-aviso-trabalhando{background:var(--amarelo-fundo);border-color:rgba(122,83,0,.25);color:var(--amarelo)}
+.tr-aviso-trabalhando .ico{animation:tr-pulsa 1.6s ease-in-out infinite}
+@keyframes tr-pulsa{0%,100%{opacity:1}50%{opacity:.35}}
+.tr-passos{margin:6px 0 0;padding-left:20px;display:grid;gap:4px}
+
+.tr-config{margin-bottom:14px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
+.tr-config>summary{display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:13px;cursor:pointer;list-style:none}
+.tr-config>summary::-webkit-details-marker{display:none}
+.tr-config>summary .mudo{margin-left:auto}
+.tr-config-corpo{padding:0 14px 14px;display:grid;gap:8px}
+.tr-config-linha{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tr-config-linha .tr-campo-link{flex:1 1 240px;max-width:360px}
+
+.tr-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:14px}
+.tr-card{display:grid;grid-template-columns:150px minmax(0,1fr);gap:0;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);overflow:hidden}
+.tr-card-falhou{border-color:rgba(154,44,22,.3)}
+.tr-capa-video{position:relative;display:grid;place-items:center;gap:6px;aspect-ratio:9/16;max-height:290px;background:linear-gradient(160deg,var(--creme-2),rgba(167,235,242,.45));color:var(--tinta-2);font-size:11.5px;text-align:center}
+.tr-capa-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.tr-capa-video .ico{width:22px;height:22px}
+.tr-capa-espera .ico{animation:tr-gira 2s linear infinite}
+@keyframes tr-gira{to{transform:rotate(360deg)}}
+.tr-ver{min-height:30px;padding:4px 10px;font-size:12px}
+.tr-card-corpo{min-width:0;padding:13px 14px;display:flex;flex-direction:column;gap:7px}
+.tr-card-topo{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tr-card-topo b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-card-quem{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12.5px}
+.tr-card-quem span:first-child{font-weight:600}
+.tr-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tr-trecho{font-size:13px;line-height:1.6;color:var(--tinta-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tr-motivo{padding:8px 10px;border-radius:var(--raio-sm);background:var(--vermelho-fundo);color:var(--vermelho);font-size:12.5px;line-height:1.55}
+.tr-espera{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--raio-sm);background:var(--amarelo-fundo);color:var(--amarelo);font-size:12.5px;line-height:1.55}
+.tr-espera .ico{flex:none;margin-top:1px;animation:tr-gira 2s linear infinite}
+.tr-card-acoes{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:auto;padding-top:4px}
+.tr-card-acoes .botao{min-height:30px;padding:4px 10px;font-size:12px}
+.tr-card-acoes .botao-icone{width:30px;padding:0}
+
+@media (max-width:860px){
+  .tr-linha{flex-direction:column;align-items:stretch}
+  /* em coluna, o "flex:1 1 320px" viraria ALTURA de 320px no campo do link */
+  .tr-linha .tr-campo-link,.tr-config-linha .tr-campo-link{flex:none}
+  .tr-linha .selecao,.tr-linha .botao{width:100%}
+  .tr-grade{grid-template-columns:minmax(0,1fr)}
+  .tr-card{grid-template-columns:118px minmax(0,1fr)}
+  .tr-capa-video{max-height:210px}
+  .tr-config-linha{flex-direction:column;align-items:stretch}
+  .tr-config-linha .tr-campo-link{max-width:none}
+}

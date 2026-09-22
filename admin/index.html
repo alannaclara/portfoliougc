@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=13">
+<link rel="stylesheet" href="admin.css?v=14">
 </head>
 <!-- A página fica escondida até o script confirmar que você está logada -->
 <body hidden>
@@ -50,6 +50,10 @@
   <symbol id="i-al-esq" viewBox="0 0 24 24"><path d="M4 6h16M4 11h10M4 16h14M4 21h8"/></symbol>
   <symbol id="i-al-centro" viewBox="0 0 24 24"><path d="M4 6h16M7 11h10M5 16h14M8 21h8"/></symbol>
   <symbol id="i-al-dir" viewBox="0 0 24 24"><path d="M4 6h16M10 11h10M6 16h14M12 21h8"/></symbol>
+  <symbol id="i-legenda" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M7 11h4M7 15h7M15 11h2"/></symbol>
+  <symbol id="i-chave" viewBox="0 0 24 24"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M15.5 12v2.5"/></symbol>
+  <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></symbol>
 </svg>
 
 <div class="app">
@@ -69,6 +73,7 @@
       <div class="menu-grupo">
         <p class="menu-rotulo">Minha rotina</p>
         <a class="menu-item" href="#roteiro" data-aba="roteiro"><svg class="ico"><use href="#i-roteiro"/></svg>Roteiro</a>
+        <a class="menu-item" href="#transcricao" data-aba="transcricao"><svg class="ico"><use href="#i-legenda"/></svg>Transcrição</a>
         <a class="menu-item" href="#calendario" data-aba="calendario"><svg class="ico"><use href="#i-calendario"/></svg>Calendário</a>
         <a class="menu-item" href="#campanhas" data-aba="campanhas"><svg class="ico"><use href="#i-campanhas"/></svg>Campanhas</a>
         <a class="menu-item" href="#checklist" data-aba="checklist"><svg class="ico"><use href="#i-checklist"/></svg>Checklist</a>
@@ -101,6 +106,7 @@
       <section class="aba" id="aba-marcas" hidden></section>
       <section class="aba" id="aba-prospeccao" hidden></section>
       <section class="aba" id="aba-roteiro" hidden></section>
+      <section class="aba" id="aba-transcricao" hidden></section>
       <section class="aba" id="aba-calendario" hidden></section>
       <section class="aba" id="aba-campanhas" hidden></section>
       <section class="aba" id="aba-checklist" hidden></section>
@@ -143,8 +149,8 @@
 
 <!-- Supabase, conexão e biblioteca do checklist -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
-<script src="../js/banco.js?v=13"></script>
-<script src="../js/biblioteca.js?v=13"></script>
+<script src="../js/banco.js?v=14"></script>
+<script src="../js/biblioteca.js?v=14"></script>
 
 <!-- PRIMEIRA COISA: conferir a sessão. Sem sessão, vai pro login. -->
 <script>
@@ -172,14 +178,15 @@ window.PAINEL_PRONTO = (async function conferirSessao() {
 </script>
 
 <!-- O painel em si, dividido por aba -->
-<script src="nucleo.js?v=13"></script>
-<script src="portfolio.js?v=13"></script>
-<script src="marcas.js?v=13"></script>
-<script src="prospeccao.js?v=13"></script>
-<script src="roteiro.js?v=13"></script>
-<script src="calendario.js?v=13"></script>
-<script src="campanhas.js?v=13"></script>
-<script src="checklist.js?v=13"></script>
+<script src="nucleo.js?v=14"></script>
+<script src="portfolio.js?v=14"></script>
+<script src="marcas.js?v=14"></script>
+<script src="prospeccao.js?v=14"></script>
+<script src="roteiro.js?v=14"></script>
+<script src="transcricao.js?v=14"></script>
+<script src="calendario.js?v=14"></script>
+<script src="campanhas.js?v=14"></script>
+<script src="checklist.js?v=14"></script>
 <script>
 // Só mostra a página depois que a sessão foi conferida
 window.PAINEL_PRONTO.then((sessao) => { if (sessao) Painel.iniciar(sessao); });
