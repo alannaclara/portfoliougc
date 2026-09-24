@@ -478,7 +478,45 @@ tr.arrastando .alca{cursor:grabbing}
 .vg-par{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:16px}
 .vg-par .dicas li+li{margin-top:10px}
 .vg-par .cartao-topo .pilula{margin-left:auto}
-@media (max-width:860px){.vg-par{grid-template-columns:minmax(0,1fr)}}
+
+/* O estrategista: a leitura em frases, cada uma com um sinal de cor */
+.vg-leitura{display:grid;gap:10px}
+.vg-linha{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:start;font-size:13.5px;line-height:1.55}
+.vg-linha .ico{width:18px;height:18px;margin-top:2px}
+.vg-bom{color:var(--verde)}
+.vg-atencao{color:var(--amarelo)}
+.vg-ideia{color:var(--lilas)}
+.vg-linha b{font-weight:700}
+.vg-foco{margin-top:14px;padding:12px 14px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--azul-bem-suave)}
+.vg-foco p:first-child{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--tinta-2);margin-bottom:4px}
+
+/* Gráficos de barra com número variável de colunas */
+.vg-grafico{display:grid;grid-template-columns:repeat(var(--barras,30),minmax(0,1fr));gap:3px;align-items:end;height:150px;padding-top:16px}
+.vg-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+.vg-barra{width:100%;min-height:2px;border-radius:3px 3px 1px 1px;background:var(--azul);border:1px solid rgba(23,59,67,.22)}
+.vg-col.alto .vg-barra{background:var(--tinta);border-color:var(--tinta)}
+.vg-eixo{display:flex;justify-content:space-between;margin-top:8px;font-size:10.5px;color:var(--tinta-2)}
+
+/* As caixas de leitura: funcionando, piorando, oportunidade, o que fazer */
+.vg-caixas{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.vg-caixa{padding:12px 14px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel)}
+.vg-caixa h3{display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:12.5px;font-weight:700}
+.vg-caixa ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.5;display:grid;gap:5px;color:var(--tinta-2)}
+.vg-caixa.boa{background:var(--verde-fundo);border-color:rgba(29,101,50,.25)}
+.vg-caixa.boa h3{color:var(--verde)}
+.vg-caixa.ruim{background:var(--vermelho-fundo);border-color:rgba(154,44,22,.22)}
+.vg-caixa.ruim h3{color:var(--vermelho)}
+.vg-caixa.chance{background:var(--amarelo-fundo);border-color:rgba(122,83,0,.22)}
+.vg-caixa.chance h3{color:var(--amarelo)}
+
+.vg-leitura-tabela{font-size:12.5px;color:var(--tinta-2);max-width:46ch}
+.vg-sobe{color:var(--verde);font-weight:600}
+.vg-desce{color:var(--vermelho);font-weight:600}
+
+@media (max-width:860px){
+  .vg-par{grid-template-columns:minmax(0,1fr)}
+  .vg-grafico{height:120px}
+}
 
 /* ---------- Tela de espera e erro geral ---------- */
 .tela-cheia{min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}
