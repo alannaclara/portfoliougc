@@ -288,6 +288,7 @@
     portfolio: "Portfólio",
     marcas: "Marcas",
     prospeccao: "Prospecção",
+    cupons: "Cupons",
     roteiro: "Roteiro",
     transcricao: "Transcrições",
     calendario: "Calendário",
