@@ -144,10 +144,27 @@ h1,h2,h3,h4,p{margin:0}
 .ordenar:hover{color:var(--tinta)}
 .ordenar .seta-ord{font-size:11px;opacity:.35}
 .ordenar[aria-sort] .seta-ord,th[aria-sort] .seta-ord{opacity:1;color:var(--tinta)}
-.alca{width:28px;height:28px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;color:var(--tinta-2);cursor:grab;touch-action:none}
+/* Alcinha grande o bastante para acertar com o dedo. O touch-action
+   none é o que impede o celular de rolar a página quando você a segura. */
+.alca{width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:8px;background:transparent;color:var(--tinta-2);cursor:grab;touch-action:none;transition:background-color .15s,color .15s}
 .alca:hover{background:var(--creme-2);color:var(--tinta)}
-tr.arrastando{background:var(--azul-suave)!important;box-shadow:var(--sombra)}
-tr.arrastando .alca{cursor:grabbing}
+.alca .ico{width:20px;height:20px;pointer-events:none}
+
+/* A linha que você segura acompanha o dedo, sem transição nenhuma,
+   senão ela ficaria correndo atrás do cursor. O fundo precisa ser cor
+   sólida: o --azul-suave tem transparência e deixaria a linha de baixo
+   aparecer através do texto. */
+tr.arrastando{position:relative;z-index:5;transition:none!important;box-shadow:var(--sombra)}
+tr.arrastando td{background:var(--ciano-fundo)}
+tr.arrastando .alca{cursor:grabbing;background:var(--azul)}
+
+/* As outras abrem espaço com calma */
+tr.deslizando{transition:transform .18s cubic-bezier(.22,.61,.36,1)}
+tr.deslizando:hover{background:transparent}
+
+@media (prefers-reduced-motion:reduce){
+  tr.deslizando{transition:none}
+}
 .link-tabela{color:var(--tinta);text-decoration:underline;text-decoration-color:var(--linha-forte);text-underline-offset:3px}
 .link-tabela:hover{text-decoration-color:var(--tinta)}
 

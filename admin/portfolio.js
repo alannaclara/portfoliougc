@@ -445,27 +445,97 @@
     });
   }
 
-  /* ---------- Arrastar pela alcinha para mudar a ordem ---------- */
+  /* ---------- Arrastar pela alcinha para mudar a ordem ----------
+     A linha que você segura acompanha o dedo, e as outras deslizam
+     para abrir o espaço. Nada muda de lugar no HTML enquanto você
+     arrasta: só quando solta. É isso que deixa o movimento liso.
+
+     As posições são medidas UMA vez, no começo, e em coordenadas da
+     página inteira, não da tela. Assim a conta continua certa mesmo
+     se a página rolar no meio do arrasto. */
   function prepararArrasto(corpo) {
+    let arrasto = null;
+
+    function medir(alca, evento) {
+      const linha = alca.closest("tr");
+      const linhas = P.$$("tr[data-id]", corpo);
+      const de = linhas.indexOf(linha);
+      if (de < 0) return null;
+      const rolagem = window.scrollY;
+      const caixas = linhas.map((l) => {
+        const c = l.getBoundingClientRect();
+        return { meio: c.top + rolagem + c.height / 2, altura: c.height };
+      });
+      return {
+        alca, linha, linhas, caixas, de, para: de,
+        altura: caixas[de].altura,
+        inicio: evento.clientY + rolagem
+      };
+    }
+
+    // Empurra cada linha uma altura para cima ou para baixo, conforme
+    // o lugar onde a linha arrastada vai cair.
+    function abrirEspaco() {
+      const { linhas, de, para, altura } = arrasto;
+      linhas.forEach((l, i) => {
+        if (i === de) return;
+        let desloca = 0;
+        if (de < para && i > de && i <= para) desloca = -altura;
+        if (de > para && i >= para && i < de) desloca = altura;
+        l.style.transform = desloca ? `translateY(${desloca}px)` : "";
+      });
+    }
+
+    function mover(ev) {
+      if (!arrasto) return;
+      const agora = ev.clientY + window.scrollY;
+      const desloca = agora - arrasto.inicio;
+      arrasto.linha.style.transform = `translateY(${desloca}px)`;
+
+      // Rola a página quando o dedo chega perto da borda
+      const borda = 90;
+      if (ev.clientY < borda) window.scrollBy(0, -14);
+      else if (ev.clientY > window.innerHeight - borda) window.scrollBy(0, 14);
+
+      // Onde está o centro da linha arrastada agora
+      const centro = arrasto.caixas[arrasto.de].meio + desloca;
+      let para = arrasto.de;
+      arrasto.caixas.forEach((c, i) => {
+        if (i === arrasto.de) return;
+        if (i > arrasto.de && centro > c.meio) para = Math.max(para, i);
+        if (i < arrasto.de && centro < c.meio) para = Math.min(para, i);
+      });
+      if (para !== arrasto.para) {
+        arrasto.para = para;
+        abrirEspaco();
+      }
+    }
+
+    function soltar() {
+      if (!arrasto) return;
+      const { alca, linha, linhas, de, para } = arrasto;
+      alca.removeEventListener("pointermove", mover);
+
+      // Tira os deslocamentos e só agora mexe de verdade no HTML
+      linhas.forEach((l) => { l.style.transform = ""; l.classList.remove("deslizando"); });
+      linha.classList.remove("arrastando");
+      if (para !== de) {
+        const vizinha = linhas[para];
+        corpo.insertBefore(linha, para > de ? vizinha.nextSibling : vizinha);
+      }
+      arrasto = null;
+      salvarOrdem();
+    }
+
     corpo.addEventListener("pointerdown", (e) => {
       const alca = e.target.closest("[data-alca]");
-      if (!alca) return;
+      if (!alca || arrasto) return;
       e.preventDefault();
-      const linha = alca.closest("tr");
-      linha.classList.add("arrastando");
+      arrasto = medir(alca, e);
+      if (!arrasto) return;
+      arrasto.linha.classList.add("arrastando");
+      arrasto.linhas.forEach((l) => { if (l !== arrasto.linha) l.classList.add("deslizando"); });
       try { alca.setPointerCapture(e.pointerId); } catch (erro) { /* segue sem captura */ }
-      const mover = (ev) => {
-        const embaixo = document.elementFromPoint(ev.clientX, ev.clientY);
-        const alvo = embaixo && embaixo.closest("tr[data-id]");
-        if (!alvo || alvo === linha || alvo.parentNode !== corpo) return;
-        const caixa = alvo.getBoundingClientRect();
-        corpo.insertBefore(linha, ev.clientY > caixa.top + caixa.height / 2 ? alvo.nextSibling : alvo);
-      };
-      const soltar = () => {
-        alca.removeEventListener("pointermove", mover);
-        linha.classList.remove("arrastando");
-        salvarOrdem();
-      };
       alca.addEventListener("pointermove", mover);
       alca.addEventListener("pointerup", soltar, { once: true });
       alca.addEventListener("pointercancel", soltar, { once: true });
