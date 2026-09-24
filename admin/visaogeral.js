@@ -193,7 +193,11 @@
     { id: "marca", nome: "marcar outro perfil", tem: (x) => /@\w/.test(x.legenda || "") },
     { id: "hashtag", nome: "usar hashtags", tem: (x) => /#\w/.test(x.legenda || "") },
     { id: "caps", nome: "começar a legenda gritando em maiúsculas", tem: (x) => /^[^a-zà-ú]{8,}/.test((x.legenda || "").trim()) },
-    { id: "fimdesemana", nome: "postar no fim de semana", tem: (x) => [0, 6].includes(new Date(x.postado_em).getDay()) }
+    { id: "fimdesemana", nome: "postar no fim de semana", tem: (x) => [0, 6].includes(new Date(x.postado_em).getDay()) },
+    { id: "noite", nome: "postar depois das 18h", tem: (x) => new Date(x.postado_em).getHours() >= 18 },
+    { id: "beleza", nome: "falar de cabelo, pele ou maquiagem", tem: (x) => /cabelo|pele|skincare|maquiagem|make\b|batom/i.test(x.legenda || "") },
+    { id: "lugar", nome: "falar de um lugar ou de Curitiba", tem: (x) => /curitiba|restaurante|caf[eé]|lugar|rolê|role\b/i.test(x.legenda || "") },
+    { id: "lista", nome: "fazer lista ou passo a passo", tem: (x) => /\b(1\.|2\.|passo|dicas?|como)\b/i.test(x.legenda || "") }
   ];
 
   function descobrirRegras(lista) {
@@ -207,8 +211,10 @@
       const mSem = media(sem, "visualizacoes");
       if (!mSem) return;
       const razao = mCom / mSem;
-      if (razao >= DIFERENCA_MINIMA) saida.push({ tipo: "repetir", nome: c.nome, mCom, mSem, razao, n: com.length });
-      else if (razao <= 1 / DIFERENCA_MINIMA) saida.push({ tipo: "evitar", nome: c.nome, mCom, mSem, razao, n: com.length });
+      const item = { nome: c.nome, mCom, mSem, razao, n: com.length };
+      if (razao >= DIFERENCA_MINIMA) saida.push({ ...item, tipo: "repetir" });
+      else if (razao <= 1 / DIFERENCA_MINIMA) saida.push({ ...item, tipo: "evitar" });
+      else if (razao >= 1.12 || razao <= 1 / 1.12) saida.push({ ...item, tipo: "fraco" });
     });
     // O melhor e o pior dia, quando há dias com posts suficientes
     const porDia = {};
@@ -222,6 +228,7 @@
   function blocoRegras({ sinais, dias }) {
     const repetir = sinais.filter((s) => s.tipo === "repetir");
     const evitar = sinais.filter((s) => s.tipo === "evitar");
+    const fracos = sinais.filter((s) => s.tipo === "fraco");
     const frase = (s) => {
       const vezes = s.razao >= 1 ? s.razao : 1 / s.razao;
       return `<li><b>${P.esc(s.nome)}</b><br>
@@ -229,7 +236,7 @@
         ou seja ${Math.round(vezes * 10) / 10}x. Medido em ${P.plural(s.n, "post", "posts")}.</span></li>`;
     };
 
-    if (!repetir.length && !evitar.length && !dias.length) {
+    if (!repetir.length && !evitar.length && !fracos.length && !dias.length) {
       return `<div class="cartao bloco"><div class="cartao-topo"><h2>O que repetir e o que não repetir</h2></div>
         <div class="cartao-corpo"><p class="mudo">Ainda não encontrei nenhum padrão forte o bastante para
         virar recomendação. Isso é bom sinal de honestidade e mau sinal de amostra: com mais posts variados,
@@ -258,7 +265,20 @@
             com ${P.inteiro(dias[dias.length - 1].views)} views em média.</p>` : ""}
         </div>
       </div>
-    </div>`;
+    </div>
+    ${fracos.length ? `<div class="cartao bloco">
+      <div class="cartao-topo"><h2>Pistas fracas, ainda sem confirmação</h2></div>
+      <div class="cartao-corpo">
+        <p class="mudo pequeno" style="margin-bottom:10px">Apareceram, mas com diferença pequena demais para eu
+        chamar de regra. Servem para você reparar nos próximos posts, não para mudar a estratégia hoje.</p>
+        <ul class="dicas">${fracos.map((s) => {
+          const vezes = s.razao >= 1 ? s.razao : 1 / s.razao;
+          return `<li>${P.esc(s.nome)}: ${s.razao >= 1 ? "um pouco melhor" : "um pouco pior"},
+            ${Math.round(vezes * 100) / 100}x
+            <span class="mudo">(${P.inteiro(s.mCom)} contra ${P.inteiro(s.mSem)} views, em ${P.plural(s.n, "post", "posts")})</span></li>`;
+        }).join("")}</ul>
+      </div>
+    </div>` : ""}`;
   }
 
   function blocoPosts(titulo, lista) {
