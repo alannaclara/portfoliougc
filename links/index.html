@@ -125,6 +125,7 @@ h1 em{font-style:normal;font-weight:400;color:var(--azul)}
 }
 .cupom-topo{display:flex;align-items:baseline;gap:10px;min-width:0;margin-bottom:12px}
 .cupom-marca{min-width:0;font-family:var(--serif);font-size:1.18rem;line-height:1.2;overflow-wrap:anywhere}
+.cupom-desconto{flex:none;padding:2px 9px;border-radius:999px;background:var(--pessego);color:#8a3a24;font-size:.72rem;font-weight:700;letter-spacing:.02em}
 .cupom-loja{
   margin-left:auto;flex:none;
   font-size:.78rem;font-weight:600;color:var(--tinta-2);
@@ -238,11 +239,17 @@ h1 em{font-style:normal;font-weight:400;color:var(--azul)}
 <script>
 /* =========================================================
    OS CUPONS
-   Para mexer, altere só esta lista. Cada item tem:
-   marca (o nome que aparece), codigo (o cupom) e link (a loja).
-   Para tirar um cupom, apague a linha inteira.
+   Eles vêm da aba Cupons do painel, então para mexer é lá, sem
+   tocar neste arquivo. A página lê a "janelinha" cupons_publicos,
+   que só mostra o que está ligado e dentro da validade.
+
+   A lista de reserva aqui embaixo só entra em cena se o banco não
+   responder, para a página nunca ficar vazia na frente de ninguém.
    ========================================================= */
-const CUPONS = [
+const BANCO = "https://rwlbefdxfnvbupwpkdxm.supabase.co";
+const CHAVE = "sb_publishable_tv2nNBYjdyxghXpteQmpIg_RCKMpamg";
+
+const CUPONS_RESERVA = [
   { marca: "Saint Germain",   codigo: "A-SGALANNAPA",    link: "https://www.saintgermainbrand.com/" },
   { marca: "Pangeia",         codigo: "ALY10",           link: "https://www.pangeia96.com.br/" },
   { marca: "YesStyle",        codigo: "ACUPOMYS10",      link: "https://www.yesstyle.com/en/home.html" },
@@ -253,17 +260,34 @@ const CUPONS = [
 const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const icone = (nome, classe) => `<svg class="ico ${classe || ""}" aria-hidden="true"><use href="#i-${nome}"/></svg>`;
 
-document.getElementById("cupons").innerHTML = CUPONS.map((c) => `
-  <article class="cupom">
-    <div class="cupom-topo">
-      <h3 class="cupom-marca">${esc(c.marca)}</h3>
-      <a class="cupom-loja" href="${esc(c.link)}" target="_blank" rel="noopener">Ir à loja${icone("link")}</a>
-    </div>
-    <button class="copiar" type="button" data-codigo="${esc(c.codigo)}">
-      ${icone("tag")}<span class="codigo">${esc(c.codigo)}</span>
-      <span class="rotulo">copiar</span>
-    </button>
-  </article>`).join("");
+async function buscarCupons() {
+  try {
+    const endereco = BANCO + "/rest/v1/cupons_publicos?select=marca,codigo,link,descricao&order=ordem";
+    const resposta = await fetch(endereco, { headers: { apikey: CHAVE, Authorization: "Bearer " + CHAVE } });
+    if (!resposta.ok) throw new Error("banco não respondeu");
+    const lista = await resposta.json();
+    return Array.isArray(lista) && lista.length ? lista : CUPONS_RESERVA;
+  } catch (erro) {
+    return CUPONS_RESERVA;
+  }
+}
+
+function desenharCupons(lista) {
+  document.getElementById("cupons").innerHTML = lista.map((c) => `
+    <article class="cupom">
+      <div class="cupom-topo">
+        <h3 class="cupom-marca">${esc(c.marca)}</h3>
+        ${c.descricao ? `<span class="cupom-desconto">${esc(c.descricao)}</span>` : ""}
+        <a class="cupom-loja" href="${esc(c.link)}" target="_blank" rel="noopener">Ir à loja${icone("link")}</a>
+      </div>
+      <button class="copiar" type="button" data-codigo="${esc(c.codigo)}">
+        ${icone("tag")}<span class="codigo">${esc(c.codigo)}</span>
+        <span class="rotulo">copiar</span>
+      </button>
+    </article>`).join("");
+}
+
+buscarCupons().then(desenharCupons);
 
 /* Copiar o cupom.
    Tenta três caminhos, do melhor para o mais antigo, porque nem todo
