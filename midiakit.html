@@ -50,8 +50,11 @@ a{color:inherit}
 .capa-arroba{display:inline-block;margin-top:8px;padding:3px 11px;border-radius:999px;background:var(--azul);font-size:.86rem;font-weight:600;text-decoration:none}
 
 /* ---------- Números ---------- */
-.numeros{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;margin-top:clamp(28px,4vw,40px);border:1px solid var(--linha);border-radius:var(--raio);background:var(--linha);overflow:hidden}
-.numero{padding:18px 20px;background:var(--papel)}
+/* Os riscos entre os números são sombras nas próprias células, e não
+   vãos do grid. Assim, quando sobra espaço na última linha, ele fica
+   da cor do cartão em vez de virar um retângulo cinza. */
+.numeros{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-top:clamp(28px,4vw,40px);border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);overflow:hidden}
+.numero{padding:18px 20px;box-shadow:1px 0 0 var(--linha),0 1px 0 var(--linha)}
 .numero b{display:block;font-family:var(--serif);font-size:clamp(1.5rem,3vw,2rem);font-weight:400;line-height:1.1;letter-spacing:-.02em}
 .numero span{display:block;margin-top:4px;font-size:.8rem;color:var(--tinta-2);line-height:1.35}
 
