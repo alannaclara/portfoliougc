@@ -289,6 +289,7 @@
     marcas: "Marcas",
     prospeccao: "Prospecção",
     cupons: "Cupons",
+    midiakit: "Mídia kit",
     roteiro: "Roteiro",
     transcricao: "Transcrições",
     calendario: "Calendário",

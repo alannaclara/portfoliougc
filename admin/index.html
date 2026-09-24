@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=19">
+<link rel="stylesheet" href="admin.css?v=20">
 </head>
 <!-- A página fica escondida até o script confirmar que você está logada -->
 <body hidden>
@@ -54,6 +54,7 @@
   <symbol id="i-chave" viewBox="0 0 24 24"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M15.5 12v2.5"/></symbol>
   <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></symbol>
   <symbol id="i-raio" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
+  <symbol id="i-kit" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10h4M7 14h7M15 9v6"/></symbol>
   <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12.5V4h8.5L21 13.5 13.5 21z"/><circle cx="7.5" cy="7.5" r="1.4"/></symbol>
   <symbol id="i-grafico" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M8 20v-6M12.5 20V9M17 20v-8"/></symbol>
   <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></symbol>
@@ -73,6 +74,7 @@
         <a class="menu-item" href="#marcas" data-aba="marcas"><svg class="ico"><use href="#i-marcas"/></svg>Marcas</a>
         <a class="menu-item" href="#prospeccao" data-aba="prospeccao"><svg class="ico"><use href="#i-carta"/></svg>Prospecção</a>
         <a class="menu-item" href="#cupons" data-aba="cupons"><svg class="ico"><use href="#i-tag"/></svg>Cupons</a>
+        <a class="menu-item" href="#midiakit" data-aba="midiakit"><svg class="ico"><use href="#i-kit"/></svg>Mídia kit</a>
       </div>
       <div class="menu-grupo">
         <p class="menu-rotulo">Minha rotina</p>
@@ -115,6 +117,7 @@
       <section class="aba" id="aba-marcas" hidden></section>
       <section class="aba" id="aba-prospeccao" hidden></section>
       <section class="aba" id="aba-cupons" hidden></section>
+      <section class="aba" id="aba-midiakit" hidden></section>
       <section class="aba" id="aba-roteiro" hidden></section>
       <section class="aba" id="aba-transcricao" hidden></section>
       <section class="aba" id="aba-calendario" hidden></section>
@@ -161,8 +164,8 @@
 
 <!-- Supabase, conexão e biblioteca do checklist -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
-<script src="../js/banco.js?v=19"></script>
-<script src="../js/biblioteca.js?v=19"></script>
+<script src="../js/banco.js?v=20"></script>
+<script src="../js/biblioteca.js?v=20"></script>
 
 <!-- PRIMEIRA COISA: conferir a sessão. Sem sessão, vai pro login. -->
 <script>
@@ -190,18 +193,19 @@ window.PAINEL_PRONTO = (async function conferirSessao() {
 </script>
 
 <!-- O painel em si, dividido por aba -->
-<script src="nucleo.js?v=19"></script>
-<script src="portfolio.js?v=19"></script>
-<script src="marcas.js?v=19"></script>
-<script src="prospeccao.js?v=19"></script>
-<script src="roteiro.js?v=19"></script>
-<script src="transcricao.js?v=19"></script>
-<script src="calendario.js?v=19"></script>
-<script src="campanhas.js?v=19"></script>
-<script src="checklist.js?v=19"></script>
-<script src="cupons.js?v=19"></script>
-<script src="visaogeral.js?v=19"></script>
-<script src="automacoes.js?v=19"></script>
+<script src="nucleo.js?v=20"></script>
+<script src="portfolio.js?v=20"></script>
+<script src="marcas.js?v=20"></script>
+<script src="prospeccao.js?v=20"></script>
+<script src="roteiro.js?v=20"></script>
+<script src="transcricao.js?v=20"></script>
+<script src="calendario.js?v=20"></script>
+<script src="campanhas.js?v=20"></script>
+<script src="checklist.js?v=20"></script>
+<script src="cupons.js?v=20"></script>
+<script src="midiakit.js?v=20"></script>
+<script src="visaogeral.js?v=20"></script>
+<script src="automacoes.js?v=20"></script>
 <script>
 // Só mostra a página depois que a sessão foi conferida
 window.PAINEL_PRONTO.then((sessao) => { if (sessao) Painel.iniciar(sessao); });
