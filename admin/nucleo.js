@@ -293,7 +293,8 @@
     calendario: "Calendário",
     campanhas: "Campanhas",
     checklist: "Checklist portfólio",
-    automacoes: "Automações"
+    automacoes: "Automações",
+    visaogeral: "Visão geral do Instagram"
   };
 
   async function irPara(aba) {
