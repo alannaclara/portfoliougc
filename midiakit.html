@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Mídia kit | Alanna Clara</title>
+<meta name="theme-color" content="#f3eee9">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a7ebf2'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='40' fill='%23173b43'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   MÍDIA KIT
+   A marca abre por um link com token. Os números vêm do
+   Instagram e se atualizam sozinhos: este mídia kit nunca
+   fica velho, que é o problema de todo mídia kit em PDF.
+   ========================================================= */
+:root{
+  --creme:#f3eee9; --creme-2:#ebe3da; --papel:#fbf8f5;
+  --tinta:#173b43; --tinta-2:#554b41;
+  --azul:#a7ebf2; --azul-claro:#dcf6f9; --pessego:#f4b8a8;
+  --linha:rgba(23,59,67,.14); --linha-forte:rgba(23,59,67,.24);
+  --sombra:0 1px 2px rgba(23,59,67,.05),0 18px 40px -22px rgba(23,59,67,.30);
+  --raio:16px;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --gutter:clamp(18px,4vw,44px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--creme);color:var(--tinta);font-family:var(--sans);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.1;margin:0;letter-spacing:-.015em}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--tinta);outline-offset:3px;border-radius:6px}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+.folha{max-width:840px;margin:0 auto;padding:clamp(28px,5vw,56px) var(--gutter) 64px}
+.secao{margin-top:clamp(36px,5vw,56px)}
+.rotulo{display:block;margin-bottom:14px;font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-2)}
+
+/* ---------- Topo ---------- */
+.capa{display:flex;align-items:center;gap:clamp(18px,3vw,28px);flex-wrap:wrap}
+.retrato{width:104px;height:104px;flex:none;border-radius:50%;object-fit:cover;border:3px solid var(--papel);box-shadow:var(--sombra)}
+.capa h1{font-size:clamp(1.9rem,4.4vw,2.7rem)}
+.capa h1 em{font-style:normal;font-weight:400;color:var(--azul)}
+.capa-sub{margin-top:6px;color:var(--tinta-2)}
+.capa-arroba{display:inline-block;margin-top:8px;padding:3px 11px;border-radius:999px;background:var(--azul);font-size:.86rem;font-weight:600;text-decoration:none}
+
+/* ---------- Números ---------- */
+.numeros{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;margin-top:clamp(28px,4vw,40px);border:1px solid var(--linha);border-radius:var(--raio);background:var(--linha);overflow:hidden}
+.numero{padding:18px 20px;background:var(--papel)}
+.numero b{display:block;font-family:var(--serif);font-size:clamp(1.5rem,3vw,2rem);font-weight:400;line-height:1.1;letter-spacing:-.02em}
+.numero span{display:block;margin-top:4px;font-size:.8rem;color:var(--tinta-2);line-height:1.35}
+
+/* ---------- Texto ---------- */
+.apresentacao{max-width:58ch;font-size:clamp(1.02rem,1.8vw,1.15rem);line-height:1.65;white-space:pre-line}
+
+/* ---------- Formatos ---------- */
+.formatos{display:grid;gap:10px}
+.formato{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:16px 20px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
+.formato h3{font-size:1.1rem;flex:1 1 180px;min-width:0}
+.formato .desc{flex:2 1 240px;min-width:0;font-size:.92rem;color:var(--tinta-2)}
+.formato .valor{flex:none;font-weight:700;font-size:1rem;padding:3px 12px;border-radius:999px;background:var(--azul-claro)}
+
+/* ---------- Marcas ---------- */
+.marcas{display:flex;flex-wrap:wrap;gap:8px}
+.marca{padding:7px 15px;border:1px solid var(--linha-forte);border-radius:999px;background:var(--papel);font-size:.92rem;font-weight:600}
+
+/* ---------- Posts ---------- */
+.posts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.post{display:block;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);overflow:hidden;text-decoration:none;transition:transform .3s cubic-bezier(.22,.61,.36,1),box-shadow .3s}
+.post:hover{transform:translateY(-3px);box-shadow:var(--sombra)}
+.post img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:var(--creme-2)}
+.post-pe{padding:11px 13px}
+.post-pe b{display:block;font-size:1.02rem;font-family:var(--serif);font-weight:400}
+.post-pe span{font-size:.76rem;color:var(--tinta-2)}
+
+/* ---------- Contato ---------- */
+.contato{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.botao{display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:11px 20px;border:1px solid var(--tinta);border-radius:var(--raio);background:var(--papel);font-weight:600;text-decoration:none;transition:background-color .25s,color .25s}
+.botao:hover{background:var(--tinta);color:var(--creme)}
+.botao-azul{background:var(--azul)}
+.botao-azul:hover{background:var(--tinta);color:var(--azul)}
+
+.rodape{margin-top:clamp(40px,6vw,64px);padding-top:20px;border-top:1px solid var(--linha);font-size:.84rem;color:var(--tinta-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+.recado{max-width:44ch;margin:18vh auto;text-align:center;padding:0 var(--gutter)}
+.recado h1{font-size:1.7rem;margin-bottom:10px}
+.recado p{color:var(--tinta-2)}
+
+@media print{
+  body{background:#fff}
+  .post:hover{transform:none}
+  .botao{display:none}
+  .folha{max-width:none;padding:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<main id="tela">
+  <div class="recado"><h1>Abrindo...</h1><p>Um instante.</p></div>
+</main>
+
+<script>
+/* O endereço e a chave pública do banco. A chave sozinha não abre nada:
+   a única porta é a função abrir_midiakit, que devolve apenas o que
+   cabe num mídia kit. */
+const BANCO = "https://rwlbefdxfnvbupwpkdxm.supabase.co";
+const CHAVE = "sb_publishable_tv2nNBYjdyxghXpteQmpIg_RCKMpamg";
+
+const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const inteiro = (v) => Math.round(Number(v) || 0).toLocaleString("pt-BR");
+const curto = (t, n) => { const s = String(t ?? "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
+
+function recado(titulo, texto) {
+  document.getElementById("tela").innerHTML =
+    `<div class="recado"><h1>${esc(titulo)}</h1><p>${esc(texto)}</p></div>`;
+}
+
+async function abrir() {
+  const token = new URLSearchParams(location.search).get("k");
+  if (!token) return recado("Link incompleto", "Peça o link do mídia kit de novo para a Alanna.");
+
+  let dados = null;
+  try {
+    const resposta = await fetch(BANCO + "/rest/v1/rpc/abrir_midiakit", {
+      method: "POST",
+      headers: { apikey: CHAVE, Authorization: "Bearer " + CHAVE, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_token: token })
+    });
+    if (!resposta.ok) throw new Error("banco recusou");
+    dados = await resposta.json();
+  } catch (erro) {
+    return recado("Não consegui abrir agora", "Tente de novo em alguns instantes.");
+  }
+  if (!dados) return recado("Link fora do ar", "Este mídia kit foi desativado. Peça um link novo para a Alanna.");
+
+  desenhar(dados);
+}
+
+function desenhar(d) {
+  const conta = d.conta || {};
+  const m = d.medias || {};
+  const p = d.periodo || {};
+  const formatos = Array.isArray(d.formatos) ? d.formatos : [];
+  const marcas = Array.isArray(d.marcas) ? d.marcas : [];
+  const posts = Array.isArray(d.posts) ? d.posts : [];
+  const mostrarValores = d.mostrar_valores !== false;
+
+  // Só entra número que existe de verdade. Melhor um mídia kit curto
+  // do que um com campo vazio ou zero inventado.
+  const numeros = [];
+  if (conta.followers_count) numeros.push([inteiro(conta.followers_count), "seguidores"]);
+  if (p.alcance) numeros.push([inteiro(p.alcance), "contas alcançadas nos últimos 30 dias"]);
+  if (m.views) numeros.push([inteiro(m.views), "visualizações por post, média de 90 dias"]);
+  if (m.engajamento) numeros.push([m.engajamento + "%", "de engajamento por alcance"]);
+  if (m.salvos) numeros.push([inteiro(m.salvos), "salvamentos por post"]);
+
+  document.getElementById("tela").innerHTML = `
+    <div class="folha">
+      <header class="capa">
+        <img class="retrato" src="links/foto.jpg" alt="Alanna Clara" width="104" height="104"
+             onerror="this.remove()">
+        <div>
+          <h1>Alanna <em>Clara</em></h1>
+          <p class="capa-sub">UGC Creator em Curitiba · beleza, skincare, comida e tech</p>
+          ${conta.username ? `<a class="capa-arroba" href="https://www.instagram.com/${esc(conta.username)}/" target="_blank" rel="noopener">@${esc(conta.username)}</a>` : ""}
+        </div>
+      </header>
+
+      ${numeros.length ? `<div class="numeros">${numeros.map(([v, r]) => `
+        <div class="numero"><b>${esc(v)}</b><span>${esc(r)}</span></div>`).join("")}</div>` : ""}
+
+      ${d.apresentacao ? `<section class="secao">
+        <span class="rotulo">Quem sou</span>
+        <p class="apresentacao">${esc(d.apresentacao)}</p>
+      </section>` : ""}
+
+      ${formatos.length ? `<section class="secao">
+        <span class="rotulo">O que eu entrego</span>
+        <div class="formatos">${formatos.map((f) => `
+          <article class="formato">
+            <h3>${esc(f.nome)}</h3>
+            ${f.descricao ? `<p class="desc">${esc(f.descricao)}</p>` : ""}
+            ${mostrarValores && f.valor ? `<span class="valor">${esc(f.valor)}</span>` : ""}
+          </article>`).join("")}</div>
+        ${mostrarValores ? "" : `<p class="capa-sub" style="margin-top:12px">Valores sob consulta, combinados por projeto.</p>`}
+      </section>` : ""}
+
+      ${marcas.length ? `<section class="secao">
+        <span class="rotulo">Marcas com quem já trabalhei</span>
+        <div class="marcas">${marcas.map((x) => `<span class="marca">${esc(x)}</span>`).join("")}</div>
+      </section>` : ""}
+
+      ${posts.length ? `<section class="secao">
+        <span class="rotulo">Alguns dos meus melhores posts</span>
+        <div class="posts">${posts.map((x) => `
+          <a class="post" href="${esc(x.permalink || "#")}" target="_blank" rel="noopener">
+            ${x.thumb ? `<img src="${esc(x.thumb)}" alt="" loading="lazy">` : ""}
+            <span class="post-pe">
+              <b>${inteiro(x.visualizacoes)} views</b>
+              <span>${esc(x.formato || "")} · ${inteiro(x.curtidas)} curtidas · ${inteiro(x.comentarios)} comentários</span>
+            </span>
+          </a>`).join("")}</div>
+      </section>` : ""}
+
+      <section class="secao">
+        <span class="rotulo">Vamos conversar</span>
+        <div class="contato">
+          <a class="botao botao-azul" href="https://wa.me/5541998669857" target="_blank" rel="noopener">Falar no WhatsApp</a>
+          <a class="botao" href="mailto:contatoalannaclara@gmail.com">contatoalannaclara@gmail.com</a>
+          <a class="botao" href="./" target="_blank" rel="noopener">Ver o portfólio completo</a>
+        </div>
+      </section>
+
+      <footer class="rodape">
+        <span>Os números vêm direto do Instagram e se atualizam sozinhos.</span>
+        <span>Atualizado em ${esc(new Date().toLocaleDateString("pt-BR"))}</span>
+      </footer>
+    </div>`;
+}
+
+abrir();
+</script>
+
+</body>
+</html>
