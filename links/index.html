@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alanna Clara | Links e cupons</title>
+<meta name="description" content="Meus cupons de desconto, portfólio e contato, tudo num lugar só.">
+<meta name="theme-color" content="#f3eee9">
+<meta property="og:title" content="Alanna Clara | Links e cupons">
+<meta property="og:description" content="Meus cupons de desconto, portfólio e contato, tudo num lugar só.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a7ebf2'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='40' fill='%23173b43'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   LINKS DA BIO
+   Mesmas cores e fontes do portfólio. Feito para celular:
+   uma coluna só, botões grandes, cupom que copia num toque.
+   ========================================================= */
+:root{
+  --creme:#f3eee9;
+  --creme-2:#ebe3da;
+  --papel:#fbf8f5;
+  --tinta:#173b43;
+  --tinta-2:#554b41;
+  --azul:#a7ebf2;
+  --azul-claro:#dcf6f9;
+  --pessego:#f4b8a8;
+  --linha:rgba(23,59,67,.14);
+  --linha-forte:rgba(23,59,67,.24);
+  --sombra:0 1px 2px rgba(23,59,67,.05),0 18px 40px -22px rgba(23,59,67,.30);
+  --raio:14px;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--creme);
+  color:var(--tinta);
+  font-family:var(--sans);
+  font-size:1rem;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2{font-family:var(--serif);font-weight:400;line-height:1.1;margin:0;letter-spacing:-.015em}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--tinta);outline-offset:3px;border-radius:8px}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- O quadriculado do topo, igual ao da capa do portfólio ---------- */
+.fundo{
+  position:absolute;inset:0 0 auto;height:172px;z-index:0;
+  background:
+    repeating-linear-gradient(to right,rgba(255,255,255,.55) 0 1px,transparent 1px 12.5%),
+    repeating-linear-gradient(to bottom,rgba(255,255,255,.55) 0 1px,transparent 1px 34px),
+    var(--azul);
+}
+/* Some antes do nome começar, para o "Clara" cair sobre o creme e não sobre o azul */
+.fundo::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--creme) 92%)}
+
+/* ---------- Estrutura ---------- */
+.folha{position:relative;z-index:1;max-width:460px;margin:0 auto;padding:36px 20px 40px}
+
+/* ---------- Cabeçalho ---------- */
+.topo{text-align:center;margin-bottom:28px}
+.retrato{
+  width:112px;height:112px;margin:0 auto 16px;display:block;
+  border-radius:50%;object-fit:cover;
+  border:3px solid var(--papel);
+  box-shadow:var(--sombra);
+}
+h1{font-size:2rem;margin-bottom:6px}
+h1 em{font-style:normal;font-weight:400;color:var(--azul)}
+.descricao{color:var(--tinta-2);font-size:.95rem;max-width:30ch;margin:0 auto}
+
+/* ---------- Redes ---------- */
+.redes{display:flex;justify-content:center;gap:10px;margin-top:18px}
+.rede{
+  width:44px;height:44px;display:grid;place-items:center;
+  border:1px solid var(--linha-forte);border-radius:50%;
+  background:var(--papel);color:var(--tinta);
+  transition:transform .25s var(--ease),background-color .25s,color .25s;
+}
+.rede:hover{transform:translateY(-3px);background:var(--tinta);color:var(--azul)}
+
+/* ---------- Botões grandes ---------- */
+.botoes{display:grid;gap:10px;margin-bottom:34px}
+.botao{
+  display:flex;align-items:center;gap:12px;
+  min-height:56px;padding:12px 18px;
+  border:1px solid var(--tinta);border-radius:var(--raio);
+  background:var(--papel);
+  font-weight:600;font-size:.98rem;
+  box-shadow:var(--sombra);
+  transition:transform .25s var(--ease),background-color .25s,color .25s;
+}
+.botao:hover{transform:translateY(-2px);background:var(--tinta);color:var(--creme)}
+.botao-principal{background:var(--azul)}
+.botao-principal:hover{background:var(--tinta);color:var(--azul)}
+.botao .seta{margin-left:auto;opacity:.5;transition:opacity .25s,transform .25s var(--ease)}
+.botao:hover .seta{opacity:1;transform:translateX(3px)}
+
+/* ---------- Cupons ---------- */
+.secao-titulo{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:16px;
+  font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-2);
+}
+.secao-titulo::after{content:"";flex:1;height:1px;background:var(--linha)}
+/* minmax(0,1fr) e os min-width:0 abaixo impedem um código comprido
+   de esticar o cartão e criar rolagem lateral no celular */
+.cupons{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.cupom{
+  min-width:0;
+  padding:16px 18px;
+  border:1px solid var(--linha);border-radius:var(--raio);
+  background:var(--papel);
+}
+.cupom-topo{display:flex;align-items:baseline;gap:10px;min-width:0;margin-bottom:12px}
+.cupom-marca{min-width:0;font-family:var(--serif);font-size:1.18rem;line-height:1.2;overflow-wrap:anywhere}
+.cupom-loja{
+  margin-left:auto;flex:none;
+  font-size:.78rem;font-weight:600;color:var(--tinta-2);
+  display:inline-flex;align-items:center;gap:4px;
+  text-decoration:underline;text-decoration-color:var(--linha-forte);text-underline-offset:3px;
+}
+.cupom-loja:hover{color:var(--tinta);text-decoration-color:var(--tinta)}
+.copiar{
+  width:100%;min-width:0;display:flex;align-items:center;gap:10px;
+  min-height:48px;padding:10px 14px;
+  border:1.5px dashed var(--linha-forte);border-radius:10px;
+  background:var(--azul-claro);
+  font:inherit;font-weight:700;letter-spacing:.04em;color:var(--tinta);
+  cursor:pointer;text-align:left;
+  transition:background-color .2s,border-color .2s;
+}
+.copiar:hover{background:var(--azul);border-color:var(--tinta)}
+/* O código nunca é cortado: se faltar espaço, ele quebra a linha */
+.copiar .codigo{min-width:0;overflow-wrap:anywhere}
+.copiar .rotulo{margin-left:auto;flex:none;font-size:.74rem;font-weight:600;letter-spacing:normal;color:var(--tinta-2);white-space:nowrap}
+.copiar.copiado{background:var(--azul);border-style:solid;border-color:var(--tinta)}
+.copiar.copiado .rotulo{color:var(--tinta)}
+
+/* ---------- Rodapé ---------- */
+.rodape{margin-top:36px;padding-top:20px;border-top:1px solid var(--linha);text-align:center;font-size:.84rem;color:var(--tinta-2)}
+.rodape a{text-decoration:underline;text-decoration-color:var(--linha);text-underline-offset:3px}
+.rodape a:hover{text-decoration-color:var(--tinta)}
+
+/* Celular estreito: o aviso de copiar sai e sobra espaço para o código */
+@media (max-width:359px){
+  .copiar .rotulo{display:none}
+  .folha{padding-left:14px;padding-right:14px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="fundo" aria-hidden="true"></div>
+
+<!-- Ícones -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M14 3v11.2a3.8 3.8 0 1 1-3.2-3.75"/><path d="M14 3c.4 2.6 2 4.2 4.6 4.5"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3 7l9 6 9-6"/></symbol>
+  <symbol id="i-whats" viewBox="0 0 24 24"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1.3-4.4A8.5 8.5 0 1 1 20.5 11.6z"/><path d="M9 9c0 3 3 6 6 6"/></symbol>
+  <symbol id="i-portfolio" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 4v5"/></symbol>
+  <symbol id="i-kit" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12.5V4h8.5L21 13.5 13.5 21z"/><circle cx="7.5" cy="7.5" r="1.4"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+</svg>
+
+<main class="folha">
+
+  <header class="topo">
+    <img class="retrato" src="foto.jpg" alt="Alanna Clara" width="112" height="112">
+    <h1>Alanna <em>Clara</em></h1>
+    <p class="descricao">UGC Creator em Curitiba · beleza, skincare, comida e tech</p>
+
+    <nav class="redes" aria-label="Minhas redes">
+      <a class="rede" href="https://www.instagram.com/_alannaclara/" target="_blank" rel="noopener">
+        <svg class="ico" aria-hidden="true"><use href="#i-insta"/></svg><span class="sr">Instagram</span>
+      </a>
+      <a class="rede" href="https://www.tiktok.com/@_alannaclara" target="_blank" rel="noopener">
+        <svg class="ico" aria-hidden="true"><use href="#i-tiktok"/></svg><span class="sr">TikTok</span>
+      </a>
+      <a class="rede" href="mailto:contatoalannaclara@gmail.com">
+        <svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg><span class="sr">E-mail</span>
+      </a>
+      <a class="rede" href="https://wa.me/5541998669857" target="_blank" rel="noopener">
+        <svg class="ico" aria-hidden="true"><use href="#i-whats"/></svg><span class="sr">WhatsApp</span>
+      </a>
+    </nav>
+  </header>
+
+  <nav class="botoes" aria-label="Links principais">
+    <a class="botao botao-principal" href="../" target="_blank" rel="noopener">
+      <svg class="ico" aria-hidden="true"><use href="#i-portfolio"/></svg>
+      Ver meu portfólio
+      <svg class="ico seta" aria-hidden="true"><use href="#i-seta"/></svg>
+    </a>
+    <a class="botao" href="../#contato" target="_blank" rel="noopener">
+      <svg class="ico" aria-hidden="true"><use href="#i-kit"/></svg>
+      Pedir meu mídia kit
+      <svg class="ico seta" aria-hidden="true"><use href="#i-seta"/></svg>
+    </a>
+    <a class="botao" href="https://wa.me/5541998669857" target="_blank" rel="noopener">
+      <svg class="ico" aria-hidden="true"><use href="#i-whats"/></svg>
+      Falar comigo no WhatsApp
+      <svg class="ico seta" aria-hidden="true"><use href="#i-seta"/></svg>
+    </a>
+  </nav>
+
+  <section aria-labelledby="titulo-cupons">
+    <h2 class="secao-titulo" id="titulo-cupons">Meus cupons</h2>
+    <div class="cupons" id="cupons"></div>
+  </section>
+
+  <footer class="rodape">
+    <p>© <span id="ano">2026</span> Alanna Clara</p>
+    <p style="margin-top:6px"><a href="../privacidade.html">Política de privacidade</a></p>
+  </footer>
+
+</main>
+
+<script>
+/* =========================================================
+   OS CUPONS
+   Para mexer, altere só esta lista. Cada item tem:
+   marca (o nome que aparece), codigo (o cupom) e link (a loja).
+   Para tirar um cupom, apague a linha inteira.
+   ========================================================= */
+const CUPONS = [
+  { marca: "Saint Germain",   codigo: "A-SGALANNAPA",    link: "https://www.saintgermainbrand.com/" },
+  { marca: "Pangeia",         codigo: "ALY10",           link: "https://www.pangeia96.com.br/" },
+  { marca: "YesStyle",        codigo: "ACUPOMYS10",      link: "https://www.yesstyle.com/en/home.html" },
+  { marca: "Océane",          codigo: "ACHADINHOALANNA", link: "https://www.oceane.com.br/" },
+  { marca: "Maria Margarida", codigo: "ACHADINHOALANNA", link: "https://www.mariamargarida.com.br/" }
+];
+
+const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const icone = (nome, classe) => `<svg class="ico ${classe || ""}" aria-hidden="true"><use href="#i-${nome}"/></svg>`;
+
+document.getElementById("cupons").innerHTML = CUPONS.map((c) => `
+  <article class="cupom">
+    <div class="cupom-topo">
+      <h3 class="cupom-marca">${esc(c.marca)}</h3>
+      <a class="cupom-loja" href="${esc(c.link)}" target="_blank" rel="noopener">Ir à loja${icone("link")}</a>
+    </div>
+    <button class="copiar" type="button" data-codigo="${esc(c.codigo)}">
+      ${icone("tag")}<span class="codigo">${esc(c.codigo)}</span>
+      <span class="rotulo">copiar</span>
+    </button>
+  </article>`).join("");
+
+/* Copiar o cupom.
+   Tenta três caminhos, do melhor para o mais antigo, porque nem todo
+   navegador libera o primeiro (o Instagram e o TikTok abrem os links
+   num navegador interno que às vezes bloqueia):
+     1. a forma moderna;
+     2. a forma antiga, com uma caixa de texto escondida;
+     3. desistir de copiar e deixar o código selecionado para a pessoa
+        copiar na mão. Nunca fica sem resposta na tela. */
+async function copiarTexto(texto) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    }
+  } catch (erro) { /* tenta o próximo */ }
+  try {
+    const caixa = document.createElement("textarea");
+    caixa.value = texto;
+    caixa.setAttribute("readonly", "");
+    caixa.style.cssText = "position:fixed;top:0;left:0;opacity:0;pointer-events:none";
+    document.body.appendChild(caixa);
+    caixa.select();
+    caixa.setSelectionRange(0, texto.length);
+    const deuCerto = document.execCommand("copy");
+    caixa.remove();
+    return deuCerto;
+  } catch (erro) {
+    return false;
+  }
+}
+
+document.getElementById("cupons").addEventListener("click", async (e) => {
+  const botao = e.target.closest(".copiar");
+  if (!botao) return;
+  const rotulo = botao.querySelector(".rotulo");
+  const deuCerto = await copiarTexto(botao.dataset.codigo);
+
+  if (!deuCerto) {
+    const faixa = document.createRange();
+    faixa.selectNodeContents(botao.querySelector(".codigo"));
+    const selecao = window.getSelection();
+    selecao.removeAllRanges();
+    selecao.addRange(faixa);
+    rotulo.textContent = "copie o código";
+    return;
+  }
+
+  botao.classList.add("copiado");
+  rotulo.textContent = "copiado!";
+  clearTimeout(botao.temporizador);
+  botao.temporizador = setTimeout(() => {
+    botao.classList.remove("copiado");
+    rotulo.textContent = "copiar";
+  }, 2000);
+});
+
+document.getElementById("ano").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
