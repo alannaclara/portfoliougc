@@ -227,7 +227,10 @@ section{padding-block:var(--secao)}
 .video::after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(23,59,67,.35) 0%,transparent 20%,transparent 55%,rgba(23,59,67,.88) 100%);pointer-events:none}
 .video-previa{position:absolute;inset:0;z-index:1;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .45s ease}
 .video-previa.pronta{opacity:1}
-.video-previa iframe{position:absolute;top:50%;left:50%;width:100%;height:100%;border:0;transform:translate(-50%,-50%) scale(1.18)}
+/* O YouTube escolhe a qualidade pelo tamanho do quadro. Por isso o quadro
+   nasce grande de verdade (1080x1920) e só depois é encolhido na tela.
+   Assim ele manda a imagem em alta, mesmo no cartão pequeno. */
+.video-previa iframe{position:absolute;top:50%;left:50%;width:1080px;height:1920px;border:0;transform-origin:50% 50%;transform:translate(-50%,-50%) scale(var(--encolhe,.2))}
 .etiquetas{position:absolute;top:14px;left:14px;right:14px;z-index:3;display:flex;flex-wrap:wrap;gap:6px}
 .etiqueta{padding:6px 11px;border-radius:999px;background:var(--papel);color:var(--tinta);font-size:.66rem;font-weight:700;line-height:1.2;letter-spacing:.12em;text-transform:uppercase}
 .etiqueta-views{background:var(--tinta);color:var(--azul)}
@@ -254,7 +257,9 @@ div.video:not([data-video]){cursor:default}
 .player-fechar{width:44px;height:44px;flex:none;display:grid;place-items:center;border:1px solid rgba(243,238,233,.4);border-radius:50%;background:transparent;color:var(--creme);cursor:pointer;transition:background-color .25s,color .25s}
 .player-fechar:hover{background:var(--creme);color:var(--tinta)}
 .player-caixa{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:var(--raio);background:#000;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
-.player-caixa iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+/* Mesma ideia no player: o quadro nasce no dobro do tamanho da tela e
+   encolhe, então o YouTube entrega o dobro de definição. */
+.player-caixa iframe{position:absolute;top:50%;left:50%;width:var(--larg,100%);height:var(--alt,100%);border:0;transform-origin:50% 50%;transform:translate(-50%,-50%) scale(var(--encolhe,1))}
 
 /* ===== COMO EU TE AJUDO ===== */
 .servicos{background:var(--tinta);color:var(--creme)}
@@ -1087,8 +1092,10 @@ function cardVideo(t) {
         ${etiquetas}${info}
       </div>`;
   }
+  // Capa na melhor definição: a vertical do Shorts primeiro, depois a grande,
+  // e só no fim a pequena. Antes ela caía direto na pequena, de 480 pixels.
   const capaSrc = t.capa ? esc(t.capa) : `https://i.ytimg.com/vi/${id}/oar2.jpg`;
-  const reserva = t.capa ? "" : ` onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'"`;
+  const reserva = t.capa ? "" : ` onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/maxresdefault.jpg';this.onerror=function(){this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'}"`;
   return `<div class="video" role="button" tabindex="0" data-video="${id}" data-marca="${esc(titulo)}" data-nicho="${esc(nicho)}" aria-label="${esc(`Assistir vídeo: ${titulo}, ${nicho}`)}">
       <img class="video-capa" src="${capaSrc}"${reserva} alt="" loading="lazy" decoding="async">
       ${etiquetas}
@@ -1217,22 +1224,59 @@ filtros.addEventListener("click", (e) => {
 const EMBED = "https://www.youtube-nocookie.com/embed/";
 const temMouse = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
+/* ---------- Qualidade máxima ----------
+   O YouTube decide a definição pelo tamanho do quadro dele, não pelo tamanho
+   que a gente vê. Um cartão de 211 pixels ganhava vídeo de 144p.
+   A solução: o quadro nasce em 1080x1920 de verdade e depois é encolhido
+   na tela. O YouTube pensa que é grande e manda em alta. */
+const ALTA_LARGURA = 1080;
+const ALTA_ALTURA = 1920;
+
+// Mede pelo tamanho de layout (offsetWidth), e não pelo getBoundingClientRect,
+// porque durante a animação de abertura o segundo devolve o tamanho animado.
+function encolherPara(caixa, quadro, larguraReal, alturaReal, folga) {
+  const larg = caixa.offsetWidth, alt = caixa.offsetHeight;
+  if (!larg || !alt) return;
+  quadro.style.setProperty("--encolhe", Math.max(larg / larguraReal, alt / alturaReal) * (folga || 1));
+}
+
+// Pede para o YouTube a melhor definição que ele tiver
+function pedirAlta(quadro, id) {
+  const falar = (msg) => { try { quadro.contentWindow.postMessage(JSON.stringify(msg), "*"); } catch (erro) { /* sem problema */ } };
+  falar({ event: "listening", id: id, channel: "widget" });
+  falar({ event: "command", func: "setPlaybackQuality", args: ["highres"] });
+  return falar;
+}
+
 function iniciarPrevia(card) {
   if ($(".video-previa", card)) return;
   const id = card.dataset.video;
   const caixa = document.createElement("span");
   caixa.className = "video-previa";
-  caixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0&enablejsapi=1" title="Prévia sem som" tabindex="-1" aria-hidden="true" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  caixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0&enablejsapi=1&vq=hd1080" title="Prévia sem som" tabindex="-1" aria-hidden="true" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   const quadro = $("iframe", caixa);
+  card.appendChild(caixa);
+  // o 1.18 é a sobra que esconde as bordas pretas do vídeo
+  encolherPara(caixa, quadro, ALTA_LARGURA, ALTA_ALTURA, 1.18);
   quadro.addEventListener("load", () => {
-    // pede para o YouTube avisar quando o vídeo começar a tocar
-    const falar = (msg) => { try { quadro.contentWindow.postMessage(JSON.stringify(msg), "*"); } catch (erro) { /* sem problema */ } };
-    falar({ event: "listening", id: id, channel: "widget" });
+    const falar = pedirAlta(quadro, id);
     falar({ event: "command", func: "mute", args: [] });
     falar({ event: "command", func: "playVideo", args: [] });
   });
-  card.appendChild(caixa);
 }
+
+// Se a janela mudar de tamanho, recalcula o encolhimento do que estiver aberto
+let esperaMedida;
+window.addEventListener("resize", () => {
+  clearTimeout(esperaMedida);
+  esperaMedida = setTimeout(() => {
+    $$(".video-previa", areaNichos).forEach((caixa) => {
+      const quadro = $("iframe", caixa);
+      if (quadro) encolherPara(caixa, quadro, ALTA_LARGURA, ALTA_ALTURA, 1.18);
+    });
+    ajustarPlayer();
+  }, 150);
+});
 
 // A prévia só aparece quando o vídeo está tocando de verdade (enquanto carrega, fica a capa)
 window.addEventListener("message", (e) => {
@@ -1267,13 +1311,44 @@ const player = $("#player");
 const playerCaixa = $("#player-caixa");
 let cardAberto = null;
 
+/* No player o quadro nasce no dobro do tamanho que aparece na tela.
+   Dobro já basta para o YouTube subir para alta definição, e os controles
+   dele continuam grandes o suficiente para clicar. */
+// A largura que o player vai ter quando terminar de abrir. Calculada na mão
+// porque, durante a animação de abertura, a medida da tela ainda está mudando.
+function larguraFinalDoPlayer() {
+  return Math.min(420, window.innerWidth - 32, (window.innerHeight - 170) * 9 / 16);
+}
+
+// O tamanho de verdade do quadro é definido uma vez só, ao abrir.
+function definirTamanhoDoPlayer(quadro) {
+  const larg = Math.min(ALTA_LARGURA, Math.max(360, Math.round(larguraFinalDoPlayer() * 2)));
+  quadro.style.setProperty("--larg", larg + "px");
+  quadro.style.setProperty("--alt", Math.round(larg * 16 / 9) + "px");
+}
+
+function ajustarPlayer() {
+  const quadro = $("iframe", playerCaixa);
+  if (!quadro) return;
+  const larg = parseFloat(quadro.style.getPropertyValue("--larg"));
+  const alt = parseFloat(quadro.style.getPropertyValue("--alt"));
+  if (!larg || !alt) return;
+  encolherPara(playerCaixa, quadro, larg, alt);
+}
+
+if (window.ResizeObserver) new ResizeObserver(ajustarPlayer).observe(playerCaixa);
+
 function abrirVideo(card) {
   pararPrevia(card);
   cardAberto = card;
   const id = card.dataset.video;
   $("#player-legenda").innerHTML = `<small>${esc(card.dataset.nicho)}</small>${esc(card.dataset.marca)}`;
-  playerCaixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="Vídeo: ${esc(card.dataset.marca)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  playerCaixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&vq=hd1080" title="Vídeo: ${esc(card.dataset.marca)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   if (typeof player.showModal === "function") player.showModal(); else player.setAttribute("open", "");
+  const quadro = $("iframe", playerCaixa);
+  quadro.addEventListener("load", () => pedirAlta(quadro, id));
+  definirTamanhoDoPlayer(quadro);
+  ajustarPlayer();
   $("#fechar-player").focus();
 }
 function aoFecharVideo() {
