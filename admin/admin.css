@@ -491,6 +491,16 @@ tr.deslizando:hover{background:transparent}
 .au-post img{width:100%;height:100%;object-fit:cover;display:block}
 .au-post[aria-pressed="true"]{border-color:var(--tinta)}
 
+/* Os campos do link, que aparecem quando você clica em adicionar */
+.au-link-campos{display:grid;gap:10px;padding:12px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--creme)}
+.au-link-campos .botao-perigo{justify-self:start}
+
+/* A prévia do balão, como a DM chega para a pessoa */
+.au-previa{padding:12px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--creme)}
+.au-balao{max-width:300px;padding:10px 12px;border-radius:14px 14px 14px 4px;background:var(--papel);border:1px solid var(--linha);box-shadow:0 1px 2px rgba(23,59,67,.06)}
+.au-balao p{font-size:13px;line-height:1.5;white-space:pre-line;margin:0}
+.au-botao-dm{display:block;margin-top:8px;padding:7px 10px;border-top:1px solid var(--linha);font-size:12.5px;font-weight:600;text-align:center;color:var(--ciano)}
+
 /* ---------- Aba Visão Geral ---------- */
 .vg-par{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:16px}
 .vg-par .dicas li+li{margin-top:10px}

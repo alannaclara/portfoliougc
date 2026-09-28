@@ -91,7 +91,11 @@
           </div>
           <div class="au-palavras">${palavras.map((p) => P.pilula(p, "cinza")).join("")}</div>
           <p class="au-msg">${P.esc(curto(r.mensagem, 180))}</p>
-          <div class="au-meta"><span>${P.esc(alvoRegra)}</span><span>${P.plural(envios, "envio", "envios")}</span></div>
+          <div class="au-meta">
+            <span>${P.esc(alvoRegra)}</span>
+            <span>${P.plural(envios, "envio", "envios")}</span>
+            ${r.link ? `<span>${P.icone("link", "ico-p")} botão "${P.esc(r.link_texto || "Ver agora")}"</span>` : ""}
+          </div>
         </article>`;
     }).join("")}</div>`;
   }
@@ -156,6 +160,27 @@
               <label for="au-mensagem">Mensagem na DM *</label>
               <textarea id="au-mensagem" placeholder="Oi! Aqui está o meu mídia kit: https://..." required></textarea>
             </div>
+
+            <div class="campo largo" id="au-bloco-link">
+              <button class="botao" type="button" id="au-add-link">${P.icone("mais", "ico-p")}Adicionar um link</button>
+              <div class="au-link-campos" id="au-link-campos" hidden>
+                <div class="campo">
+                  <label for="au-link">Para onde o botão leva</label>
+                  <input id="au-link" type="url" placeholder="https://...">
+                </div>
+                <div class="campo">
+                  <label for="au-link-texto">O que o botão escreve</label>
+                  <input id="au-link-texto" type="text" maxlength="20" placeholder="Ver agora">
+                  <span class="campo-ajuda">Até 20 letras. É limite do Instagram, não meu.</span>
+                </div>
+                <button class="botao botao-perigo" type="button" id="au-tirar-link">${P.icone("x", "ico-p")}Tirar o link</button>
+              </div>
+            </div>
+
+            <div class="campo largo">
+              <label>Como vai chegar</label>
+              <div class="au-previa" id="au-previa"></div>
+            </div>
             <div class="campo largo" id="au-bloco-publica">
               <label for="au-publica">Resposta no comentário</label>
               <input id="au-publica" type="text" placeholder="Te mandei no direct!">
@@ -188,8 +213,46 @@
       postEscolhido = { id: b.dataset.id, legenda: b.dataset.legenda };
       mostrarPost();
     });
+    P.$("#au-add-link", janela).addEventListener("click", () => mostrarLink(true));
+    P.$("#au-tirar-link", janela).addEventListener("click", () => {
+      P.$("#au-link", janela).value = "";
+      P.$("#au-link-texto", janela).value = "";
+      mostrarLink(false);
+    });
+    ["au-mensagem", "au-link", "au-link-texto"].forEach((id) => {
+      P.$("#" + id, janela).addEventListener("input", desenharPrevia);
+    });
     P.$("#au-apagar", janela).addEventListener("click", apagar);
     P.$("#au-form", janela).addEventListener("submit", salvar);
+  }
+
+  // Mostra ou esconde os campos do link. O botão "Adicionar um link"
+  // some quando os campos aparecem, para não ficarem os dois na tela.
+  function mostrarLink(mostrar) {
+    P.$("#au-link-campos", janela).hidden = !mostrar;
+    P.$("#au-add-link", janela).hidden = mostrar;
+    if (mostrar) P.$("#au-link", janela).focus();
+    desenharPrevia();
+  }
+
+  /* A prévia: o balão da DM como a pessoa vai ver, com o botão embaixo
+     quando existe link. Não é foto de celular como na referência, é o
+     conteúdo de verdade, que é o que importa conferir antes de salvar. */
+  function desenharPrevia() {
+    const texto = P.$("#au-mensagem", janela).value.trim();
+    const link = P.$("#au-link", janela).value.trim();
+    const rotulo = P.$("#au-link-texto", janela).value.trim() || "Ver agora";
+    const alvo = P.$("#au-previa", janela);
+    if (!texto && !link) {
+      alvo.innerHTML = `<p class="mudo pequeno">Escreva a mensagem para ver como ela chega.</p>`;
+      return;
+    }
+    alvo.innerHTML = `
+      <div class="au-balao">
+        <p>${P.esc(texto) || `<span class="mudo">sua mensagem aqui</span>`}</p>
+        ${link ? `<span class="au-botao-dm">${P.esc(rotulo)}</span>` : ""}
+      </div>
+      ${link ? `<p class="mudo pequeno">O botão leva para ${P.esc(curto(link, 50))}</p>` : ""}`;
   }
 
   function fechar() { if (janela.open) janela.close(); }
@@ -225,6 +288,9 @@
     P.$("#au-mensagem", janela).value = regra ? P.texto(regra.mensagem) : "";
     P.$("#au-publica", janela).value = regra ? P.texto(regra.resposta_publica) : "";
     P.$("#au-ativa", janela).checked = regra ? !!regra.ativa : true;
+    P.$("#au-link", janela).value = regra ? P.texto(regra.link) : "";
+    P.$("#au-link-texto", janela).value = regra ? P.texto(regra.link_texto) : "";
+    mostrarLink(!!(regra && regra.link));
     P.$("#au-posts", janela).hidden = true;
     P.$("#au-posts", janela).innerHTML = "";
     postEscolhido = regra && regra.post_id ? { id: regra.post_id, legenda: regra.post_legenda } : null;
@@ -238,7 +304,10 @@
     e.preventDefault();
     const comentario = P.$("#au-gatilho", janela).value === "comentario";
     const publica = P.$("#au-publica", janela).value.trim();
+    const link = P.$("#au-link", janela).value.trim();
     const valores = {
+      link: link || null,
+      link_texto: link ? (P.$("#au-link-texto", janela).value.trim() || "Ver agora") : null,
       nome: P.$("#au-nome", janela).value.trim(),
       gatilho: comentario ? "comentario" : "dm",
       palavras: P.$("#au-palavras", janela).value.trim(),
@@ -251,6 +320,7 @@
     if (!valores.nome) return erroNaJanela('Preencha o campo "Nome".');
     if (!valores.palavras) return erroNaJanela('Preencha o campo "Palavras-chave".');
     if (!valores.mensagem) return erroNaJanela('Preencha o campo "Mensagem na DM".');
+    if (link && !/^https?:\/\//i.test(link)) return erroNaJanela("O link precisa começar com https://");
 
     const botao = P.$("#au-salvar", janela);
     botao.disabled = true;
