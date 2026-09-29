@@ -3,7 +3,12 @@
    Respostas automáticas para comentários e DMs do Instagram.
    As regras ficam na tabela "automacoes" do Supabase.
    Quem dispara as respostas é a função "instagram" (Edge Function),
-   que o Instagram chama sozinho quando alguém comenta ou manda DM.
+   que o Instagram chama sozinho quando alguém comenta, manda DM ou
+   toca num botão da mensagem.
+
+   A automação pode ser só uma mensagem, como era no começo, ou uma
+   conversa em etapas: boas-vindas com botão, pedido para seguir, o
+   link, o pedido de e-mail e o lembrete de quem não abriu.
    ========================================================= */
 (function () {
   "use strict";
@@ -11,14 +16,27 @@
 
   let secao = null;
   let regras = [];
+  let emails = [];
   let janela = null;
   let editando = null;       // regra aberta na janela (null = nova)
   let postEscolhido = null;  // { id, legenda } ou null = todos os posts
+
+  // Os mesmos textos que a função "instagram" usa quando o campo fica vazio.
+  const PADRAO = {
+    botaoBoasVindas: "Me envie o link",
+    seguir: "Antes de eu te mandar: me segue aqui? Leva um segundo e me ajuda demais.",
+    email: "Me manda o seu e-mail? Assim eu te aviso quando sair coisa nova.",
+    emailOk: "Anotado, obrigada!",
+    lembrete: "Oi! Vi que você ainda não abriu o link. Deixei ele aqui de novo."
+  };
 
   const curto = (t, n) => {
     const s = String(t == null ? "" : t).replace(/\s+/g, " ").trim();
     return s.length > n ? s.slice(0, n - 1) + "…" : s;
   };
+
+  const val = (id) => P.$("#" + id, janela).value.trim();
+  const marcado = (id) => P.$("#" + id, janela).checked;
 
   P.abas.automacoes = {
     async iniciar(s) {
@@ -32,7 +50,8 @@
           </div>
         </div>
         <div id="au-lista"></div>
-        <p class="mudo pequeno" style="margin-top:10px">Regra do Instagram: cada comentário recebe uma DM só, até 7 dias depois de ser escrito. O painel nunca manda duas para o mesmo comentário.</p>`;
+        <div id="au-emails"></div>
+        <p class="mudo pequeno" style="margin-top:10px">Regra do Instagram: cada comentário recebe uma DM só, até 7 dias depois de ser escrito. E depois de 24 horas sem a pessoa responder nem tocar em nada, ele não deixa mais mandar nada para ela. Por isso o lembrete espera no máximo 23 horas.</p>`;
       montarJanela();
       P.$("#au-nova", s).addEventListener("click", () => abrir(null));
       P.$("#au-lista", s).addEventListener("click", (e) => {
@@ -40,10 +59,21 @@
         if (b) abrir(regras.find((r) => r.id === b.dataset.editar));
       });
       P.$("#au-lista", s).addEventListener("change", ligarOuPausar);
+      P.$("#au-emails", s).addEventListener("click", cuidarDosEmails);
       await carregar();
     },
-    async aoMostrar() { await carregar(); }
+    async aoMostrar() {
+      await carregar();
+      soltarLembretes();
+    }
   };
+
+  /* Toda vez que você abre a aba, o painel aproveita e pergunta ao robô
+     se tem lembrete vencido para mandar. Quem também pergunta, de hora
+     em hora, é o agendador do Supabase. */
+  function soltarLembretes() {
+    banco.functions.invoke("instagram", { body: { acao: "lembretes" } }).catch(() => { /* sem barulho */ });
+  }
 
   /* ---------- Ler as regras (com a contagem de envios junto) ---------- */
   async function lerRegras() {
@@ -63,12 +93,13 @@
     const avisos = P.$(".avisos", secao);
     P.limparAvisos(avisos);
     const r = await lerRegras();
-    if (r.erro) P.avisar(avisos, r.erro + " O arquivo das tabelas é o automacoes.sql.");
+    if (r.erro) P.avisar(avisos, r.erro + " Os arquivos das tabelas são o automacoes.sql e o automacoes-conversa.sql.");
     regras = r.dados;
     desenhar();
+    await carregarEmails();
   }
 
-  /* ---------- A lista ---------- */
+  /* ---------- A lista de regras ---------- */
   function desenhar() {
     const alvo = P.$("#au-lista", secao);
     if (!regras.length) {
@@ -77,28 +108,37 @@
     }
     alvo.innerHTML = `<div class="au-lista">${regras.map((r) => {
       const envios = P.num(r.automacoes_envios && r.automacoes_envios[0] && r.automacoes_envios[0].count);
-      const alvoRegra = r.gatilho === "dm"
-        ? "Em qualquer DM"
-        : r.post_id ? `Post: ${curto(r.post_legenda || "sem legenda", 45)}` : "Em todos os posts";
+      const alvoRegra = r.gatilho === "comentario"
+        ? (r.post_id ? `Post: ${curto(r.post_legenda || "sem legenda", 45)}` : "Em todos os posts")
+        : r.gatilho === "primeira_dm" ? "Na primeira DM da pessoa" : "Em qualquer DM";
       const palavras = String(r.palavras || "").split(",").map((p) => p.trim()).filter(Boolean);
       return `
         <article class="au-regra${r.ativa ? "" : " pausada"}">
           <div class="au-linha">
             <h3 class="au-nome">${P.esc(r.nome)}</h3>
-            ${P.pilula(r.gatilho === "dm" ? "Mensagem direta" : "Comentário", r.gatilho === "dm" ? "lilas" : "ciano")}
+            ${P.pilula(rotuloGatilho(r.gatilho), corGatilho(r.gatilho))}
             <label class="au-ligar"><input type="checkbox" data-ligar="${P.esc(r.id)}"${r.ativa ? " checked" : ""}>${r.ativa ? "Ligada" : "Pausada"}</label>
             <button class="botao botao-icone" type="button" data-editar="${P.esc(r.id)}" aria-label="Editar ${P.esc(r.nome)}">${P.icone("editar")}</button>
           </div>
-          <div class="au-palavras">${palavras.map((p) => P.pilula(p, "cinza")).join("")}</div>
+          ${r.gatilho === "primeira_dm" ? "" : `<div class="au-palavras">${palavras.map((p) => P.pilula(p, "cinza")).join("")}</div>`}
           <p class="au-msg">${P.esc(curto(r.mensagem, 180))}</p>
           <div class="au-meta">
             <span>${P.esc(alvoRegra)}</span>
             <span>${P.plural(envios, "envio", "envios")}</span>
+            ${r.boas_vindas ? `<span>${P.icone("raio", "ico-p")} boas-vindas</span>` : ""}
+            ${r.pedir_seguir ? `<span>${P.icone("check", "ico-p")} pede para seguir</span>` : ""}
             ${r.link ? `<span>${P.icone("link", "ico-p")} botão "${P.esc(r.link_texto || "Ver agora")}"</span>` : ""}
+            ${r.pedir_email ? `<span>${P.icone("carta", "ico-p")} pede e-mail</span>` : ""}
+            ${r.lembrete ? `<span>${P.icone("relogio", "ico-p")} lembra em ${Math.round(P.num(r.lembrete_horas)) || 20}h</span>` : ""}
           </div>
         </article>`;
     }).join("")}</div>`;
   }
+
+  const rotuloGatilho = (g) =>
+    g === "dm" ? "Mensagem direta" : g === "primeira_dm" ? "Primeira DM" : "Comentário";
+  const corGatilho = (g) =>
+    g === "dm" ? "lilas" : g === "primeira_dm" ? "verde" : "ciano";
 
   async function ligarOuPausar(e) {
     const chave = e.target.closest("[data-ligar]");
@@ -115,7 +155,80 @@
     await carregar();
   }
 
+  /* ---------- Os e-mails que as pessoas mandaram ---------- */
+  async function carregarEmails() {
+    const alvo = P.$("#au-emails", secao);
+    try {
+      const { data, error } = await banco
+        .from("automacoes_emails")
+        .select("*")
+        .order("criado_em", { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      emails = Array.isArray(data) ? data : [];
+    } catch (e) {
+      emails = [];
+    }
+    if (!emails.length) { alvo.innerHTML = ""; return; }
+    alvo.innerHTML = `
+      <div class="cartao au-emails">
+        <div class="au-linha">
+          <h3 class="au-nome">${P.icone("carta", "ico-p")}E-mails recebidos</h3>
+          ${P.pilula(P.plural(emails.length, "e-mail", "e-mails"), "cinza")}
+          <button class="botao empurra" type="button" id="au-copiar-emails">${P.icone("copiar", "ico-p")}Copiar todos</button>
+        </div>
+        <ul class="au-emails-lista">
+          ${emails.map((e) => `
+            <li>
+              <span class="au-email">${P.esc(e.email)}</span>
+              <span class="mudo pequeno">${e.username ? P.arroba(e.username) + " · " : ""}${P.esc(P.dataBR(e.criado_em))}</span>
+              <button class="botao botao-icone" type="button" data-apagar-email="${P.esc(e.id)}" aria-label="Apagar ${P.esc(e.email)}">${P.icone("lixo")}</button>
+            </li>`).join("")}
+        </ul>
+      </div>`;
+  }
+
+  async function cuidarDosEmails(e) {
+    const copiar = e.target.closest("#au-copiar-emails");
+    if (copiar) {
+      try {
+        await navigator.clipboard.writeText(emails.map((x) => x.email).join("\n"));
+        P.toast("E-mails copiados.");
+      } catch (erro) {
+        P.toast("Seu navegador não deixou copiar. Selecione com o mouse.", "erro");
+      }
+      return;
+    }
+    const apagar = e.target.closest("[data-apagar-email]");
+    if (!apagar) return;
+    if (!confirm("Apagar este e-mail da lista? Isso não tem volta.")) return;
+    const erro = await P.gravar("automacoes_emails", "apagar", null, apagar.dataset.apagarEmail);
+    if (erro) return P.toast(erro, "erro");
+    P.toast("E-mail apagado.");
+    await carregarEmails();
+  }
+
   /* ---------- A janela de criar e editar ---------- */
+
+  // Um cartão de etapa: título, chavinha de ligar e os campos que só
+  // aparecem quando ela está ligada.
+  function etapa(id, titulo, ajuda, campos) {
+    return `
+      <section class="au-etapa" data-etapa="${id}">
+        <div class="au-etapa-topo">
+          <div>
+            <h4>${titulo}</h4>
+            ${ajuda ? `<p class="mudo pequeno">${ajuda}</p>` : ""}
+          </div>
+          <label class="au-chave">
+            <input type="checkbox" id="au-${id}" aria-label="Ligar: ${titulo}">
+            <span class="au-chave-trilho" aria-hidden="true"></span>
+          </label>
+        </div>
+        <div class="au-etapa-campos" id="au-campos-${id}" hidden>${campos}</div>
+      </section>`;
+  }
+
   function montarJanela() {
     if (janela) return;
     janela = document.createElement("dialog");
@@ -139,12 +252,14 @@
               <label for="au-gatilho">Quando</label>
               <select id="au-gatilho">
                 <option value="comentario">Alguém comentar num post</option>
-                <option value="dm">Alguém mandar uma DM</option>
+                <option value="dm">Alguém mandar uma DM com a palavra</option>
+                <option value="primeira_dm">Alguém te mandar a primeira DM</option>
               </select>
+              <span class="campo-ajuda" id="au-ajuda-gatilho"></span>
             </div>
-            <div class="campo largo">
+            <div class="campo largo" id="au-bloco-palavras">
               <label for="au-palavras">Palavras-chave *</label>
-              <input id="au-palavras" type="text" placeholder="quero, mídia kit, link" required>
+              <input id="au-palavras" type="text" placeholder="quero, mídia kit, link">
               <span class="campo-ajuda">Separe por vírgula. Maiúsculas e acentos não fazem diferença.</span>
             </div>
             <div class="campo largo" id="au-bloco-post">
@@ -156,27 +271,91 @@
               </div>
               <div class="au-posts" id="au-posts" hidden></div>
             </div>
-            <div class="campo largo">
-              <label for="au-mensagem">Mensagem na DM *</label>
-              <textarea id="au-mensagem" placeholder="Oi! Aqui está o meu mídia kit: https://..." required></textarea>
-            </div>
+          </div>
 
-            <div class="campo largo" id="au-bloco-link">
-              <button class="botao" type="button" id="au-add-link">${P.icone("mais", "ico-p")}Adicionar um link</button>
-              <div class="au-link-campos" id="au-link-campos" hidden>
-                <div class="campo">
-                  <label for="au-link">Para onde o botão leva</label>
-                  <input id="au-link" type="url" placeholder="https://...">
+          <h3 class="au-titulo-secao">Eles receberão</h3>
+          <p class="mudo pequeno" id="au-aviso-etapas" hidden></p>
+
+          ${etapa("boas_vindas",
+            "uma mensagem de boas-vindas",
+            "Com um botão para a pessoa tocar. Só depois do toque é que o resto acontece.",
+            `<div class="campo largo">
+               <label for="au-boas_vindas_texto">O que ela vai ler</label>
+               <textarea id="au-boas_vindas_texto" maxlength="640" placeholder="Oi! Que bom te ver por aqui. Toca no botão abaixo que eu já te mando."></textarea>
+             </div>
+             <div class="campo largo">
+               <label for="au-boas_vindas_botao">O que o botão escreve</label>
+               <input id="au-boas_vindas_botao" type="text" maxlength="20" placeholder="${PADRAO.botaoBoasVindas}">
+               <span class="campo-ajuda">Até 20 letras. É limite do Instagram, não meu.</span>
+             </div>`)}
+
+          ${etapa("pedir_seguir",
+            "uma DM pedindo que te sigam antes do link",
+            "Só aparece para quem ainda não te segue. Quem já segue vai direto para o link.",
+            `<div class="campo largo">
+               <label for="au-pedir_seguir_texto">O que ela vai ler</label>
+               <textarea id="au-pedir_seguir_texto" maxlength="640" placeholder="${P.esc(PADRAO.seguir)}"></textarea>
+               <span class="campo-ajuda">Vão dois botões junto: um que abre o seu perfil e um "Já segui".</span>
+             </div>`)}
+
+          <section class="au-etapa au-etapa-fixa">
+            <div class="au-etapa-topo">
+              <div>
+                <h4>uma DM com a sua mensagem</h4>
+                <p class="mudo pequeno">Esta é a única que sempre vai. As outras são opcionais.</p>
+              </div>
+              <span class="pilula p-cinza">sempre</span>
+            </div>
+            <div class="au-etapa-campos">
+              <div class="campo largo">
+                <label for="au-mensagem">O que ela vai ler *</label>
+                <textarea id="au-mensagem" placeholder="Oi! Aqui está o meu mídia kit:" required></textarea>
+              </div>
+              <div class="campo largo" id="au-bloco-link">
+                <button class="botao" type="button" id="au-add-link">${P.icone("mais", "ico-p")}Adicionar um link</button>
+                <div class="au-link-campos" id="au-link-campos" hidden>
+                  <div class="campo">
+                    <label for="au-link">Para onde o botão leva</label>
+                    <input id="au-link" type="url" placeholder="https://...">
+                  </div>
+                  <div class="campo">
+                    <label for="au-link-texto">O que o botão escreve</label>
+                    <input id="au-link-texto" type="text" maxlength="20" placeholder="Ver agora">
+                    <span class="campo-ajuda">Até 20 letras. É limite do Instagram, não meu.</span>
+                  </div>
+                  <button class="botao botao-perigo" type="button" id="au-tirar-link">${P.icone("x", "ico-p")}Tirar o link</button>
                 </div>
-                <div class="campo">
-                  <label for="au-link-texto">O que o botão escreve</label>
-                  <input id="au-link-texto" type="text" maxlength="20" placeholder="Ver agora">
-                  <span class="campo-ajuda">Até 20 letras. É limite do Instagram, não meu.</span>
-                </div>
-                <button class="botao botao-perigo" type="button" id="au-tirar-link">${P.icone("x", "ico-p")}Tirar o link</button>
               </div>
             </div>
+          </section>
 
+          ${etapa("pedir_email",
+            "uma DM pedindo o e-mail",
+            "Vai logo depois do link. O que a pessoa responder fica guardado na lista de e-mails desta aba.",
+            `<div class="campo largo">
+               <label for="au-pedir_email_texto">O pedido</label>
+               <textarea id="au-pedir_email_texto" maxlength="900" placeholder="${P.esc(PADRAO.email)}"></textarea>
+             </div>
+             <div class="campo largo">
+               <label for="au-pedir_email_ok">O agradecimento</label>
+               <input id="au-pedir_email_ok" type="text" maxlength="300" placeholder="${PADRAO.emailOk}">
+               <span class="campo-ajuda">Mandado assim que ela responder com um e-mail de verdade.</span>
+             </div>`)}
+
+          ${etapa("lembrete",
+            "uma DM de lembrete, se ela não abrir o link",
+            "Só chega para quem recebeu o link e não tocou nele.",
+            `<div class="campo largo">
+               <label for="au-lembrete_horas">Esperar quantas horas</label>
+               <input id="au-lembrete_horas" type="number" min="1" max="23" step="1" value="20">
+               <span class="campo-ajuda">No máximo 23. Depois de 24 horas o Instagram não deixa mais falar com quem não respondeu.</span>
+             </div>
+             <div class="campo largo">
+               <label for="au-lembrete_texto">O que ela vai ler</label>
+               <textarea id="au-lembrete_texto" maxlength="640" placeholder="${P.esc(PADRAO.lembrete)}"></textarea>
+             </div>`)}
+
+          <div class="grade-campos" style="margin-top:14px">
             <div class="campo largo">
               <label>Como vai chegar</label>
               <div class="au-previa" id="au-previa"></div>
@@ -219,9 +398,19 @@
       P.$("#au-link-texto", janela).value = "";
       mostrarLink(false);
     });
-    ["au-mensagem", "au-link", "au-link-texto"].forEach((id) => {
+
+    // As chavinhas das etapas
+    ["boas_vindas", "pedir_seguir", "pedir_email", "lembrete"].forEach((id) => {
+      P.$("#au-" + id, janela).addEventListener("change", () => { ajustarEtapas(); desenharPrevia(); });
+    });
+
+    // Tudo que muda o texto redesenha a prévia
+    ["au-mensagem", "au-link", "au-link-texto", "au-boas_vindas_texto", "au-boas_vindas_botao",
+     "au-pedir_seguir_texto", "au-pedir_email_texto", "au-lembrete_texto", "au-lembrete_horas"
+    ].forEach((id) => {
       P.$("#" + id, janela).addEventListener("input", desenharPrevia);
     });
+
     P.$("#au-apagar", janela).addEventListener("click", apagar);
     P.$("#au-form", janela).addEventListener("submit", salvar);
   }
@@ -235,24 +424,89 @@
     desenharPrevia();
   }
 
-  /* A prévia: o balão da DM como a pessoa vai ver, com o botão embaixo
-     quando existe link. Não é foto de celular como na referência, é o
-     conteúdo de verdade, que é o que importa conferir antes de salvar. */
+  /* As etapas de seguir, e-mail e lembrete precisam saber QUEM é a
+     pessoa, e o Instagram só conta isso depois que ela toca em algo seu.
+     Num comentário ninguém tocou em nada ainda, então essas três só
+     funcionam junto com as boas-vindas. O painel liga sozinho e avisa. */
+  function ajustarEtapas() {
+    const gatilho = P.$("#au-gatilho", janela).value;
+    const dependentes = ["pedir_seguir", "pedir_email", "lembrete"];
+    const precisa = gatilho === "comentario" && dependentes.some((d) => marcado("au-" + d));
+
+    if (precisa && !marcado("au-boas_vindas")) P.$("#au-boas_vindas", janela).checked = true;
+
+    const aviso = P.$("#au-aviso-etapas", janela);
+    aviso.hidden = !precisa;
+    aviso.textContent = precisa
+      ? "As boas-vindas ficam ligadas porque num comentário o Instagram só me conta quem é a pessoa depois que ela toca no botão."
+      : "";
+
+    ["boas_vindas", "pedir_seguir", "pedir_email", "lembrete"].forEach((id) => {
+      const ligada = marcado("au-" + id);
+      P.$("#au-campos-" + id, janela).hidden = !ligada;
+      P.$$(`[data-etapa="${id}"]`, janela).forEach((s) => s.classList.toggle("ligada", ligada));
+    });
+
+    // Sem link não existe o que lembrar de abrir
+    const semLink = !val("au-link");
+    const cartaoLembrete = P.$('[data-etapa="lembrete"]', janela);
+    cartaoLembrete.classList.toggle("impedida", semLink);
+    P.$("#au-lembrete", janela).disabled = semLink;
+    if (semLink && marcado("au-lembrete")) P.$("#au-lembrete", janela).checked = false;
+  }
+
+  /* A prévia: os balões da DM na ordem em que vão chegar. Não é foto de
+     celular, é o conteúdo de verdade, que é o que importa conferir. */
+  function balao(texto, botoes, nota, vazio) {
+    return `
+      <div class="au-passo">
+        <div class="au-balao">
+          <p>${texto ? P.esc(texto) : `<span class="mudo">${P.esc(vazio || "")}</span>`}</p>
+          ${(botoes || []).map((b) => `<span class="au-botao-dm">${P.esc(b)}</span>`).join("")}
+        </div>
+        ${nota ? `<p class="mudo pequeno">${P.esc(nota)}</p>` : ""}
+      </div>`;
+  }
+
   function desenharPrevia() {
-    const texto = P.$("#au-mensagem", janela).value.trim();
-    const link = P.$("#au-link", janela).value.trim();
-    const rotulo = P.$("#au-link-texto", janela).value.trim() || "Ver agora";
-    const alvo = P.$("#au-previa", janela);
-    if (!texto && !link) {
-      alvo.innerHTML = `<p class="mudo pequeno">Escreva a mensagem para ver como ela chega.</p>`;
-      return;
+    if (!janela) return;
+    ajustarEtapas();
+    const link = val("au-link");
+    const rotuloLink = val("au-link-texto") || "Ver agora";
+    const passos = [];
+
+    if (marcado("au-boas_vindas")) {
+      passos.push(balao(
+        val("au-boas_vindas_texto") || val("au-mensagem"),
+        [val("au-boas_vindas_botao") || PADRAO.botaoBoasVindas],
+        "Nada mais acontece enquanto ela não tocar nesse botão.",
+        "sua mensagem de boas-vindas aqui"));
     }
-    alvo.innerHTML = `
-      <div class="au-balao">
-        <p>${P.esc(texto) || `<span class="mudo">sua mensagem aqui</span>`}</p>
-        ${link ? `<span class="au-botao-dm">${P.esc(rotulo)}</span>` : ""}
-      </div>
-      ${link ? `<p class="mudo pequeno">O botão leva para ${P.esc(curto(link, 50))}</p>` : ""}`;
+    if (marcado("au-pedir_seguir")) {
+      passos.push(balao(
+        val("au-pedir_seguir_texto") || PADRAO.seguir,
+        ["Seguir", "Já segui"],
+        "Só para quem ainda não te segue."));
+    }
+    passos.push(balao(
+      val("au-mensagem"),
+      link ? [rotuloLink] : [],
+      link ? "O botão leva para " + curto(link, 45) : "",
+      "sua mensagem aqui"));
+    if (marcado("au-pedir_email")) {
+      passos.push(balao(
+        val("au-pedir_email_texto") || PADRAO.email,
+        [],
+        "A resposta dela entra na lista de e-mails desta aba."));
+    }
+    if (marcado("au-lembrete")) {
+      const horas = Math.round(P.num(val("au-lembrete_horas"))) || 20;
+      passos.push(balao(
+        val("au-lembrete_texto") || PADRAO.lembrete,
+        link ? [rotuloLink] : [],
+        `Só para quem não abriu o link, ${horas} ${horas === 1 ? "hora" : "horas"} depois.`));
+    }
+    P.$("#au-previa", janela).innerHTML = passos.join("");
   }
 
   function fechar() { if (janela.open) janela.close(); }
@@ -263,11 +517,18 @@
     el.hidden = !msg;
   }
 
-  // Post e resposta pública só existem quando o gatilho é comentário
+  // Post e resposta pública só existem no comentário.
+  // Palavras-chave não existem na primeira DM: ali vale qualquer coisa.
   function ajustarGatilho() {
-    const comentario = P.$("#au-gatilho", janela).value === "comentario";
+    const gatilho = P.$("#au-gatilho", janela).value;
+    const comentario = gatilho === "comentario";
     P.$("#au-bloco-post", janela).hidden = !comentario;
     P.$("#au-bloco-publica", janela).hidden = !comentario;
+    P.$("#au-bloco-palavras", janela).hidden = gatilho === "primeira_dm";
+    P.$("#au-ajuda-gatilho", janela).textContent = gatilho === "primeira_dm"
+      ? "Vale uma vez por pessoa, na primeira mensagem que ela te manda. O Instagram não avisa ninguém quando você ganha um seguidor, então esta é a boas-vindas que dá para fazer de verdade."
+      : "";
+    desenharPrevia();
   }
 
   function mostrarPost() {
@@ -290,6 +551,19 @@
     P.$("#au-ativa", janela).checked = regra ? !!regra.ativa : true;
     P.$("#au-link", janela).value = regra ? P.texto(regra.link) : "";
     P.$("#au-link-texto", janela).value = regra ? P.texto(regra.link_texto) : "";
+
+    P.$("#au-boas_vindas", janela).checked = !!(regra && regra.boas_vindas);
+    P.$("#au-boas_vindas_texto", janela).value = regra ? P.texto(regra.boas_vindas_texto) : "";
+    P.$("#au-boas_vindas_botao", janela).value = regra ? P.texto(regra.boas_vindas_botao) : "";
+    P.$("#au-pedir_seguir", janela).checked = !!(regra && regra.pedir_seguir);
+    P.$("#au-pedir_seguir_texto", janela).value = regra ? P.texto(regra.pedir_seguir_texto) : "";
+    P.$("#au-pedir_email", janela).checked = !!(regra && regra.pedir_email);
+    P.$("#au-pedir_email_texto", janela).value = regra ? P.texto(regra.pedir_email_texto) : "";
+    P.$("#au-pedir_email_ok", janela).value = regra ? P.texto(regra.pedir_email_ok) : "";
+    P.$("#au-lembrete", janela).checked = !!(regra && regra.lembrete);
+    P.$("#au-lembrete_texto", janela).value = regra ? P.texto(regra.lembrete_texto) : "";
+    P.$("#au-lembrete_horas", janela).value = regra && regra.lembrete_horas ? regra.lembrete_horas : 20;
+
     mostrarLink(!!(regra && regra.link));
     P.$("#au-posts", janela).hidden = true;
     P.$("#au-posts", janela).innerHTML = "";
@@ -302,25 +576,48 @@
 
   async function salvar(e) {
     e.preventDefault();
-    const comentario = P.$("#au-gatilho", janela).value === "comentario";
-    const publica = P.$("#au-publica", janela).value.trim();
-    const link = P.$("#au-link", janela).value.trim();
+    const gatilho = P.$("#au-gatilho", janela).value;
+    const comentario = gatilho === "comentario";
+    const publica = val("au-publica");
+    const link = val("au-link");
+    const horas = Math.round(P.num(val("au-lembrete_horas"))) || 20;
+
     const valores = {
-      link: link || null,
-      link_texto: link ? (P.$("#au-link-texto", janela).value.trim() || "Ver agora") : null,
-      nome: P.$("#au-nome", janela).value.trim(),
-      gatilho: comentario ? "comentario" : "dm",
-      palavras: P.$("#au-palavras", janela).value.trim(),
-      mensagem: P.$("#au-mensagem", janela).value.trim(),
+      nome: val("au-nome"),
+      gatilho,
+      palavras: gatilho === "primeira_dm" ? "" : val("au-palavras"),
+      mensagem: val("au-mensagem"),
       resposta_publica: comentario && publica ? publica : null,
       post_id: comentario && postEscolhido ? postEscolhido.id : null,
       post_legenda: comentario && postEscolhido ? postEscolhido.legenda : null,
-      ativa: P.$("#au-ativa", janela).checked
+      ativa: marcado("au-ativa"),
+
+      link: link || null,
+      link_texto: link ? (val("au-link-texto") || "Ver agora") : null,
+
+      boas_vindas: marcado("au-boas_vindas"),
+      boas_vindas_texto: val("au-boas_vindas_texto") || null,
+      boas_vindas_botao: val("au-boas_vindas_botao") || null,
+
+      pedir_seguir: marcado("au-pedir_seguir"),
+      pedir_seguir_texto: val("au-pedir_seguir_texto") || null,
+
+      pedir_email: marcado("au-pedir_email"),
+      pedir_email_texto: val("au-pedir_email_texto") || null,
+      pedir_email_ok: val("au-pedir_email_ok") || null,
+
+      lembrete: marcado("au-lembrete") && !!link,
+      lembrete_texto: val("au-lembrete_texto") || null,
+      lembrete_horas: Math.min(23, Math.max(1, horas))
     };
+
     if (!valores.nome) return erroNaJanela('Preencha o campo "Nome".');
-    if (!valores.palavras) return erroNaJanela('Preencha o campo "Palavras-chave".');
-    if (!valores.mensagem) return erroNaJanela('Preencha o campo "Mensagem na DM".');
+    if (gatilho !== "primeira_dm" && !valores.palavras) return erroNaJanela('Preencha o campo "Palavras-chave".');
+    if (!valores.mensagem) return erroNaJanela('Escreva a mensagem que a pessoa vai receber.');
     if (link && !/^https?:\/\//i.test(link)) return erroNaJanela("O link precisa começar com https://");
+    if (valores.boas_vindas && !valores.boas_vindas_texto && !valores.mensagem) {
+      return erroNaJanela("Escreva o texto das boas-vindas.");
+    }
 
     const botao = P.$("#au-salvar", janela);
     botao.disabled = true;
@@ -359,9 +656,9 @@
         ? posts.map((p) => {
             const img = p.media_type === "VIDEO" ? p.thumbnail_url : p.media_url;
             const legenda = curto(p.caption, 120);
-            const marcado = postEscolhido && postEscolhido.id === p.id;
+            const escolhido = postEscolhido && postEscolhido.id === p.id;
             return `<button class="au-post" type="button" data-id="${P.esc(p.id)}" data-legenda="${P.esc(legenda)}"
-                      aria-pressed="${marcado ? "true" : "false"}" title="${P.esc(legenda || "Post sem legenda")}">
+                      aria-pressed="${escolhido ? "true" : "false"}" title="${P.esc(legenda || "Post sem legenda")}">
                       ${img ? `<img src="${P.esc(img)}" alt="" loading="lazy">` : ""}
                     </button>`;
           }).join("")
