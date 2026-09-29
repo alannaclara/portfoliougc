@@ -128,12 +128,17 @@
             ${r.boas_vindas ? `<span>${P.icone("raio", "ico-p")} boas-vindas</span>` : ""}
             ${r.pedir_seguir ? `<span>${P.icone("check", "ico-p")} pede para seguir</span>` : ""}
             ${r.link ? `<span>${P.icone("link", "ico-p")} botão "${P.esc(r.link_texto || "Ver agora")}"</span>` : ""}
+            ${quantasRespostas(r) > 1 ? `<span>${P.icone("legenda", "ico-p")} ${quantasRespostas(r)} respostas sorteadas</span>` : ""}
             ${r.pedir_email ? `<span>${P.icone("carta", "ico-p")} pede e-mail</span>` : ""}
             ${r.lembrete ? `<span>${P.icone("relogio", "ico-p")} lembra em ${Math.round(P.num(r.lembrete_horas)) || 20}h</span>` : ""}
           </div>
         </article>`;
     }).join("")}</div>`;
   }
+
+  const quantasRespostas = (r) =>
+    [r.resposta_publica, r.resposta_publica_2, r.resposta_publica_3, r.resposta_publica_4]
+      .filter((t) => String(t || "").trim()).length;
 
   const rotuloGatilho = (g) =>
     g === "dm" ? "Mensagem direta" : g === "primeira_dm" ? "Primeira DM" : "Comentário";
@@ -362,8 +367,14 @@
             </div>
             <div class="campo largo" id="au-bloco-publica">
               <label for="au-publica">Resposta no comentário</label>
-              <input id="au-publica" type="text" placeholder="Te mandei no direct!">
-              <span class="campo-ajuda">Opcional. Fica visível para todo mundo embaixo do comentário.</span>
+              <div class="au-respostas">
+                <input id="au-publica" type="text" maxlength="300" placeholder="Te mandei no direct!">
+                <input id="au-publica-2" type="text" maxlength="300" placeholder="Prontinho, corre ver o seu direct">
+                <input id="au-publica-3" type="text" maxlength="300" placeholder="Acabei de te mandar por lá">
+                <input id="au-publica-4" type="text" maxlength="300" placeholder="Já foi pro seu direct, dá uma olhada">
+              </div>
+              <span class="campo-ajuda">Opcional. Fica visível para todo mundo embaixo do comentário. Escreva mais de uma e o robô sorteia uma a cada comentário, para não ficar a mesma frase repetida embaixo de todo mundo.</span>
+              <p class="mudo pequeno" id="au-conta-respostas"></p>
             </div>
             <label class="campo campo-marcar largo" for="au-ativa"><input id="au-ativa" type="checkbox" checked>Automação ligada</label>
           </div>
@@ -411,8 +422,24 @@
       P.$("#" + id, janela).addEventListener("input", desenharPrevia);
     });
 
+    P.$$(".au-respostas input", janela).forEach((i) => i.addEventListener("input", contarRespostas));
+
     P.$("#au-apagar", janela).addEventListener("click", apagar);
     P.$("#au-form", janela).addEventListener("submit", salvar);
+  }
+
+  // Só para você saber, sem abrir o Instagram, quantas frases estão
+  // entrando no sorteio das respostas públicas.
+  function respostasEscritas() {
+    return ["au-publica", "au-publica-2", "au-publica-3", "au-publica-4"]
+      .map(val).filter(Boolean);
+  }
+
+  function contarRespostas() {
+    const quantas = respostasEscritas().length;
+    P.$("#au-conta-respostas", janela).textContent = quantas > 1
+      ? `O robô vai sortear entre ${quantas} respostas.`
+      : quantas === 1 ? "Só uma resposta escrita, então ela vai repetir embaixo de todo comentário." : "";
   }
 
   // Mostra ou esconde os campos do link. O botão "Adicionar um link"
@@ -548,6 +575,9 @@
     P.$("#au-palavras", janela).value = regra ? P.texto(regra.palavras) : "";
     P.$("#au-mensagem", janela).value = regra ? P.texto(regra.mensagem) : "";
     P.$("#au-publica", janela).value = regra ? P.texto(regra.resposta_publica) : "";
+    P.$("#au-publica-2", janela).value = regra ? P.texto(regra.resposta_publica_2) : "";
+    P.$("#au-publica-3", janela).value = regra ? P.texto(regra.resposta_publica_3) : "";
+    P.$("#au-publica-4", janela).value = regra ? P.texto(regra.resposta_publica_4) : "";
     P.$("#au-ativa", janela).checked = regra ? !!regra.ativa : true;
     P.$("#au-link", janela).value = regra ? P.texto(regra.link) : "";
     P.$("#au-link-texto", janela).value = regra ? P.texto(regra.link_texto) : "";
@@ -570,6 +600,7 @@
     postEscolhido = regra && regra.post_id ? { id: regra.post_id, legenda: regra.post_legenda } : null;
     mostrarPost();
     ajustarGatilho();
+    contarRespostas();
     if (typeof janela.showModal === "function") janela.showModal(); else janela.setAttribute("open", "");
     P.$("#au-nome", janela).focus();
   }
@@ -578,7 +609,9 @@
     e.preventDefault();
     const gatilho = P.$("#au-gatilho", janela).value;
     const comentario = gatilho === "comentario";
-    const publica = val("au-publica");
+    // As respostas vazias saem da lista e as que sobraram sobem, para
+    // não ficar buraco no meio nem frase em branco no sorteio.
+    const publicas = comentario ? respostasEscritas() : [];
     const link = val("au-link");
     const horas = Math.round(P.num(val("au-lembrete_horas"))) || 20;
 
@@ -587,7 +620,10 @@
       gatilho,
       palavras: gatilho === "primeira_dm" ? "" : val("au-palavras"),
       mensagem: val("au-mensagem"),
-      resposta_publica: comentario && publica ? publica : null,
+      resposta_publica: publicas[0] || null,
+      resposta_publica_2: publicas[1] || null,
+      resposta_publica_3: publicas[2] || null,
+      resposta_publica_4: publicas[3] || null,
       post_id: comentario && postEscolhido ? postEscolhido.id : null,
       post_legenda: comentario && postEscolhido ? postEscolhido.legenda : null,
       ativa: marcado("au-ativa"),

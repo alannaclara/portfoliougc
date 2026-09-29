@@ -525,6 +525,9 @@ tr.deslizando:hover{background:transparent}
 .au-balao p{font-size:13px;line-height:1.5;white-space:pre-line;margin:0}
 .au-botao-dm{display:block;margin-top:8px;padding:7px 10px;border-top:1px solid var(--linha);font-size:12.5px;font-weight:600;text-align:center;color:var(--ciano)}
 
+/* As quatro respostas públicas que entram no sorteio */
+.au-respostas{display:grid;gap:6px}
+
 /* A lista de e-mails que chegaram pelas automações */
 .au-emails{margin-top:14px}
 .au-emails-lista{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:1px;background:var(--linha);border:1px solid var(--linha);border-radius:var(--raio-sm);overflow:hidden}
