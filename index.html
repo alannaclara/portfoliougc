@@ -101,7 +101,8 @@ section{padding-block:var(--secao)}
 
 /* ===== CAPA ===== */
 .capa{padding-top:calc(var(--topo) + clamp(16px,3vw,32px));padding-bottom:0}
-.capa-grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:center;padding-block:clamp(44px,7vw,96px)}
+/* Pouco espaço em cima (a faixa que ficava aqui foi tirada) e o respiro normal embaixo */
+.capa-grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:center;padding-top:clamp(10px,1.5vw,20px);padding-bottom:clamp(44px,7vw,96px)}
 .capa h1{font-size:clamp(3.6rem,12.4vw,9.6rem);line-height:.88;letter-spacing:-.04em;margin-bottom:clamp(24px,3vw,36px)}
 .capa h1 span{display:block}
 .capa h1 em{display:inline-block;margin-left:.55em}
