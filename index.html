@@ -42,7 +42,10 @@
   --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --topo:72px;
   --gutter:clamp(16px,4vw,40px);
-  --secao:clamp(88px,12vw,164px);
+  /* Respiro dentro das seções coloridas (Serviços e Contato) */
+  --secao:clamp(64px,8vw,112px);
+  /* Espaço vazio entre duas seções de fundo claro */
+  --entre:clamp(36px,4.5vw,64px);
   --ease:cubic-bezier(.22,.61,.36,1);
 }
 
@@ -65,9 +68,14 @@ button{font:inherit}
 .pular:focus{top:12px}
 .container{width:100%;max-width:1240px;margin-inline:auto;padding-inline:var(--gutter)}
 section{padding-block:var(--secao)}
-/* O fim do Sobre mim e o começo dos Trabalhos ficam mais perto um do outro */
-#sobre{padding-bottom:clamp(36px,4.5vw,64px)}
-#trabalhos{padding-top:clamp(36px,4.5vw,64px)}
+/* REGRA DO ESPAÇO ENTRE AS SEÇÕES
+   As seções de fundo claro (Sobre mim, Trabalhos, Números) usam o espaço
+   menor, porque entre elas é só vazio. As seções coloridas (Serviços e
+   Contato) ficam com o espaço maior, que ali não é vazio: é o respiro
+   dentro do próprio bloco de cor.
+   Se um dia eu tirar alguma parte do site, é esta regra que evita
+   sobrar um buraco no lugar. */
+#sobre,#trabalhos,#numeros{padding-block:var(--entre)}
 
 /* ===== CABEÇALHO DE CADA SEÇÃO ===== */
 .cabeca{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:20px clamp(32px,6vw,96px);align-items:end;margin-bottom:clamp(44px,6vw,80px)}
