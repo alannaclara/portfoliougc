@@ -167,29 +167,12 @@ section{padding-block:var(--secao)}
 .promessas span:not(.icone){display:block;font-size:.93rem;line-height:1.5;color:var(--tinta-2)}
 .assinatura-pre{font-size:.9rem;color:var(--tinta-2)}
 .assinatura-nome{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(2.2rem,4vw,3rem);line-height:1.1;color:var(--tinta);padding:0 .12em;background:linear-gradient(transparent 55%,var(--azul) 55%,var(--azul) 88%,transparent 88%);transform:rotate(-2deg);transform-origin:left;display:inline-block}
-/* ===== CONTEÚDOS DE DESTAQUE ===== */
-.destaques{background:var(--papel)}
-.destaques-grade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,40px)}
-.destaque{display:flex;flex-direction:column;color:inherit;text-decoration:none;border-radius:var(--raio)}
-.destaque:focus-visible{outline-offset:8px}
-.destaque-capa{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:var(--raio);box-shadow:var(--sombra);transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
-.destaque:hover .destaque-capa{transform:translateY(-6px);box-shadow:var(--sombra-forte)}
-.destaque-capa img,.trabalho-capa img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* ===== ESPAÇO RESERVADO E BOTÃO DE PLAY DOS CARTÕES DE VÍDEO ===== */
 .ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px}
 .ph::after{content:"";position:absolute;inset:auto 0 0;height:45%;background:linear-gradient(transparent,rgba(23,59,67,.35));pointer-events:none}
 .ph .legenda{position:relative;z-index:1}
-.chip{position:absolute;top:14px;left:14px;z-index:2;padding:6px 11px;border-radius:999px;background:var(--papel);color:var(--tinta);font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 .play{position:absolute;top:50%;left:50%;z-index:2;width:76px;height:76px;margin:-38px 0 0 -38px;display:grid;place-items:center;border-radius:50%;background:rgba(251,248,245,.94);color:var(--tinta);box-shadow:0 14px 30px -12px rgba(23,59,67,.55);transition:transform .4s var(--ease),background-color .3s,color .3s}
 .play svg{width:26px;height:26px;margin-left:4px;fill:currentColor}
-.destaque:hover .play{transform:scale(1.1);background:var(--azul);color:var(--tinta)}
-.destaque-info{padding:26px 4px 0}
-.destaque .num{font-size:clamp(2.6rem,4.6vw,3.7rem)}
-.destaque-rotulo{display:block;margin-top:10px;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2)}
-.destaque h3{margin-top:20px;padding-top:20px;border-top:1px solid var(--linha);font-size:clamp(1.35rem,2vw,1.6rem);line-height:1.15}
-.destaque-contexto{margin-top:8px;font-size:.94rem;line-height:1.5;color:var(--tinta-2)}
-.assistir{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding-bottom:3px;font-size:.88rem;font-weight:600;color:var(--tinta);background:linear-gradient(var(--azul),var(--azul)) 0 100%/100% 4px no-repeat}
-.assistir .ico{width:16px;height:16px;transition:transform .3s var(--ease)}
-.destaque:hover .assistir .ico{transform:translate(2px,-2px)}
 
 /* Degradês dos espaços reservados, um por nicho */
 .ph-beleza{background:radial-gradient(90% 55% at 30% 15%,rgba(255,255,255,.55),transparent 60%),linear-gradient(165deg,#fbe8e1 0%,#f4b8a8 58%,#e9a08e 100%)}
@@ -411,7 +394,6 @@ div.video:not([data-video]){cursor:default}
   .video{--por-tela:3}
 }
 @media (max-width:760px){
-  .destaques-grade{grid-template-columns:minmax(0,1fr);max-width:400px;margin-inline:auto;gap:56px}
   .video{--por-tela:2.4}
   .servicos-grade,.depoimentos{grid-template-columns:minmax(0,1fr)}
   .capa-meta span:nth-child(2){display:none}
@@ -476,7 +458,6 @@ div.video:not([data-video]){cursor:default}
     <nav class="menu" id="menu" aria-label="Menu principal">
       <ul>
         <li><a href="#sobre">Sobre</a></li>
-        <li><a href="#destaques">Destaques</a></li>
         <li><a href="#trabalhos">Trabalhos</a></li>
         <li><a href="#servicos">Serviços</a></li>
         <li><a href="#numeros">Números</a></li>
@@ -579,28 +560,12 @@ div.video:not([data-video]){cursor:default}
   </div>
 </section>
 
-<!-- ================= 3. CONTEÚDOS DE DESTAQUE ================= -->
-<section class="destaques" id="destaques" aria-labelledby="destaques-titulo">
-  <div class="container">
-    <header class="cabeca">
-      <div>
-        <p class="rotulo revelar"><b>02</b> Destaques</p>
-        <h2 class="titulo revelar" id="destaques-titulo">Conteúdos de <em>destaque</em></h2>
-      </div>
-      <p class="intro revelar">Três vídeos que resumem o meu jeito de criar: gancho forte nos primeiros segundos, luz bonita e uma história que dá vontade de ver até o fim.</p>
-    </header>
-    <!-- Os três cards vêm do array DESTAQUES no script.
-         LINK DO VÍDEO: campo "link" de cada item. CAPA 9:16: campo "capa" de cada item. -->
-    <div class="destaques-grade" id="grade-destaques"></div>
-  </div>
-</section>
-
-<!-- ================= 4. TRABALHOS POR NICHO ================= -->
+<!-- ================= 3. TRABALHOS POR NICHO ================= -->
 <section class="trabalhos" id="trabalhos" aria-labelledby="trabalhos-titulo">
   <div class="container">
     <header class="cabeca">
       <div>
-        <p class="rotulo revelar"><b>03</b> Trabalhos</p>
+        <p class="rotulo revelar"><b>02</b> Trabalhos</p>
         <h2 class="titulo revelar" id="trabalhos-titulo">Trabalhos por <em>nicho</em></h2>
       </div>
       <p class="intro revelar">Escolha um nicho e veja como eu adapto a linguagem, o cenário e o ritmo para cada tipo de produto. Passe o mouse sobre um vídeo para ver a prévia sem som e clique para assistir com som.</p>
@@ -611,12 +576,12 @@ div.video:not([data-video]){cursor:default}
     <div class="nichos" id="nichos"></div>
   </div>
 </section>
-<!-- ================= 5. COMO EU TE AJUDO ================= -->
+<!-- ================= 4. COMO EU TE AJUDO ================= -->
 <section class="servicos" id="servicos" aria-labelledby="servicos-titulo">
   <div class="container">
     <header class="cabeca">
       <div>
-        <p class="rotulo revelar"><b>04</b> Serviços</p>
+        <p class="rotulo revelar"><b>03</b> Serviços</p>
         <h2 class="titulo revelar" id="servicos-titulo">Como eu te <em>ajudo</em></h2>
       </div>
       <p class="intro revelar">Do vídeo avulso ao pacote do mês: escolha o formato que faz sentido para o momento da sua marca.</p>
@@ -630,12 +595,12 @@ div.video:not([data-video]){cursor:default}
   </div>
 </section>
 
-<!-- ================= 6. NÚMEROS E DEPOIMENTOS ================= -->
+<!-- ================= 5. NÚMEROS E DEPOIMENTOS ================= -->
 <section class="numeros" id="numeros" aria-labelledby="numeros-titulo">
   <div class="container">
     <header class="cabeca">
       <div>
-        <p class="rotulo revelar"><b>05</b> Números</p>
+        <p class="rotulo revelar"><b>04</b> Números</p>
         <h2 class="titulo revelar" id="numeros-titulo">Números e <em>depoimentos</em></h2>
       </div>
       <p class="intro revelar">Resultados que dá para medir e palavras de quem já criou comigo.</p>
@@ -649,11 +614,11 @@ div.video:not([data-video]){cursor:default}
   </div>
 </section>
 
-<!-- ================= 7. BORA CRIAR JUNTOS ================= -->
+<!-- ================= 6. BORA CRIAR JUNTOS ================= -->
 <section class="contato" id="contato" aria-labelledby="contato-titulo">
   <div class="container contato-grade">
     <div class="contato-texto">
-      <p class="rotulo revelar"><b>06</b> Contato</p>
+      <p class="rotulo revelar"><b>05</b> Contato</p>
       <h2 class="titulo revelar" id="contato-titulo">Bora criar <em>juntos</em>?</h2>
       <p class="revelar">Me conta sobre a sua marca, o produto e o que você quer alcançar. Eu respondo com ideias de roteiro e uma proposta sob medida.</p>
       <ul class="canais revelar">
@@ -719,7 +684,7 @@ div.video:not([data-video]){cursor:default}
 
 </main>
 
-<!-- ================= 8. RODAPÉ ================= -->
+<!-- ================= 7. RODAPÉ ================= -->
 <footer class="rodape">
   <div class="container">
     <div class="rodape-grade">
@@ -846,42 +811,6 @@ const NICHOS = {
   tech: "Tech"
 };
 
-// DESTAQUES: os três vídeos grandes da seção Conteúdos de destaque.
-const DESTAQUES = [
-  {
-    // LINK DO VÍDEO: cole aqui o link do reels, do TikTok ou do Google Drive.
-    link: "https://www.instagram.com/_alannaclara/",
-    // CAPA: caminho da imagem vertical 9:16 (ex.: "capa-destaque-1.jpg"). Deixe vazio para mostrar o degradê.
-    capa: "",
-    nicho: "skincare",
-    formato: "Reels",
-    valor: 0, casas: 1, prefixo: "+", sufixo: "M", // PLACEHOLDER: troque pelo número real
-    rotulo: "views no reels",
-    titulo: "Rotina de skincare da noite",
-    contexto: "Marca 01 · vídeo UGC publicado como reels orgânico"
-  },
-  {
-    link: "https://www.instagram.com/_alannaclara/", // LINK DO VÍDEO
-    capa: "",                                          // CAPA 9:16
-    nicho: "comida",
-    formato: "TikTok",
-    valor: 0, casas: 0, prefixo: "+", sufixo: "K",    // PLACEHOLDER
-    rotulo: "salvamentos",
-    titulo: "Receita rápida com o produto",
-    contexto: "Marca 02 · receita gravada na cozinha de casa"
-  },
-  {
-    link: "https://www.instagram.com/_alannaclara/", // LINK DO VÍDEO
-    capa: "",                                          // CAPA 9:16
-    nicho: "tech",
-    formato: "Anúncio",
-    valor: 0, casas: 1, prefixo: "", sufixo: "%",     // PLACEHOLDER
-    rotulo: "de CTR no anúncio",
-    titulo: "Unboxing do fone sem fio",
-    contexto: "Marca 03 · corte para anúncio com gancho logo no início"
-  }
-];
-
 // FRASES DOS NICHOS: aparecem em itálico embaixo do nome de cada carrossel.
 const FRASES_NICHOS = {
   beleza: "Produtos que viram ritual",
@@ -981,12 +910,6 @@ function contador(m) {
   return `<span class="num"><span class="contador" aria-hidden="true" data-valor="${valor}" data-casas="${casas}" data-prefixo="${esc(pre)}" data-sufixo="${esc(suf)}">${esc(animar ? inicio : final)}</span><span class="sr">${esc(final)}</span></span>`;
 }
 
-// Capa: usa a imagem se existir, senão mostra o degradê com a legenda do formato.
-function capa(item, legenda, alt) {
-  if (item.capa) return `<img src="${esc(item.capa)}" alt="${esc(alt)}" loading="lazy" decoding="async">`;
-  return `<span class="ph ph-${esc(item.nicho)}" role="img" aria-label="${esc(alt)}"><span class="legenda">${esc(legenda)}</span></span>`;
-}
-
 function sigla(nome) {
   const palavras = String(nome).trim().split(/\s+/);
   const letras = palavras.filter((p) => /^[A-Za-zÀ-ÿ]/.test(p)).map((p) => p[0]);
@@ -1041,25 +964,6 @@ $("#numeros-capa").innerHTML = METRICAS.slice(0, 3)
 
 $("#lista-metricas").innerHTML = METRICAS
   .map((m) => `<li class="metrica">${contador(m)}<span class="num-rotulo">${esc(m.rotulo)}</span></li>`).join("");
-
-$("#grade-destaques").innerHTML = DESTAQUES.map((d, i) => {
-  const numero = (d.prefixo || "") + formatar(Number(d.valor) || 0, Number(d.casas) || 0) + (d.sufixo || "");
-  const nome = `${d.titulo}. ${numero} ${d.rotulo}. Assistir ao vídeo em nova aba`;
-  return `<a class="destaque revelar" style="--atraso:${i * 0.12}s" href="${esc(d.link)}" target="_blank" rel="noopener" aria-label="${esc(nome)}">
-      <div class="destaque-capa">
-        ${capa(d, "capa do vídeo · 9:16", "Capa do vídeo " + d.titulo)}
-        <span class="chip">${esc(d.formato)}</span>
-        <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
-      </div>
-      <div class="destaque-info">
-        ${contador(d)}
-        <span class="destaque-rotulo">${esc(d.rotulo)}</span>
-        <h3>${esc(d.titulo)}</h3>
-        <p class="destaque-contexto">${esc(d.contexto)}</p>
-        <span class="assistir">Assistir ao vídeo <svg class="ico" aria-hidden="true"><use href="#i-diag"/></svg></span>
-      </div>
-    </a>`;
-}).join("");
 
 /* ---------- Trabalhos: um carrossel por nicho ---------- */
 // Pega o código do vídeo de qualquer link do YouTube (shorts, watch, youtu.be ou embed)
