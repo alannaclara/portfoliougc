@@ -101,7 +101,6 @@ section{padding-block:var(--secao)}
 
 /* ===== CAPA ===== */
 .capa{padding-top:calc(var(--topo) + clamp(16px,3vw,32px));padding-bottom:0}
-.capa-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 20px;padding-block:14px;border-block:1px solid var(--linha);font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-2)}
 .capa-grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:center;padding-block:clamp(44px,7vw,96px)}
 .capa h1{font-size:clamp(3.6rem,12.4vw,9.6rem);line-height:.88;letter-spacing:-.04em;margin-bottom:clamp(24px,3vw,36px)}
 .capa h1 span{display:block}
@@ -396,7 +395,6 @@ div.video:not([data-video]){cursor:default}
 @media (max-width:760px){
   .video{--por-tela:2.4}
   .servicos-grade,.depoimentos{grid-template-columns:minmax(0,1fr)}
-  .capa-meta span:nth-child(2){display:none}
   .sobre-foto::before{top:14px;left:14px;right:-14px;bottom:-14px}
 }
 @media (max-width:480px){
@@ -443,7 +441,6 @@ div.video:not([data-video]){cursor:default}
   <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r=".9" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></symbol>
   <symbol id="i-whats" viewBox="0 0 24 24"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1.3-4.4A8.5 8.5 0 1 1 20.5 11.6z"/><path d="M9.3 8.3c.3-.4.9-.4 1.1.1l.7 1.6c.1.3 0 .6-.2.8l-.4.4a6 6 0 0 0 2.4 2.4l.4-.4c.2-.2.5-.3.8-.2l1.6.7c.5.2.5.8.1 1.1-.7.6-1.6.9-2.5.6a7.3 7.3 0 0 1-4.6-4.6c-.3-.9 0-1.8.6-2.5z" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.6 2.2 4.4 5 4.6"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
   <symbol id="i-roteiro" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
   <symbol id="i-ajuste" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20v-4h-4"/></symbol>
@@ -472,12 +469,6 @@ div.video:not([data-video]){cursor:default}
 <!-- ================= 1. CAPA ================= -->
 <section class="capa" id="inicio" aria-labelledby="capa-titulo">
   <div class="container">
-    <div class="capa-meta entrada">
-      <span>Portfólio UGC</span>
-      <span>Curitiba</span>
-      <span>Beleza · Skincare · Comida · Tech</span>
-    </div>
-
     <div class="capa-grade">
       <div class="capa-texto">
         <p class="rotulo entrada" style="--atraso:.1s">UGC Creator</p>
@@ -690,12 +681,10 @@ div.video:not([data-video]){cursor:default}
     <div class="rodape-grade">
       <div>
         <p class="rodape-nome">Alanna <em>Clara</em></p>
-        <p class="rodape-desc">UGC Creator em Curitiba · beleza, skincare, comida e tech</p>
+        <p class="rodape-desc">UGC Creator</p>
       </div>
       <ul class="redes" aria-label="Minhas redes">
         <li><a href="https://www.instagram.com/_alannaclara/" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-insta"/></svg>@_alannaclara<span class="sr"> no Instagram (abre em nova aba)</span></a></li>
-        <!-- PLACEHOLDER: troque "seuusuario" pelo seu usuário do TikTok, ou apague esta linha -->
-        <li><a href="https://www.tiktok.com/@seuusuario" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-tiktok"/></svg>@seuusuario<span class="sr"> no TikTok (abre em nova aba)</span></a></li>
         <li><a href="mailto:contatoalannaclara@gmail.com"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>E-mail</a></li>
         <li><a href="https://wa.me/5541998669857" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-whats"/></svg>WhatsApp<span class="sr"> (abre em nova aba)</span></a></li>
       </ul>
