@@ -69,13 +69,13 @@ button{font:inherit}
 .container{width:100%;max-width:1240px;margin-inline:auto;padding-inline:var(--gutter)}
 section{padding-block:var(--secao)}
 /* REGRA DO ESPAÇO ENTRE AS SEÇÕES
-   As seções de fundo claro (Sobre mim, Trabalhos, Números) usam o espaço
+   As seções de fundo claro (Sobre mim, Trabalhos, Depoimentos) usam o espaço
    menor, porque entre elas é só vazio. As seções coloridas (Serviços e
    Contato) ficam com o espaço maior, que ali não é vazio: é o respiro
    dentro do próprio bloco de cor.
    Se um dia eu tirar alguma parte do site, é esta regra que evita
    sobrar um buraco no lugar. */
-#sobre,#trabalhos,#numeros{padding-block:var(--entre)}
+#sobre,#trabalhos,#depoimentos{padding-block:var(--entre)}
 
 /* ===== CABEÇALHO DE CADA SEÇÃO ===== */
 .cabeca{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:20px clamp(32px,6vw,96px);align-items:end;margin-bottom:clamp(44px,6vw,80px)}
@@ -102,9 +102,20 @@ section{padding-block:var(--secao)}
 /* ===== MENU FIXO ===== */
 .topo{position:fixed;inset:0 0 auto;z-index:100;height:var(--topo);border-bottom:1px solid transparent;transition:background-color .35s,border-color .35s}
 .topo.rolou,.topo.menu-aberto{background:rgba(243,238,233,.9);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-bottom-color:var(--linha)}
-.topo .container{height:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.topo .container{height:100%;display:flex;align-items:center;gap:clamp(16px,2.2vw,28px)}
 .logo{font-family:var(--serif);font-size:1.5rem;line-height:1;text-decoration:none;white-space:nowrap;letter-spacing:-.01em}
-.menu ul{display:flex;gap:clamp(18px,2.6vw,36px)}
+.menu{margin-left:auto}
+.menu ul{display:flex;align-items:center;gap:clamp(16px,2.2vw,32px)}
+.menu .so-celular{display:none}
+/* Idioma (PT/EN) e botão Trabalhe comigo, no canto direito */
+.topo-acoes{display:flex;align-items:center;gap:14px}
+.idioma{display:inline-flex;padding:3px;border:1px solid var(--linha);border-radius:999px;background:var(--papel)}
+.idioma button{min-width:38px;padding:6px 10px;border:0;border-radius:999px;background:transparent;color:var(--tinta-2);font-size:.76rem;font-weight:700;letter-spacing:.06em;line-height:1;cursor:pointer;transition:background-color .25s,color .25s}
+.idioma button[aria-pressed="true"]{background:var(--tinta);color:var(--creme)}
+.idioma button:not([aria-pressed="true"]):hover{color:var(--tinta)}
+.btn-topo{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 18px;border-radius:var(--raio-sm);background:var(--tinta);color:var(--creme);font-size:.9rem;font-weight:600;line-height:1.1;text-decoration:none;white-space:nowrap;transition:background-color .25s,transform .25s var(--ease)}
+.btn-topo:hover{background:#0f2a30;transform:translateY(-1px)}
+.topo :focus-visible{outline-color:var(--tinta)}
 .menu a{position:relative;isolation:isolate;display:inline-block;padding-block:8px;font-size:.93rem;font-weight:500;text-decoration:none}
 .menu a::after{content:"";position:absolute;z-index:-1;left:-3px;right:-3px;bottom:9px;height:.5em;border-radius:2px;background:var(--azul);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
 .menu a:hover::after,.menu a[aria-current="true"]::after{transform:scaleX(1)}
@@ -122,7 +133,7 @@ section{padding-block:var(--secao)}
 .numeros-capa li{padding:20px 12px 0 0}
 .numeros-capa li+li{padding-left:clamp(12px,2vw,24px);border-left:1px solid var(--linha)}
 .num{display:block;font-family:var(--serif);font-weight:400;line-height:1;letter-spacing:-.02em;color:var(--tinta);font-variant-numeric:lining-nums}
-.numeros-capa .num{font-size:clamp(2rem,4.2vw,3.2rem)}
+.numeros-capa .num{font-size:clamp(1.7rem,3.4vw,2.7rem);white-space:nowrap}
 .num-rotulo{display:block;margin-top:10px;font-size:.84rem;line-height:1.35;color:var(--tinta-2)}
 
 /* ===== FOTOS (espaços reservados com degradê) ===== */
@@ -169,8 +180,14 @@ section{padding-block:var(--secao)}
 .sobre-grade{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1fr);gap:clamp(44px,8vw,120px);align-items:center}
 .sobre-foto{position:relative;max-width:480px}
 .sobre-foto::before{content:"";position:absolute;top:22px;left:22px;right:-22px;bottom:-22px;background:var(--azul);border-radius:var(--raio);z-index:-1}
-.sobre .lead{margin:6px 0 20px;font-family:var(--serif);font-size:clamp(1.3rem,2.3vw,1.7rem);font-weight:300;line-height:1.38}
-.sobre-texto>p:not(.rotulo):not(.lead){color:var(--tinta-2)}
+/* Texto do Sobre mim: cinza, com as palavras-chave em negrito escuro */
+.sobre-corpo{margin-top:clamp(20px,2.6vw,30px);color:var(--tinta-2)}
+.sobre-corpo p+p{margin-top:16px}
+.sobre-corpo strong{font-weight:700;color:var(--tinta)}
+/* Selos embaixo do texto */
+.selos{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.selos li{padding:11px 20px;border:1px solid var(--linha);border-radius:999px;background:var(--creme-2);font-size:.92rem;font-weight:600;line-height:1.3;color:var(--tinta)}
+.selos .selo-destaque{background:var(--azul-claro);border-color:var(--azul-2)}
 .promessas{margin:36px 0 40px;border-top:1px solid var(--linha)}
 .promessas li{display:grid;grid-template-columns:48px minmax(0,1fr);gap:18px;align-items:center;padding:18px 0;border-bottom:1px solid var(--linha)}
 .promessas .icone{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:var(--azul);color:var(--tinta)}
@@ -270,18 +287,6 @@ div.video:not([data-video]){cursor:default}
 .servicos-cta p{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(1.3rem,2.4vw,1.75rem)}
 
 /* ===== NÚMEROS E DEPOIMENTOS ===== */
-.metricas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--linha);border-block:1px solid var(--tinta)}
-.metrica{padding:clamp(28px,4vw,44px) clamp(16px,2vw,28px);background:var(--creme)}
-.metrica .num{font-size:clamp(3rem,6vw,5rem)}
-.subrotulo{display:flex;align-items:center;gap:18px;margin:clamp(72px,9vw,112px) 0 clamp(28px,3vw,40px);font-family:var(--sans);font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-2)}
-.subrotulo::after{content:"";flex:1;height:1px;background:var(--linha)}
-.resultados{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2.4vw,28px)}
-.resultado{display:flex;flex-direction:column;padding:clamp(26px,3vw,36px);border-radius:var(--raio);border-top:4px solid var(--azul);background:var(--papel);box-shadow:var(--sombra)}
-.resultado:nth-child(2){border-top-color:var(--laranja)}
-.resultado-marca{font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2)}
-.resultado .num{margin-top:28px;font-size:clamp(2.8rem,4.6vw,3.8rem)}
-.resultado .num-rotulo{font-size:.95rem;font-weight:600;color:var(--tinta)}
-.resultado p:last-child{margin-top:18px;padding-top:18px;border-top:1px solid var(--linha);font-size:.93rem;line-height:1.55;color:var(--tinta-2)}
 .depoimentos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,2.4vw,28px)}
 .depoimento{display:flex;flex-direction:column;gap:28px;margin:0;padding:clamp(28px,3.4vw,44px);border:1px solid var(--linha);border-radius:var(--raio)}
 .depoimento:first-child{background:var(--azul);border-color:var(--azul);color:var(--tinta)}
@@ -310,7 +315,6 @@ div.video:not([data-video]){cursor:default}
 .canal span{min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.3}
 .canal small{display:block;margin-bottom:2px;font-size:.7rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
 .canal .seta{margin-left:auto;width:18px;height:18px}
-.cidade{display:flex;align-items:center;gap:10px;margin-top:28px;font-size:.92rem;color:var(--tinta-2)}
 .formulario{padding:clamp(24px,4vw,44px);border-radius:var(--raio);background:var(--papel);color:var(--tinta);box-shadow:0 34px 70px -34px rgba(0,0,0,.55)}
 .formulario :focus-visible{outline-color:var(--tinta)}
 .form-titulo{margin-bottom:26px;font-size:clamp(1.6rem,2.6vw,2rem)}
@@ -377,13 +381,11 @@ div.video:not([data-video]){cursor:default}
 @media (max-width:1040px){
   .video{--por-tela:4}
   .servicos-grade{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .metricas{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:960px){
   .capa-grade,.sobre-grade,.contato-grade{grid-template-columns:minmax(0,1fr)}
   .capa-foto{justify-self:center;max-width:420px}
   .sobre-foto{max-width:420px;margin-inline:auto;width:calc(100% - 22px)}
-  .resultados{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:880px){
   .sanduiche{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel);color:var(--tinta);cursor:pointer}
@@ -397,10 +399,16 @@ div.video:not([data-video]){cursor:default}
   .sanduiche[aria-expanded="true"] span::after{transform:translateY(-6px) rotate(-45deg)}
   .menu{position:fixed;top:var(--topo);left:0;right:0;max-height:calc(100dvh - var(--topo));overflow-y:auto;padding:8px var(--gutter) 28px;background:var(--creme);border-bottom:1px solid var(--linha);box-shadow:var(--sombra);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .3s,transform .3s var(--ease),visibility 0s .3s}
   .menu.aberto{opacity:1;visibility:visible;transform:none;transition:opacity .3s,transform .3s var(--ease)}
-  .menu ul{flex-direction:column;gap:0}
+  .menu ul{flex-direction:column;align-items:stretch;gap:0}
   .menu li+li{border-top:1px solid var(--linha)}
   .menu a{display:block;padding:16px 0;font-family:var(--serif);font-size:1.6rem;font-weight:400}
   .menu a::after{display:none}
+  /* No celular: PT/EN fica na barra, e o Trabalhe comigo vai para dentro do menu */
+  .menu{margin-left:0}
+  .topo-acoes{margin-left:auto;gap:10px}
+  .topo-acoes .btn-topo{display:none}
+  .menu .so-celular{display:block;padding-top:20px;border-top:0}
+  .menu .so-celular .btn-topo{display:flex;width:100%;min-height:52px;padding:14px 18px;font-family:var(--sans);font-size:1rem;font-weight:600}
   .cabeca{grid-template-columns:minmax(0,1fr)}
   .video{--por-tela:3}
 }
@@ -415,13 +423,9 @@ div.video:not([data-video]){cursor:default}
   .num-rotulo{font-size:.76rem}
   .botoes .btn{flex:1 1 100%}
   .servicos-cta .btn{width:100%}
-  .metrica .num{font-size:2.6rem}
   .video{--por-tela:1.6}
   .seta{width:44px;height:44px}
   .video-info{padding:14px}
-}
-@media (max-width:340px){
-  .metricas{grid-template-columns:minmax(0,1fr)}
 }
 
 /* ===== MOVIMENTO REDUZIDO ===== */
@@ -439,7 +443,7 @@ div.video:not([data-video]){cursor:default}
 </style>
 </head>
 <body>
-<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<a class="pular" href="#conteudo" data-i18n="pular">Pular para o conteúdo</a>
 
 <!-- Ícones usados no site (não precisa mexer) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -453,7 +457,6 @@ div.video:not([data-video]){cursor:default}
   <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r=".9" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></symbol>
   <symbol id="i-whats" viewBox="0 0 24 24"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1.3-4.4A8.5 8.5 0 1 1 20.5 11.6z"/><path d="M9.3 8.3c.3-.4.9-.4 1.1.1l.7 1.6c.1.3 0 .6-.2.8l-.4.4a6 6 0 0 0 2.4 2.4l.4-.4c.2-.2.5-.3.8-.2l1.6.7c.5.2.5.8.1 1.1-.7.6-1.6.9-2.5.6a7.3 7.3 0 0 1-4.6-4.6c-.3-.9 0-1.8.6-2.5z" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
   <symbol id="i-roteiro" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
   <symbol id="i-ajuste" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20v-4h-4"/></symbol>
   <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
@@ -462,17 +465,27 @@ div.video:not([data-video]){cursor:default}
 <!-- ================= MENU FIXO ================= -->
 <header class="topo" id="topo">
   <div class="container">
-    <a class="logo" href="#inicio" aria-label="Alanna Clara, voltar ao início">Alanna <em>Clara</em></a>
-    <button class="sanduiche" id="botao-menu" type="button" aria-controls="menu" aria-expanded="false" aria-label="Abrir menu"><span></span></button>
-    <nav class="menu" id="menu" aria-label="Menu principal">
+    <a class="logo" href="#inicio" aria-label="Alanna Clara, voltar ao início" data-i18n-attr="aria-label:logo.aria">Alanna <em>Clara</em></a>
+    <nav class="menu" id="menu" aria-label="Menu principal" data-i18n-attr="aria-label:menu.aria">
       <ul>
-        <li><a href="#sobre">Sobre</a></li>
-        <li><a href="#trabalhos">Trabalhos</a></li>
-        <li><a href="#servicos">Serviços</a></li>
-        <li><a href="#numeros">Números</a></li>
-        <li><a href="#contato">Contato</a></li>
+        <li><a href="#sobre" data-i18n="menu.sobre">Sobre</a></li>
+        <li><a href="#trabalhos" data-i18n="menu.trabalhos">Trabalhos</a></li>
+        <li><a href="#servicos" data-i18n="menu.servicos">Serviços</a></li>
+        <li><a href="#depoimentos" data-i18n="menu.depoimentos">Depoimentos</a></li>
+        <li><a href="#contato" data-i18n="menu.contato">Contato</a></li>
+        <!-- No celular, o botão Trabalhe comigo aparece aqui dentro do menu -->
+        <li class="so-celular"><a class="btn-topo" href="#contato" data-i18n="menu.trabalhe">Trabalhe comigo</a></li>
       </ul>
     </nav>
+    <!-- IDIOMA DO SITE: o texto em português está aqui no HTML, e o inglês fica no script (INGLES) -->
+    <div class="topo-acoes">
+      <div class="idioma" role="group" aria-label="Idioma do site" data-i18n-attr="aria-label:idioma.aria">
+        <button type="button" data-idioma="pt" aria-pressed="true" lang="pt-BR">PT</button>
+        <button type="button" data-idioma="en" aria-pressed="false" lang="en">EN</button>
+      </div>
+      <a class="btn-topo" href="#contato" data-i18n="menu.trabalhe">Trabalhe comigo</a>
+    </div>
+    <button class="sanduiche" id="botao-menu" type="button" aria-controls="menu" aria-expanded="false" aria-label="Abrir menu"><span></span></button>
   </div>
 </header>
 
@@ -485,13 +498,13 @@ div.video:not([data-video]){cursor:default}
       <div class="capa-texto">
         <p class="rotulo entrada" style="--atraso:.1s">UGC Creator</p>
         <h1 id="capa-titulo" class="entrada" style="--atraso:.2s"><span>Alanna</span> <em>Clara</em></h1>
-        <p class="capa-frase entrada" style="--atraso:.35s">Eu gravo conteúdos criativos que <em>conectam</em> a sua marca a quem compra, com a naturalidade de uma indicação de amiga.</p>
+        <p class="capa-frase entrada" style="--atraso:.35s" data-i18n="capa.frase">Eu gravo conteúdos criativos que <em>conectam</em> a sua marca a quem compra, com a naturalidade de uma indicação de amiga.</p>
         <div class="botoes entrada" style="--atraso:.5s">
-          <a class="btn btn-azul" href="#contato">Falar comigo <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
-          <a class="btn btn-linha" href="#trabalhos">Ver os trabalhos</a>
+          <a class="btn btn-azul" href="#contato"><span data-i18n="capa.falar">Falar comigo</span> <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
+          <a class="btn btn-linha" href="#trabalhos" data-i18n="capa.ver">Ver os trabalhos</a>
         </div>
-        <!-- Os três números da capa vêm do array METRICAS no script (os três primeiros itens). -->
-        <ul class="numeros-capa entrada" id="numeros-capa" style="--atraso:.65s" aria-label="Meus números"></ul>
+        <!-- Os três números da capa vêm do array METRICAS no script. -->
+        <ul class="numeros-capa entrada" id="numeros-capa" style="--atraso:.65s" aria-label="Meus números" data-i18n-attr="aria-label:capa.numeros"></ul>
       </div>
 
       <div class="capa-foto entrada" style="--atraso:.3s">
@@ -502,7 +515,7 @@ div.video:not([data-video]){cursor:default}
              Para trocar, salve fotos novas com os mesmos nomes (mesmo tamanho e mesmo enquadramento). -->
         <div class="cena">
           <span class="quadriculado" aria-hidden="true"></span>
-          <div class="rosto" role="img" aria-label="Foto de Alanna Clara dando uma piscadinha">
+          <div class="rosto" role="img" aria-label="Foto de Alanna Clara dando uma piscadinha" data-i18n-attr="aria-label:capa.foto">
             <img class="rosto-aberto" src="fotos/alanna-olhos-abertos.webp" alt="" width="1254" height="1254" fetchpriority="high" decoding="async">
             <img class="rosto-piscada" src="fotos/alanna-piscadinha.webp" alt="" width="1254" height="1254" decoding="async">
           </div>
@@ -513,7 +526,7 @@ div.video:not([data-video]){cursor:default}
 
   <!-- Faixa de marcas: as logos vêm da pasta "logos" e da lista MARCAS no script -->
   <div class="faixa" role="region" aria-labelledby="faixa-titulo">
-    <p class="faixa-titulo" id="faixa-titulo">Marcas que confiam no meu trabalho</p>
+    <p class="faixa-titulo" id="faixa-titulo" data-i18n="faixa.titulo">Marcas atendidas</p>
     <div class="faixa-trilho">
       <ul id="lista-marcas"></ul>
       <ul id="lista-marcas-copia" aria-hidden="true"></ul>
@@ -529,34 +542,42 @@ div.video:not([data-video]){cursor:default}
            Troque o bloco div abaixo por:
            <div class="foto"><img src="foto-sobre.jpg" alt="Alanna Clara gravando um vídeo em casa" width="800" height="1000" loading="lazy"></div>
            Formato ideal: vertical 4:5. -->
-      <div class="foto foto-ph foto-sobre" role="img" aria-label="Espaço para a foto da Alanna Clara gravando">
-        <span class="legenda">foto da creator · 4:5</span>
+      <div class="foto foto-ph foto-sobre" role="img" aria-label="Espaço para a foto da Alanna Clara gravando" data-i18n-attr="aria-label:sobre.foto">
+        <span class="legenda" data-i18n="sobre.legenda">foto da creator · 4:5</span>
       </div>
     </div>
 
     <div class="sobre-texto">
-      <p class="rotulo revelar"><b>01</b> Sobre mim</p>
-      <h2 class="titulo revelar" id="sobre-titulo">Gente confia em <em>gente</em>.</h2>
-      <p class="lead revelar">Prazer, eu sou Alanna Clara. Moro em Curitiba e crio conteúdo UGC para marcas de beleza, skincare, comida e tech.</p>
-      <p class="revelar">Meu trabalho é mostrar o seu produto do jeito que ele aparece na vida real: na pia do banheiro, na mesa do café, na mochila do dia a dia. Eu penso no roteiro, cuido da luz e do som e entrego um vídeo que parece conversa, não propaganda. É assim que o público para, assiste e confia.</p>
+      <p class="rotulo revelar"><b>01</b> <span data-i18n="sobre.rotulo">Sobre mim</span></p>
+      <h2 class="titulo revelar" id="sobre-titulo" data-i18n="sobre.titulo">Oii, sou a <em>Alanna Clara</em></h2>
+      <!-- TEXTO DO SOBRE MIM: o que estiver entre <strong> e </strong> aparece em negrito -->
+      <div class="sobre-corpo revelar" data-i18n="sobre.corpo">
+        <p>Tenho <strong>20 anos</strong> e sou <strong>UGC Creator, Universitária e Maquiadora Profissional</strong> em <strong>Curitiba (PR)</strong> há <strong>3 anos</strong>.</p>
+        <p>Em minhas redes, inspiro <strong>confiança e autoestima</strong> de forma simples e descomplicada. Criando <strong>conexões reais</strong>, despertando desejo e vendas.</p>
+        <p>Meu trabalho é focado em criar conexões reais entre a marca e o público. Despertando desejo na audiência e gerando <strong>alta conversão</strong> para marcas que buscam destaque com <strong>conteúdos autênticos</strong> que geram autoridade e resultados.</p>
+      </div>
+      <ul class="selos revelar">
+        <li class="selo-destaque" data-i18n="sobre.selo1">+20 marcas parceiras</li>
+        <li data-i18n="sobre.selo2">Curitiba (PR) · Brasil</li>
+      </ul>
 
-      <ul class="promessas revelar" aria-label="O que eu garanto">
+      <ul class="promessas revelar" aria-label="O que eu garanto" data-i18n-attr="aria-label:prom.aria">
         <li>
           <span class="icone" aria-hidden="true"><svg class="ico"><use href="#i-roteiro"/></svg></span>
-          <div><strong>Roteiro aprovado antes de gravar</strong><span>Você valida a ideia e a fala antes de eu apertar o rec.</span></div>
+          <div><strong data-i18n="prom1.t">Roteiro aprovado antes de gravar</strong><span data-i18n="prom1.d">Você valida a ideia e a fala antes de eu apertar o rec.</span></div>
         </li>
         <li>
           <span class="icone" aria-hidden="true"><svg class="ico"><use href="#i-ajuste"/></svg></span>
-          <div><strong>Uma rodada de ajuste inclusa</strong><span>Se algo não ficou do seu jeito, eu ajusto sem custo extra.</span></div>
+          <div><strong data-i18n="prom2.t">Uma rodada de ajuste inclusa</strong><span data-i18n="prom2.d">Se algo não ficou do seu jeito, eu ajusto sem custo extra.</span></div>
         </li>
         <li>
           <span class="icone" aria-hidden="true"><svg class="ico"><use href="#i-relogio"/></svg></span>
-          <div><strong>Entrega em até 72 horas úteis</strong><span>Seu conteúdo pronto para publicar, sem enrolação.</span></div>
+          <div><strong data-i18n="prom3.t">Entrega em até 72 horas úteis</strong><span data-i18n="prom3.d">Seu conteúdo pronto para publicar, sem enrolação.</span></div>
         </li>
       </ul>
 
       <div class="assinatura revelar">
-        <p class="assinatura-pre">Com carinho,</p>
+        <p class="assinatura-pre" data-i18n="sobre.assinatura">Com carinho,</p>
         <p class="assinatura-nome">Alanna Clara</p>
       </div>
     </div>
@@ -568,13 +589,13 @@ div.video:not([data-video]){cursor:default}
   <div class="container">
     <header class="cabeca">
       <div>
-        <p class="rotulo revelar"><b>02</b> Trabalhos</p>
-        <h2 class="titulo revelar" id="trabalhos-titulo">Trabalhos por <em>nicho</em></h2>
+        <p class="rotulo revelar"><b>02</b> <span data-i18n="trab.rotulo">Trabalhos</span></p>
+        <h2 class="titulo revelar" id="trabalhos-titulo" data-i18n="trab.titulo">Trabalhos por <em>nicho</em></h2>
       </div>
-      <p class="intro revelar">Escolha um nicho e veja como eu adapto a linguagem, o cenário e o ritmo para cada tipo de produto. Passe o mouse sobre um vídeo para ver a prévia sem som e clique para assistir com som.</p>
+      <p class="intro revelar" data-i18n="trab.intro">Escolha um nicho e veja como eu adapto a linguagem, o cenário e o ritmo para cada tipo de produto. Cada linha é uma especialidade. Passe o mouse sobre um vídeo para ver a prévia sem som e clique para assistir com som. Deslize pro lado pra ver mais.</p>
     </header>
     <!-- Os botões de filtro e os carrosséis vêm do painel (tabela videos). Reserva: array TRABALHOS no script -->
-    <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho"></div>
+    <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho" data-i18n-attr="aria-label:trab.filtros"></div>
     <p class="sr" id="status-filtro" aria-live="polite"></p>
     <div class="nichos" id="nichos"></div>
   </div>
@@ -584,35 +605,30 @@ div.video:not([data-video]){cursor:default}
   <div class="container">
     <header class="cabeca">
       <div>
-        <p class="rotulo revelar"><b>03</b> Serviços</p>
-        <h2 class="titulo revelar" id="servicos-titulo">Como eu te <em>ajudo</em></h2>
+        <p class="rotulo revelar"><b>03</b> <span data-i18n="serv.rotulo">Serviços</span></p>
+        <h2 class="titulo revelar" id="servicos-titulo" data-i18n="serv.titulo">Como eu te <em>ajudo</em></h2>
       </div>
-      <p class="intro revelar">Do vídeo avulso ao pacote do mês: escolha o formato que faz sentido para o momento da sua marca.</p>
+      <p class="intro revelar" data-i18n="serv.intro">Do vídeo avulso ao pacote do mês: escolha o formato que faz sentido para o momento da sua marca.</p>
     </header>
     <!-- Os seis serviços vêm do array SERVICOS no script -->
     <ol class="servicos-grade revelar" id="grade-servicos"></ol>
     <div class="servicos-cta revelar">
-      <p>Quer combinar formatos? Eu monto uma proposta sob medida.</p>
-      <a class="btn btn-claro" href="#contato">Pedir proposta <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
+      <p data-i18n="serv.cta">Quer combinar formatos? Eu monto uma proposta sob medida.</p>
+      <a class="btn btn-claro" href="#contato"><span data-i18n="serv.botao">Pedir proposta</span> <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
     </div>
   </div>
 </section>
 
-<!-- ================= 5. NÚMEROS E DEPOIMENTOS ================= -->
-<section class="numeros" id="numeros" aria-labelledby="numeros-titulo">
+<!-- ================= 5. DEPOIMENTOS ================= -->
+<section id="depoimentos" aria-labelledby="depoimentos-titulo">
   <div class="container">
     <header class="cabeca">
       <div>
-        <p class="rotulo revelar"><b>04</b> Números</p>
-        <h2 class="titulo revelar" id="numeros-titulo">Números e <em>depoimentos</em></h2>
+        <p class="rotulo revelar"><b>04</b> <span data-i18n="dep.rotulo">Depoimentos</span></p>
+        <h2 class="titulo revelar" id="depoimentos-titulo" data-i18n="dep.titulo">O que dizem as <em>marcas</em></h2>
       </div>
-      <p class="intro revelar">Resultados que dá para medir e palavras de quem já criou comigo.</p>
     </header>
-    <!-- Métricas: array METRICAS. Resultados: array RESULTADOS. Depoimentos: array DEPOIMENTOS. -->
-    <ul class="metricas revelar" id="lista-metricas" aria-label="Métricas"></ul>
-    <h3 class="subrotulo revelar">Resultados de campanha</h3>
-    <div class="resultados" id="lista-resultados"></div>
-    <h3 class="subrotulo revelar">O que dizem as marcas</h3>
+    <!-- Os depoimentos vêm do array DEPOIMENTOS no script -->
     <div class="depoimentos" id="lista-depoimentos"></div>
   </div>
 </section>
@@ -621,22 +637,22 @@ div.video:not([data-video]){cursor:default}
 <section class="contato" id="contato" aria-labelledby="contato-titulo">
   <div class="container contato-grade">
     <div class="contato-texto">
-      <p class="rotulo revelar"><b>05</b> Contato</p>
-      <h2 class="titulo revelar" id="contato-titulo">Bora criar <em>juntos</em>?</h2>
-      <p class="revelar">Me conta sobre a sua marca, o produto e o que você quer alcançar. Eu respondo com ideias de roteiro e uma proposta sob medida.</p>
+      <p class="rotulo revelar"><b>05</b> <span data-i18n="cont.rotulo">Contato</span></p>
+      <h2 class="titulo revelar" id="contato-titulo" data-i18n="cont.titulo">Bora criar <em>juntos</em>?</h2>
+      <p class="revelar" data-i18n="cont.texto">Me conta sobre a sua marca, o produto e o que você quer alcançar. Respondo em até 48h.</p>
       <ul class="canais revelar">
         <li>
           <a class="canal" href="https://wa.me/5541998669857?text=Oi%2C%20Alanna!%20Vim%20pelo%20seu%20portf%C3%B3lio." target="_blank" rel="noopener">
             <svg class="ico" aria-hidden="true"><use href="#i-whats"/></svg>
             <span><small>WhatsApp</small>(41) 99866-9857</span>
             <svg class="ico seta" aria-hidden="true"><use href="#i-diag"/></svg>
-            <span class="sr">(abre em nova aba)</span>
+            <span class="sr" data-i18n="aba.nova">(abre em nova aba)</span>
           </a>
         </li>
         <li>
           <a class="canal" href="mailto:contatoalannaclara@gmail.com">
             <svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>
-            <span><small>E-mail</small>contatoalannaclara<wbr>@gmail.com</span>
+            <span><small data-i18n="cont.email">E-mail</small>contatoalannaclara<wbr>@gmail.com</span>
             <svg class="ico seta" aria-hidden="true"><use href="#i-diag"/></svg>
           </a>
         </li>
@@ -645,41 +661,45 @@ div.video:not([data-video]){cursor:default}
             <svg class="ico" aria-hidden="true"><use href="#i-insta"/></svg>
             <span><small>Instagram</small>@_alannaclara</span>
             <svg class="ico seta" aria-hidden="true"><use href="#i-diag"/></svg>
-            <span class="sr">(abre em nova aba)</span>
+            <span class="sr" data-i18n="aba.nova">(abre em nova aba)</span>
           </a>
         </li>
       </ul>
-      <p class="cidade revelar"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg> Direto de Curitiba para a sua marca</p>
     </div>
 
     <div class="formulario revelar">
-      <!-- FORMULÁRIO: cada mensagem enviada entra no painel, na aba Marcas, como Lead
-           (função salvarLead, no script). -->
+      <!-- FORMULÁRIO: cada mensagem enviada entra no painel, na aba Portfólio, como recado do site
+           (função salvarLead, no script). O nome da marca vira o nome do recado. -->
       <form id="form-contato" novalidate>
-        <h3 class="form-titulo">Me manda uma <em>mensagem</em></h3>
+        <h3 class="form-titulo" data-i18n="form.titulo">Me manda uma <em>mensagem</em></h3>
         <div class="campo">
-          <label for="c-nome">Seu nome</label>
-          <input id="c-nome" name="nome" type="text" autocomplete="name" required aria-describedby="c-nome-erro">
+          <label for="c-nome" data-i18n="form.nome">Nome</label>
+          <input id="c-nome" name="nome" type="text" autocomplete="name" required placeholder="Seu nome" data-i18n-attr="placeholder:form.nome.ph" aria-describedby="c-nome-erro">
           <span class="erro" id="c-nome-erro"></span>
         </div>
         <div class="campo">
-          <label for="c-email">Seu e-mail</label>
-          <input id="c-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="c-email-erro">
+          <label for="c-email" data-i18n="form.email">E-mail</label>
+          <input id="c-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="voce@marca.com" data-i18n-attr="placeholder:form.email.ph" aria-describedby="c-email-erro">
           <span class="erro" id="c-email-erro"></span>
         </div>
         <div class="campo">
-          <label for="c-mensagem">Mensagem</label>
-          <textarea id="c-mensagem" name="mensagem" rows="5" required placeholder="Conta sobre a marca, o produto e o formato que você procura." aria-describedby="c-mensagem-erro"></textarea>
+          <label for="c-marca" data-i18n="form.marca">Marca / Empresa</label>
+          <input id="c-marca" name="marca" type="text" autocomplete="organization" maxlength="200" placeholder="Nome da marca" data-i18n-attr="placeholder:form.marca.ph" aria-describedby="c-marca-erro">
+          <span class="erro" id="c-marca-erro"></span>
+        </div>
+        <div class="campo">
+          <label for="c-mensagem" data-i18n="form.mensagem">Mensagem</label>
+          <textarea id="c-mensagem" name="mensagem" rows="5" required placeholder="Conta sobre a marca, o produto e o formato que você procura." data-i18n-attr="placeholder:form.mensagem.ph" aria-describedby="c-mensagem-erro"></textarea>
           <span class="erro" id="c-mensagem-erro"></span>
         </div>
-        <button class="btn btn-azul" type="submit">Enviar mensagem <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></button>
-        <p class="form-nota">Respondo por e-mail ou WhatsApp, como você preferir.</p>
+        <button class="btn btn-azul" type="submit"><span data-i18n="form.enviar">Enviar mensagem</span> <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></button>
+        <p class="form-nota" data-i18n="form.nota">Respondo por e-mail ou WhatsApp, como você preferir.</p>
       </form>
       <div class="confirmacao" id="ok-contato" role="status" tabindex="-1" hidden>
         <div class="check" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></div>
-        <h3>Mensagem <em>recebida</em>!</h3>
+        <h3 data-i18n="ok.titulo">Mensagem <em>recebida</em>!</h3>
         <p id="ok-contato-texto">Obrigada pelo contato. Vou ler com carinho e te respondo em breve.</p>
-        <button class="btn btn-linha" type="button" id="nova-mensagem">Enviar outra mensagem</button>
+        <button class="btn btn-linha" type="button" id="nova-mensagem" data-i18n="ok.outra">Enviar outra mensagem</button>
       </div>
     </div>
   </div>
@@ -695,15 +715,15 @@ div.video:not([data-video]){cursor:default}
         <p class="rodape-nome">Alanna <em>Clara</em></p>
         <p class="rodape-desc">UGC Creator</p>
       </div>
-      <ul class="redes" aria-label="Minhas redes">
-        <li><a href="https://www.instagram.com/_alannaclara/" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-insta"/></svg>@_alannaclara<span class="sr"> no Instagram (abre em nova aba)</span></a></li>
-        <li><a href="mailto:contatoalannaclara@gmail.com"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>E-mail</a></li>
-        <li><a href="https://wa.me/5541998669857" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-whats"/></svg>WhatsApp<span class="sr"> (abre em nova aba)</span></a></li>
+      <ul class="redes" aria-label="Minhas redes" data-i18n-attr="aria-label:rodape.redes">
+        <li><a href="https://www.instagram.com/_alannaclara/" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-insta"/></svg>@_alannaclara<span class="sr" data-i18n="rodape.insta"> no Instagram (abre em nova aba)</span></a></li>
+        <li><a href="mailto:contatoalannaclara@gmail.com"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg><span data-i18n="cont.email">E-mail</span></a></li>
+        <li><a href="https://wa.me/5541998669857" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-whats"/></svg>WhatsApp <span class="sr" data-i18n="aba.nova">(abre em nova aba)</span></a></li>
       </ul>
     </div>
     <div class="rodape-base">
-      <p>© <span id="ano">2026</span> Alanna Clara. Todos os direitos reservados.</p>
-      <p><a href="privacidade.html">Política de privacidade</a> · <a href="#inicio">Voltar ao topo</a></p>
+      <p>© <span id="ano">2026</span> Alanna Clara. <span data-i18n="rodape.direitos">Todos os direitos reservados.</span></p>
+      <p><a href="privacidade.html" data-i18n="rodape.privacidade">Política de privacidade</a> · <a href="#inicio" data-i18n="rodape.topo">Voltar ao topo</a></p>
     </div>
   </div>
 </footer>
@@ -713,7 +733,7 @@ div.video:not([data-video]){cursor:default}
 <dialog class="player" id="player" aria-labelledby="player-legenda">
   <div class="player-topo">
     <p class="player-legenda" id="player-legenda"></p>
-    <button class="player-fechar" type="button" id="fechar-player" aria-label="Fechar vídeo"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <button class="player-fechar" type="button" id="fechar-player" aria-label="Fechar vídeo" data-i18n-attr="aria-label:player.fechar"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
   </div>
   <div class="player-caixa" id="player-caixa"></div>
 </dialog>
@@ -723,30 +743,30 @@ div.video:not([data-video]){cursor:default}
      Para mudar o tempo, altere TEMPO_MIDIA_KIT no começo do script. -->
 <dialog class="modal" id="midia-kit" aria-labelledby="kit-titulo" aria-describedby="kit-desc">
   <div class="modal-card" tabindex="-1">
-    <button class="fechar" type="button" id="fechar-kit" aria-label="Fechar"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <button class="fechar" type="button" id="fechar-kit" aria-label="Fechar" data-i18n-attr="aria-label:kit.fechar"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
     <div id="kit-corpo">
-      <p class="rotulo">Mídia kit</p>
-      <h2 id="kit-titulo">Quer meu mídia kit <em>completo</em>?</h2>
-      <p class="modal-desc" id="kit-desc">Deixe seu nome e e-mail que eu te envio meus formatos, números e condições para parcerias.</p>
+      <p class="rotulo" data-i18n="kit.rotulo">Mídia kit</p>
+      <h2 id="kit-titulo" data-i18n="kit.titulo">Quer meu mídia kit <em>completo</em>?</h2>
+      <p class="modal-desc" id="kit-desc" data-i18n="kit.desc">Deixe seu nome e e-mail que eu te envio meus formatos, números e condições para parcerias.</p>
       <form id="form-kit" novalidate>
         <div class="campo">
-          <label for="k-nome">Seu nome</label>
+          <label for="k-nome" data-i18n="kit.nome">Seu nome</label>
           <input id="k-nome" name="nome" type="text" autocomplete="name" required aria-describedby="k-nome-erro">
           <span class="erro" id="k-nome-erro"></span>
         </div>
         <div class="campo">
-          <label for="k-email">Seu e-mail</label>
+          <label for="k-email" data-i18n="kit.email">Seu e-mail</label>
           <input id="k-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="k-email-erro">
           <span class="erro" id="k-email-erro"></span>
         </div>
-        <button class="btn btn-azul" type="submit">Quero receber</button>
+        <button class="btn btn-azul" type="submit" data-i18n="kit.botao">Quero receber</button>
       </form>
     </div>
     <div class="confirmacao" id="ok-kit" role="status" tabindex="-1" hidden>
       <div class="check" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></div>
-      <h3>Pedido <em>anotado</em>!</h3>
+      <h3 data-i18n="kit.ok">Pedido <em>anotado</em>!</h3>
       <p id="ok-kit-texto">Em breve o mídia kit chega no seu e-mail.</p>
-      <button class="btn btn-linha" type="button" id="fechar-kit-ok">Fechar</button>
+      <button class="btn btn-linha" type="button" id="fechar-kit-ok" data-i18n="kit.fechar">Fechar</button>
     </div>
   </div>
 </dialog>
@@ -793,15 +813,13 @@ const MARCAS = [
   { nome: "Tour Curitiba",         logo: "logos/tour-curitiba.png" }
 ];
 
-// MÉTRICAS: os três primeiros itens aparecem na capa, e os quatro aparecem na seção Números.
+// MÉTRICAS: os três números da capa.
 // valor = número final do contador | casas = casas decimais | prefixo e sufixo = o que vem antes e depois.
-// Exemplo: { valor: 2.4, casas: 1, prefixo: "+", sufixo: "M" } vira +2,4M (use ponto no lugar da vírgula).
-// PLACEHOLDER: os zeros estão aqui para você trocar pelos seus números reais.
+// Os campos terminados em _en são a versão em inglês.
 const METRICAS = [
-  { valor: 0, casas: 0, prefixo: "+", sufixo: "",  rotulo: "vídeos entregues" },
-  { valor: 0, casas: 0, prefixo: "",  sufixo: "",  rotulo: "marcas atendidas" },
-  { valor: 0, casas: 1, prefixo: "+", sufixo: "M", rotulo: "views somadas" },
-  { valor: 0, casas: 1, prefixo: "",  sufixo: "%", rotulo: "de engajamento médio" }
+  { valor: 100, casas: 0, prefixo: "+", sufixo: "",     sufixo_en: "",  rotulo: "vídeos entregues", rotulo_en: "videos delivered" },
+  { valor: 20,  casas: 0, prefixo: "+", sufixo: "",     sufixo_en: "",  rotulo: "marcas atendidas", rotulo_en: "brands served" },
+  { valor: 250, casas: 0, prefixo: "+", sufixo: " MIL", sufixo_en: "K", rotulo: "views somadas",    rotulo_en: "total views" }
 ];
 
 // NICHOS: nome que aparece nos botões de filtro. A chave (à esquerda) é usada nos trabalhos.
@@ -811,6 +829,13 @@ const NICHOS = {
   comida: "Comida",
   tech: "Tech"
 };
+const NICHOS_EN = {
+  beleza: "Beauty",
+  skincare: "Skincare",
+  comida: "Food",
+  tech: "Tech",
+  outros: "Others"
+};
 
 // FRASES DOS NICHOS: aparecem em itálico embaixo do nome de cada carrossel.
 const FRASES_NICHOS = {
@@ -818,6 +843,12 @@ const FRASES_NICHOS = {
   skincare: "Pele cuidada na vida real",
   comida: "Receitas que dão vontade",
   tech: "Tecnologia sem complicação"
+};
+const FRASES_NICHOS_EN = {
+  beleza: "Products that become a ritual",
+  skincare: "Skincare in real life",
+  comida: "Recipes you'll crave",
+  tech: "Tech made simple"
 };
 
 // TRABALHOS: LISTA RESERVA. Agora os vídeos do site vêm do painel (aba Portfólio).
@@ -852,30 +883,123 @@ const TRABALHOS = [
 
 // SERVIÇOS: os seis cards da seção Como eu te ajudo. O número (01, 02...) é gerado sozinho.
 const SERVICOS = [
-  { titulo: "Vídeo UGC", descricao: "Vídeo vertical com roteiro pensado para o seu produto e linguagem de gente de verdade, pronto para postar." },
-  { titulo: "Corte para anúncio", descricao: "Versões curtas com gancho forte nos primeiros segundos, prontas para testar nas campanhas pagas." },
-  { titulo: "Fotos do produto", descricao: "Fotos com luz natural e cenário real para usar no site, no feed e nos anúncios." },
-  { titulo: "Unboxing", descricao: "A primeira impressão do seu produto, da embalagem ao uso, com reação sincera e os detalhes que vendem." },
-  { titulo: "Publicação no meu perfil", descricao: "O conteúdo vai ao ar no meu Instagram, com legenda e marcação, para chegar em quem já me acompanha." },
-  { titulo: "Pacote mensal", descricao: "Uma quantidade fixa de conteúdos por mês, com calendário combinado e prioridade na minha agenda." }
-];
-
-// RESULTADOS DE CAMPANHA: três cards na seção Números.
-// PLACEHOLDER: troque marca, número e descrição pelos resultados reais.
-const RESULTADOS = [
-  { marca: "Marca 01", nicho: "skincare", valor: 0, casas: 0, prefixo: "+", sufixo: "%", rotulo: "de alcance no lançamento",  descricao: "Série de vídeos UGC para apresentar um produto novo nas redes da marca." },
-  { marca: "Marca 02", nicho: "comida",   valor: 0, casas: 1, prefixo: "",  sufixo: "x", rotulo: "de retorno sobre o anúncio", descricao: "Cortes para anúncio testados em versões diferentes de gancho." },
-  { marca: "Marca 03", nicho: "tech",     valor: 0, casas: 0, prefixo: "+", sufixo: "",  rotulo: "vendas no mês da campanha",  descricao: "Unboxing e vídeo de uso publicados no meu perfil e no perfil da marca." }
+  { titulo: "Vídeo UGC", descricao: "Vídeo vertical com roteiro pensado para o seu produto e linguagem de gente de verdade, pronto para postar.",
+    titulo_en: "UGC video", descricao_en: "A vertical video with a script built around your product and the voice of real people, ready to post." },
+  { titulo: "Corte para anúncio", descricao: "Versões curtas com gancho forte nos primeiros segundos, prontas para testar nas campanhas pagas.",
+    titulo_en: "Ad cuts", descricao_en: "Short versions with a strong hook in the first seconds, ready to test in paid campaigns." },
+  { titulo: "Fotos do produto", descricao: "Fotos com luz natural e cenário real para usar no site, no feed e nos anúncios.",
+    titulo_en: "Product photos", descricao_en: "Photos with natural light and a real setting, for your website, feed and ads." },
+  { titulo: "Unboxing", descricao: "A primeira impressão do seu produto, da embalagem ao uso, com reação sincera e os detalhes que vendem.",
+    titulo_en: "Unboxing", descricao_en: "Your product's first impression, from the packaging to first use, with an honest reaction and the details that sell." },
+  { titulo: "Publicação no meu perfil", descricao: "O conteúdo vai ao ar no meu Instagram, com legenda e marcação, para chegar em quem já me acompanha.",
+    titulo_en: "Post on my profile", descricao_en: "The content goes live on my Instagram, with caption and tag, reaching the people who already follow me." },
+  { titulo: "Pacote mensal", descricao: "Uma quantidade fixa de conteúdos por mês, com calendário combinado e prioridade na minha agenda.",
+    titulo_en: "Monthly package", descricao_en: "A fixed amount of content every month, with an agreed calendar and priority in my schedule." }
 ];
 
 // DEPOIMENTOS: quatro cards. A sigla do avatar é gerada a partir do nome.
 // PLACEHOLDER: textos de exemplo, troque pelos depoimentos reais dos seus clientes.
 const DEPOIMENTOS = [
-  { texto: "Entendeu o briefing de primeira e entregou antes do prazo. O vídeo parecia recomendação de amiga, do jeito que a gente queria.", nome: "Cliente 01", empresa: "Marca 01" },
-  { texto: "Roteiro claro, resposta rápida e um cuidado enorme com cada detalhe do produto. Já estamos planejando a próxima campanha.", nome: "Cliente 02", empresa: "Marca 02" },
-  { texto: "O conteúdo ficou natural e bonito ao mesmo tempo. Usamos nos anúncios e no feed da marca.", nome: "Cliente 03", empresa: "Marca 03" },
-  { texto: "Profissionalismo, criatividade e uma parceria muito fácil. Recomendo para qualquer marca que queira conteúdo com verdade.", nome: "Cliente 04", empresa: "Marca 04" }
+  { texto: "Entendeu o briefing de primeira e entregou antes do prazo. O vídeo parecia recomendação de amiga, do jeito que a gente queria.", nome: "Cliente 01", empresa: "Marca 01",
+    texto_en: "She got the brief right away and delivered ahead of schedule. The video felt like a friend's recommendation, exactly what we wanted.", nome_en: "Client 01", empresa_en: "Brand 01" },
+  { texto: "Roteiro claro, resposta rápida e um cuidado enorme com cada detalhe do produto. Já estamos planejando a próxima campanha.", nome: "Cliente 02", empresa: "Marca 02",
+    texto_en: "A clear script, quick replies and great care for every detail of the product. We're already planning the next campaign.", nome_en: "Client 02", empresa_en: "Brand 02" },
+  { texto: "O conteúdo ficou natural e bonito ao mesmo tempo. Usamos nos anúncios e no feed da marca.", nome: "Cliente 03", empresa: "Marca 03",
+    texto_en: "The content came out natural and beautiful at the same time. We used it in our ads and on the brand's feed.", nome_en: "Client 03", empresa_en: "Brand 03" },
+  { texto: "Profissionalismo, criatividade e uma parceria muito fácil. Recomendo para qualquer marca que queira conteúdo com verdade.", nome: "Cliente 04", empresa: "Marca 04",
+    texto_en: "Professional, creative and so easy to work with. I'd recommend her to any brand that wants honest content.", nome_en: "Client 04", empresa_en: "Brand 04" }
 ];
+
+// INGLÊS: a versão em inglês de cada texto fixo do site.
+// O português está escrito direto no HTML; cada pedaço tem um data-i18n com a chave daqui.
+const INGLES = {
+  "site.titulo": "Alanna Clara | UGC Creator Portfolio",
+  "pular": "Skip to content",
+  "logo.aria": "Alanna Clara, back to top",
+  "menu.aria": "Main menu",
+  "menu.sobre": "About",
+  "menu.trabalhos": "Work",
+  "menu.servicos": "Services",
+  "menu.depoimentos": "Testimonials",
+  "menu.contato": "Contact",
+  "menu.trabalhe": "Work with me",
+  "idioma.aria": "Site language",
+
+  "capa.frase": "I create content that <em>connects</em> your brand with the people who buy it, as naturally as a recommendation from a friend.",
+  "capa.falar": "Get in touch",
+  "capa.ver": "See my work",
+  "capa.numeros": "My numbers",
+  "capa.foto": "Photo of Alanna Clara winking",
+  "faixa.titulo": "Brands I've worked with",
+
+  "sobre.foto": "Space for a photo of Alanna Clara filming",
+  "sobre.legenda": "creator photo · 4:5",
+  "sobre.rotulo": "About me",
+  "sobre.titulo": "Hi, I'm <em>Alanna Clara</em>",
+  "sobre.corpo":
+    "<p>I'm <strong>20 years old</strong> and I've been a <strong>UGC Creator, college student and Professional Makeup Artist</strong> in <strong>Curitiba (PR)</strong> for <strong>3 years</strong>.</p>" +
+    "<p>On my social media, I inspire <strong>confidence and self-esteem</strong> in a simple, effortless way. Creating <strong>real connections</strong> that spark desire and drive sales.</p>" +
+    "<p>My work is focused on building real connections between brands and their audience. Sparking desire and driving <strong>high conversion</strong> for brands that want to stand out with <strong>authentic content</strong> that builds authority and delivers results.</p>",
+  "sobre.selo1": "+20 partner brands",
+  "sobre.selo2": "Curitiba (PR) · Brazil",
+  "prom.aria": "What I guarantee",
+  "prom1.t": "Script approved before filming",
+  "prom1.d": "You sign off on the idea and the lines before I hit record.",
+  "prom2.t": "One round of revisions included",
+  "prom2.d": "If something isn't quite right, I'll adjust it at no extra cost.",
+  "prom3.t": "Delivery within 72 business hours",
+  "prom3.d": "Your content ready to post, no delays.",
+  "sobre.assinatura": "With love,",
+
+  "trab.rotulo": "Work",
+  "trab.titulo": "Work by <em>niche</em>",
+  "trab.intro": "Pick a niche and see how I adapt the language, the setting and the pace to each type of product. Each row is a specialty. Hover over a video to watch a silent preview, and click to play it with sound. Swipe sideways to see more.",
+  "trab.filtros": "Filter work by niche",
+
+  "serv.rotulo": "Services",
+  "serv.titulo": "How I can <em>help</em>",
+  "serv.intro": "From a single video to a monthly package: choose the format that makes sense for where your brand is right now.",
+  "serv.cta": "Want to combine formats? I'll put together a custom proposal.",
+  "serv.botao": "Request a proposal",
+
+  "dep.rotulo": "Testimonials",
+  "dep.titulo": "What <em>brands</em> say",
+
+  "cont.rotulo": "Contact",
+  "cont.titulo": "Shall we create <em>together</em>?",
+  "cont.texto": "Tell me about your brand, your product and what you want to achieve. I reply within 48 hours.",
+  "cont.email": "Email",
+  "aba.nova": "(opens in a new tab)",
+  "form.titulo": "Send me a <em>message</em>",
+  "form.nome": "Name",
+  "form.nome.ph": "Your name",
+  "form.email": "Email",
+  "form.email.ph": "you@brand.com",
+  "form.marca": "Brand / Company",
+  "form.marca.ph": "Brand name",
+  "form.mensagem": "Message",
+  "form.mensagem.ph": "Tell me about the brand, the product and the format you're looking for.",
+  "form.enviar": "Send message",
+  "form.nota": "I'll reply by email or WhatsApp, whichever you prefer.",
+  "ok.titulo": "Message <em>received</em>!",
+  "ok.outra": "Send another message",
+
+  "rodape.redes": "My social media",
+  "rodape.insta": " on Instagram (opens in a new tab)",
+  "rodape.direitos": "All rights reserved.",
+  "rodape.privacidade": "Privacy policy",
+  "rodape.topo": "Back to top",
+  "player.fechar": "Close video",
+
+  "kit.fechar": "Close",
+  "kit.rotulo": "Media kit",
+  "kit.titulo": "Want my <em>full</em> media kit?",
+  "kit.desc": "Leave your name and email and I'll send you my formats, numbers and partnership terms.",
+  "kit.nome": "Your name",
+  "kit.email": "Your email",
+  "kit.botao": "Send it to me",
+  "kit.ok": "Request <em>received</em>!"
+};
 
 /* =========================================================
    DAQUI PARA BAIXO É O FUNCIONAMENTO DO SITE.
@@ -891,9 +1015,18 @@ const movimentoReduzido = window.matchMedia("(prefers-reduced-motion: reduce)").
 const temObserver = "IntersectionObserver" in window;
 const animar = !movimentoReduzido && temObserver;
 
-// Formata no padrão brasileiro (2,4 e 1.200). Números inteiros abaixo de 10 ganham zero à esquerda (05).
+/* ---------- Idioma ----------
+   A escolha (PT ou EN) fica salva no navegador da pessoa. Ela é lida antes de
+   montar qualquer coisa, para os números da capa já nascerem no idioma certo. */
+let idioma = "pt";
+try { if (localStorage.getItem("idioma") === "en") idioma = "en"; } catch (e) { /* navegação privada */ }
+const tr = (pt, en) => (idioma === "en" ? en : pt);
+// Pega o campo no idioma atual: em inglês, usa o campo_en quando ele existe
+const doIdioma = (obj, campo) => (idioma === "en" && obj[campo + "_en"] != null ? obj[campo + "_en"] : obj[campo]);
+
+// Formata o número (2,4 em português e 2.4 em inglês). Inteiros abaixo de 10 ganham zero à esquerda (05).
 function formatar(n, casas) {
-  return n.toLocaleString("pt-BR", {
+  return n.toLocaleString(tr("pt-BR", "en-US"), {
     minimumFractionDigits: casas,
     maximumFractionDigits: casas,
     minimumIntegerDigits: casas === 0 && n < 9.5 ? 2 : 1
@@ -901,14 +1034,16 @@ function formatar(n, casas) {
 }
 
 // Número com contador animado. O leitor de tela lê só o valor final.
-function contador(m) {
+// jaAnimado = true mostra direto o número final (usado ao trocar de idioma).
+function contador(m, jaAnimado) {
   const valor = Number(m.valor) || 0;
   const casas = Number(m.casas) || 0;
   const pre = m.prefixo || "";
-  const suf = m.sufixo || "";
+  const suf = doIdioma(m, "sufixo") || "";
   const final = pre + formatar(valor, casas) + suf;
   const inicio = pre + formatar(0, casas) + suf;
-  return `<span class="num"><span class="contador" aria-hidden="true" data-valor="${valor}" data-casas="${casas}" data-prefixo="${esc(pre)}" data-sufixo="${esc(suf)}">${esc(animar ? inicio : final)}</span><span class="sr">${esc(final)}</span></span>`;
+  const mostrar = animar && !jaAnimado ? inicio : final;
+  return `<span class="num"><span class="contador${jaAnimado ? " pronto" : ""}" aria-hidden="true" data-valor="${valor}" data-casas="${casas}" data-prefixo="${esc(pre)}" data-sufixo="${esc(suf)}">${esc(mostrar)}</span><span class="sr">${esc(final)}</span></span>`;
 }
 
 function sigla(nome) {
@@ -960,11 +1095,11 @@ function mudarVelocidade(alvo) {
 $(".faixa").addEventListener("mouseenter", () => mudarVelocidade(VELOCIDADE_NO_MOUSE));
 $(".faixa").addEventListener("mouseleave", () => mudarVelocidade(1));
 
-$("#numeros-capa").innerHTML = METRICAS.slice(0, 3)
-  .map((m) => `<li>${contador(m)}<span class="num-rotulo">${esc(m.rotulo)}</span></li>`).join("");
-
-$("#lista-metricas").innerHTML = METRICAS
-  .map((m) => `<li class="metrica">${contador(m)}<span class="num-rotulo">${esc(m.rotulo)}</span></li>`).join("");
+function montarNumerosCapa(jaAnimado) {
+  $("#numeros-capa").innerHTML = METRICAS.slice(0, 3)
+    .map((m) => `<li>${contador(m, jaAnimado)}<span class="num-rotulo">${esc(doIdioma(m, "rotulo"))}</span></li>`).join("");
+}
+montarNumerosCapa(false);
 
 /* ---------- Trabalhos: um carrossel por nicho ---------- */
 // Pega o código do vídeo de qualquer link do YouTube (shorts, watch, youtu.be ou embed)
@@ -972,8 +1107,14 @@ const idYoutube = (url) => {
   const m = String(url || "").match(/(?:shorts\/|[?&]v=|youtu\.be\/|embed\/)([\w-]{11})/);
   return m ? m[1] : "";
 };
-// Nome bonito do nicho (os que não estão em NICHOS ganham a primeira letra maiúscula)
-const nomeNicho = (n) => NICHOS[n] || (n ? String(n).charAt(0).toUpperCase() + String(n).slice(1) : "Outros");
+// Nome bonito do nicho, no idioma atual (os que não estão na lista ganham a primeira letra maiúscula)
+const nomeNicho = (n) => {
+  const lista = idioma === "en" ? NICHOS_EN : NICHOS;
+  if (lista[n]) return lista[n];
+  if (!n) return tr("Outros", "Others");
+  return String(n).charAt(0).toUpperCase() + String(n).slice(1);
+};
+const fraseNicho = (n) => (idioma === "en" ? FRASES_NICHOS_EN[n] : FRASES_NICHOS[n]) || "";
 
 function cardVideo(t) {
   const id = idYoutube(t.video);
@@ -984,7 +1125,7 @@ function cardVideo(t) {
   const linkSeguro = /^https?:\/\//i.test(String(t.video || "")) ? t.video : "";
   if (!id && linkSeguro) {
     // Link que não é do YouTube (Instagram, TikTok, Drive): abre numa aba nova
-    return `<a class="video" href="${esc(linkSeguro)}" target="_blank" rel="noopener" aria-label="${esc(`Ver vídeo: ${titulo}, ${nicho} (abre em nova aba)`)}">
+    return `<a class="video" href="${esc(linkSeguro)}" target="_blank" rel="noopener" aria-label="${esc(tr(`Ver vídeo: ${titulo}, ${nicho} (abre em nova aba)`, `Watch video: ${titulo}, ${nicho} (opens in a new tab)`))}">
         <span class="ph ph-${esc(t.nicho)}"></span>
         ${etiquetas}
         <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
@@ -992,8 +1133,8 @@ function cardVideo(t) {
       </a>`;
   }
   if (!id) {
-    return `<div class="video" role="img" aria-label="${esc(`Espaço para vídeo de ${nicho}: ${titulo}`)}">
-        <span class="ph ph-${esc(t.nicho)}"><span class="legenda">capa do vídeo · 9:16</span></span>
+    return `<div class="video" role="img" aria-label="${esc(tr(`Espaço para vídeo de ${nicho}: ${titulo}`, `Placeholder for a ${nicho} video: ${titulo}`))}">
+        <span class="ph ph-${esc(t.nicho)}"><span class="legenda">${tr("capa do vídeo · 9:16", "video cover · 9:16")}</span></span>
         ${etiquetas}${info}
       </div>`;
   }
@@ -1001,7 +1142,7 @@ function cardVideo(t) {
   // e só no fim a pequena. Antes ela caía direto na pequena, de 480 pixels.
   const capaSrc = t.capa ? esc(t.capa) : `https://i.ytimg.com/vi/${id}/oar2.jpg`;
   const reserva = t.capa ? "" : ` onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/maxresdefault.jpg';this.onerror=function(){this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'}"`;
-  return `<div class="video" role="button" tabindex="0" data-video="${id}" data-marca="${esc(titulo)}" data-nicho="${esc(nicho)}" aria-label="${esc(`Assistir vídeo: ${titulo}, ${nicho}`)}">
+  return `<div class="video" role="button" tabindex="0" data-video="${id}" data-marca="${esc(titulo)}" data-nicho="${esc(nicho)}" aria-label="${esc(tr(`Assistir vídeo: ${titulo}, ${nicho}`, `Watch video: ${titulo}, ${nicho}`))}">
       <img class="video-capa" src="${capaSrc}"${reserva} alt="" loading="lazy" decoding="async">
       ${etiquetas}
       <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
@@ -1012,35 +1153,39 @@ function cardVideo(t) {
 const areaNichos = $("#nichos");
 areaNichos.classList.add("revelar");
 
-// Monta os carrosséis a partir de uma lista de vídeos (do banco ou da lista reserva)
+// Monta os carrosséis a partir de uma lista de vídeos (do banco ou da lista reserva).
+// A lista fica guardada para remontar tudo quando a pessoa troca o idioma.
+let listaTrabalhos = null;
 function montarTrabalhos(lista) {
+  listaTrabalhos = lista;
   const chaves = [...new Set(lista.map((t) => t.nicho))];
   const nichosUsados = Object.keys(NICHOS).filter((n) => chaves.includes(n)).concat(chaves.filter((n) => !NICHOS[n]));
   if (!nichosUsados.length) {
-    areaNichos.innerHTML = `<p class="nicho-sub" style="text-align:center">Novos vídeos chegando em breve.</p>`;
+    areaNichos.innerHTML = `<p class="nicho-sub" style="text-align:center">${tr("Novos vídeos chegando em breve.", "New videos coming soon.")}</p>`;
     filtros.innerHTML = "";
     return;
   }
   areaNichos.innerHTML = nichosUsados.map((n) => {
   const itens = lista.filter((t) => t.nicho === n);
   const nome = esc(nomeNicho(n));
+  const frase = fraseNicho(n);
   return `<article class="nicho" data-nicho="${esc(n)}" aria-labelledby="nicho-${esc(n)}">
       <div class="nicho-topo">
         <div>
           <h3 class="nicho-titulo" id="nicho-${esc(n)}">${nome} <span class="nicho-qtd">${String(itens.length).padStart(2, "0")}</span></h3>
-          ${FRASES_NICHOS[n] ? `<p class="nicho-sub">${esc(FRASES_NICHOS[n])}</p>` : ""}
+          ${frase ? `<p class="nicho-sub">${esc(frase)}</p>` : ""}
         </div>
         <div class="setas">
-          <button class="seta" type="button" data-dir="-1" aria-label="Vídeos anteriores de ${nome}"><svg class="ico" aria-hidden="true"><use href="#i-esq"/></svg></button>
-          <button class="seta" type="button" data-dir="1" aria-label="Próximos vídeos de ${nome}"><svg class="ico" aria-hidden="true"><use href="#i-dir"/></svg></button>
+          <button class="seta" type="button" data-dir="-1" aria-label="${tr(`Vídeos anteriores de ${nome}`, `Previous ${nome} videos`)}"><svg class="ico" aria-hidden="true"><use href="#i-esq"/></svg></button>
+          <button class="seta" type="button" data-dir="1" aria-label="${tr(`Próximos vídeos de ${nome}`, `Next ${nome} videos`)}"><svg class="ico" aria-hidden="true"><use href="#i-dir"/></svg></button>
         </div>
       </div>
-      <div class="trilho" role="region" tabindex="0" aria-label="Carrossel de vídeos de ${nome}">${itens.map(cardVideo).join("")}</div>
+      <div class="trilho" role="region" tabindex="0" aria-label="${tr(`Carrossel de vídeos de ${nome}`, `${nome} video carousel`)}">${itens.map(cardVideo).join("")}</div>
     </article>`;
   }).join("");
 
   // Botões de filtro, com a quantidade de vídeos de cada nicho
-  filtros.innerHTML = [["todos", "Todos", lista.length]].concat(
+  filtros.innerHTML = [["todos", tr("Todos", "All"), lista.length]].concat(
     nichosUsados.map((n) => [n, nomeNicho(n), lista.filter((t) => t.nicho === n).length])
   ).map(([chave, nome, qtd]) =>
     `<button class="filtro" type="button" data-filtro="${esc(chave)}" aria-pressed="${chave === "todos"}">${esc(nome)}<span class="qtd" aria-hidden="true">${String(qtd).padStart(2, "0")}</span></button>`
@@ -1074,28 +1219,26 @@ $$(".nicho", areaNichos).forEach((bloco) => {
 });
 }
 
-$("#grade-servicos").innerHTML = SERVICOS.map((s, i) =>
-  `<li class="servico"><span class="servico-num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span><h3>${esc(s.titulo)}</h3><p>${esc(s.descricao)}</p></li>`
-).join("");
+function montarServicos() {
+  $("#grade-servicos").innerHTML = SERVICOS.map((s, i) =>
+    `<li class="servico"><span class="servico-num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span><h3>${esc(doIdioma(s, "titulo"))}</h3><p>${esc(doIdioma(s, "descricao"))}</p></li>`
+  ).join("");
+}
+montarServicos();
 
-$("#lista-resultados").innerHTML = RESULTADOS.map((r, i) =>
-  `<article class="resultado revelar" style="--atraso:${i * 0.1}s">
-      <p class="resultado-marca">${esc(r.marca)} · ${esc(NICHOS[r.nicho] || r.nicho)}</p>
-      ${contador(r)}
-      <span class="num-rotulo">${esc(r.rotulo)}</span>
-      <p>${esc(r.descricao)}</p>
-    </article>`
-).join("");
-
-$("#lista-depoimentos").innerHTML = DEPOIMENTOS.map((d, i) =>
-  `<figure class="depoimento revelar" style="--atraso:${(i % 2) * 0.1}s">
-      <blockquote><p>${esc(d.texto)}</p></blockquote>
-      <figcaption>
-        <span class="avatar" aria-hidden="true">${esc(sigla(d.nome))}</span>
-        <span><cite>${esc(d.nome)}</cite><span class="empresa">${esc(d.empresa)}</span></span>
-      </figcaption>
-    </figure>`
-).join("");
+// jaVisivel = true quando remonta depois de trocar o idioma (a seção já apareceu na tela)
+function montarDepoimentos(jaVisivel) {
+  $("#lista-depoimentos").innerHTML = DEPOIMENTOS.map((d, i) =>
+    `<figure class="depoimento revelar${jaVisivel ? " visivel" : ""}" style="--atraso:${(i % 2) * 0.1}s">
+        <blockquote><p>${esc(doIdioma(d, "texto"))}</p></blockquote>
+        <figcaption>
+          <span class="avatar" aria-hidden="true">${esc(sigla(doIdioma(d, "nome")))}</span>
+          <span><cite>${esc(doIdioma(d, "nome"))}</cite><span class="empresa">${esc(doIdioma(d, "empresa"))}</span></span>
+        </figcaption>
+      </figure>`
+  ).join("");
+}
+montarDepoimentos(false);
 
 /* ---------- Filtro de trabalhos por nicho ---------- */
 const filtros = $("#filtros");
@@ -1121,8 +1264,9 @@ filtros.addEventListener("click", (e) => {
     }
   });
   $("#status-filtro").textContent = escolha === "todos"
-    ? `Mostrando todos os ${visiveis} trabalhos`
-    : `Mostrando ${visiveis} ${visiveis === 1 ? "trabalho" : "trabalhos"} de ${nomeNicho(escolha)}`;
+    ? tr(`Mostrando todos os ${visiveis} trabalhos`, `Showing all ${visiveis} videos`)
+    : tr(`Mostrando ${visiveis} ${visiveis === 1 ? "trabalho" : "trabalhos"} de ${nomeNicho(escolha)}`,
+         `Showing ${visiveis} ${nomeNicho(escolha)} ${visiveis === 1 ? "video" : "videos"}`);
 });
 
 /* ---------- Vídeos: prévia sem som no mouse e player com som no clique ---------- */
@@ -1339,13 +1483,13 @@ function abrirMenu() {
   menu.classList.add("aberto");
   topo.classList.add("menu-aberto");
   botaoMenu.setAttribute("aria-expanded", "true");
-  botaoMenu.setAttribute("aria-label", "Fechar menu");
+  botaoMenu.setAttribute("aria-label", tr("Fechar menu", "Close menu"));
 }
 function fecharMenu() {
   menu.classList.remove("aberto");
   topo.classList.remove("menu-aberto");
   botaoMenu.setAttribute("aria-expanded", "false");
-  botaoMenu.setAttribute("aria-label", "Abrir menu");
+  botaoMenu.setAttribute("aria-label", tr("Abrir menu", "Open menu"));
 }
 botaoMenu.addEventListener("click", () => (menu.classList.contains("aberto") ? fecharMenu() : abrirMenu()));
 menu.addEventListener("click", (e) => { if (e.target.closest("a")) fecharMenu(); });
@@ -1387,9 +1531,11 @@ function validar(form) {
     const valor = campo.value.trim();
     let msg = "";
     if (campo.required && !valor) {
-      msg = campo.type === "email" ? "Digite seu e-mail." : campo.tagName === "TEXTAREA" ? "Escreva sua mensagem." : "Digite seu nome.";
+      msg = campo.type === "email" ? tr("Digite seu e-mail.", "Please enter your email.")
+        : campo.tagName === "TEXTAREA" ? tr("Escreva sua mensagem.", "Please write your message.")
+        : tr("Digite seu nome.", "Please enter your name.");
     } else if (campo.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valor)) {
-      msg = "Confira o e-mail, parece que falta alguma coisa.";
+      msg = tr("Confira o e-mail, parece que falta alguma coisa.", "Please check your email, something seems to be missing.");
     }
     if (erro) erro.textContent = msg;
     if (msg) {
@@ -1445,18 +1591,32 @@ formContato.addEventListener("submit", async (e) => {
   erroEnvio.textContent = "";
   if (!validar(formContato)) return;
   const dados = new FormData(formContato);
+  const nome = String(dados.get("nome") || "").trim();
+  const marca = String(dados.get("marca") || "").trim();
+  // No painel, o recado aparece com o nome da marca. A pessoa que escreveu fica anotada na observação.
+  const obs = [
+    `Contato: ${nome}`,
+    marca ? `Marca: ${marca}` : "",
+    idioma === "en" ? "Escreveu pelo site em inglês." : "",
+    `Mensagem pelo site: ${dados.get("mensagem")}`
+  ].filter(Boolean).join("\n");
   const botao = $("button[type=submit]", formContato);
+  const rotuloBotao = $("[data-i18n]", botao); // troca só o texto, para a tradução continuar achando ele
+  const textoBotao = rotuloBotao.textContent;
   botao.disabled = true;
-  const textoBotao = botao.innerHTML;
-  botao.textContent = "Enviando...";
-  const deuCerto = await salvarLead(dados.get("nome"), dados.get("email"), `Mensagem pelo site: ${dados.get("mensagem")}`);
+  rotuloBotao.textContent = tr("Enviando...", "Sending...");
+  const deuCerto = await salvarLead(marca || nome, dados.get("email"), obs);
   botao.disabled = false;
-  botao.innerHTML = textoBotao;
+  rotuloBotao.textContent = textoBotao;
   if (!deuCerto) {
-    erroEnvio.textContent = "Não consegui enviar agora. Me chama no WhatsApp (41) 99866-9857 ou no e-mail contatoalannaclara@gmail.com.";
+    erroEnvio.textContent = tr(
+      "Não consegui enviar agora. Me chama no WhatsApp (41) 99866-9857 ou no e-mail contatoalannaclara@gmail.com.",
+      "I couldn't send it right now. Reach me on WhatsApp +55 41 99866-9857 or at contatoalannaclara@gmail.com.");
     return;
   }
-  $("#ok-contato-texto").textContent = `Obrigada, ${primeiroNome(dados.get("nome"))}! Vou ler com carinho e te respondo em breve.`;
+  $("#ok-contato-texto").textContent = tr(
+    `Obrigada, ${primeiroNome(nome)}! Vou ler com carinho e te respondo em até 48h.`,
+    `Thank you, ${primeiroNome(nome)}! I'll read it carefully and reply within 48 hours.`);
   formContato.hidden = true;
   okContato.hidden = false;
   okContato.focus();
@@ -1511,8 +1671,11 @@ formKit.addEventListener("submit", async (e) => {
   if (!validar(formKit)) return;
   const dados = new FormData(formKit);
   // Quem pede o mídia kit também entra na sua base de marcas como Lead
-  await salvarLead(dados.get("nome"), dados.get("email"), "Pediu o mídia kit pelo site.");
-  $("#ok-kit-texto").textContent = `Obrigada, ${primeiroNome(dados.get("nome"))}! O mídia kit vai chegar em ${String(dados.get("email")).trim()} em breve.`;
+  await salvarLead(dados.get("nome"), dados.get("email"),
+    idioma === "en" ? "Pediu o mídia kit pelo site, em inglês." : "Pediu o mídia kit pelo site.");
+  $("#ok-kit-texto").textContent = tr(
+    `Obrigada, ${primeiroNome(dados.get("nome"))}! O mídia kit vai chegar em ${String(dados.get("email")).trim()} em breve.`,
+    `Thank you, ${primeiroNome(dados.get("nome"))}! The media kit will arrive at ${String(dados.get("email")).trim()} soon.`);
   $("#kit-corpo").hidden = true;
   const ok = $("#ok-kit");
   ok.hidden = false;
@@ -1596,6 +1759,60 @@ registrarVisita();
 
 /* ---------- Ano automático no rodapé ---------- */
 $("#ano").textContent = new Date().getFullYear();
+
+/* ---------- Troca de idioma (PT / EN) ----------
+   Quando a página abre, o português de cada pedaço fixo (os que têm data-i18n)
+   fica guardado. Ao trocar, esses pedaços recebem o texto do INGLES, ou voltam
+   ao português guardado. As partes montadas pelo script são montadas de novo. */
+const ORIGINAIS = new Map();
+const TITULO_PT = document.title;
+$$("[data-i18n]").forEach((el) => ORIGINAIS.set(el, { html: el.innerHTML, attrs: {} }));
+$$("[data-i18n-attr]").forEach((el) => {
+  const guardado = ORIGINAIS.get(el) || { html: null, attrs: {} };
+  el.dataset.i18nAttr.split(",").forEach((par) => {
+    const attr = par.split(":")[0].trim();
+    guardado.attrs[attr] = el.getAttribute(attr);
+  });
+  ORIGINAIS.set(el, guardado);
+});
+
+function traduzirFixos() {
+  const en = idioma === "en";
+  document.documentElement.lang = en ? "en" : "pt-BR";
+  document.title = en ? INGLES["site.titulo"] : TITULO_PT;
+  ORIGINAIS.forEach((guardado, el) => {
+    if (el.dataset.i18n && guardado.html != null) {
+      const ingles = INGLES[el.dataset.i18n];
+      el.innerHTML = en && ingles != null ? ingles : guardado.html;
+    }
+    if (el.dataset.i18nAttr) {
+      el.dataset.i18nAttr.split(",").forEach((par) => {
+        const [attr, chave] = par.split(":").map((s) => s.trim());
+        const ingles = INGLES[chave];
+        const valor = en && ingles != null ? ingles : guardado.attrs[attr];
+        if (valor == null) el.removeAttribute(attr); else el.setAttribute(attr, valor);
+      });
+    }
+  });
+  $$("[data-idioma]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.idioma === idioma)));
+  botaoMenu.setAttribute("aria-label", menu.classList.contains("aberto") ? tr("Fechar menu", "Close menu") : tr("Abrir menu", "Open menu"));
+}
+
+function trocarIdioma(novo) {
+  novo = novo === "en" ? "en" : "pt";
+  if (novo === idioma) return;
+  idioma = novo;
+  try { localStorage.setItem("idioma", idioma); } catch (e) { /* navegação privada */ }
+  traduzirFixos();
+  montarNumerosCapa(true);
+  montarServicos();
+  montarDepoimentos(true);
+  if (listaTrabalhos) montarTrabalhos(listaTrabalhos);
+}
+
+$$("[data-idioma]").forEach((b) => b.addEventListener("click", () => trocarIdioma(b.dataset.idioma)));
+// Quem escolheu inglês numa visita anterior já abre o site em inglês
+if (idioma === "en") traduzirFixos();
 </script>
 </body>
 </html>
