@@ -824,7 +824,14 @@ const MARCAS = [
 // Como adicionar: salve a foto na pasta "fotos" e escreva o nome dela entre aspas, uma por linha,
 // com vírgula no fim (ex.: "fotos/sobre-1.webp",). Formato ideal: vertical 2:3, como 1000 x 1500.
 // Enquanto a lista estiver vazia, aparecem espaços coloridos numerados no lugar das fotos.
+// As fotos originais, em tamanho grande, ficam guardadas em fotos/originais.
 const FOTOS_SOBRE = [
+  "fotos/sobre-1.jpg",
+  "fotos/sobre-2.jpg",
+  "fotos/sobre-3.jpg",
+  "fotos/sobre-4.jpg",
+  "fotos/sobre-5.jpg",
+  "fotos/sobre-6.jpg",
 ];
 
 // Tempo (em milissegundos) que cada foto fica parada na frente antes do círculo girar de novo.
@@ -1141,7 +1148,7 @@ function montarRoda() {
   let lugares = fotos.slice();
   while (lugares.length < 6) lugares = lugares.concat(fotos);
   roda.innerHTML = lugares.map((f) => f.foto
-    ? `<div class="roda-foto"><img src="${esc(f.foto)}" alt="" decoding="async"></div>`
+    ? `<div class="roda-foto"><img src="${esc(f.foto)}" alt="" width="1000" height="1500" decoding="async" fetchpriority="low"></div>`
     : `<div class="roda-foto roda-ph" data-cor="${(f.numero - 1) % 6 + 1}"><span class="roda-num">${String(f.numero).padStart(2, "0")}</span><span class="legenda" data-numero="${f.numero}"></span></div>`
   ).join("");
   cartoesRoda = Array.from(roda.children);
