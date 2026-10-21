@@ -132,8 +132,9 @@ section{padding-block:var(--secao)}
 .topo.em-fundo-claro:not(.menu-aberto) .idioma button{color:rgba(243,238,233,.75)}
 .topo.em-fundo-claro:not(.menu-aberto) .idioma button:not([aria-pressed="true"]):hover{color:var(--creme)}
 .topo.em-fundo-claro:not(.menu-aberto) .idioma button[aria-pressed="true"]{background:var(--creme);color:var(--tinta)}
-.topo.em-fundo-claro:not(.menu-aberto) .topo-acoes .btn-topo{background:var(--azul);color:var(--tinta)}
-.topo.em-fundo-claro:not(.menu-aberto) .topo-acoes .btn-topo:hover{background:var(--creme)}
+/* Trabalhe comigo envidraçado, igual ao seletor PT/EN */
+.topo.em-fundo-claro:not(.menu-aberto) .topo-acoes .btn-topo{border:1px solid rgba(243,238,233,.25);background:rgba(243,238,233,.08);color:var(--creme);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.topo.em-fundo-claro:not(.menu-aberto) .topo-acoes .btn-topo:hover{background:rgba(243,238,233,.18)}
 .topo.em-fundo-claro:not(.menu-aberto) .sanduiche{border-color:rgba(243,238,233,.25);background:rgba(243,238,233,.08);color:var(--creme)}
 .topo.em-fundo-claro:not(.menu-aberto) :focus-visible{outline-color:var(--azul)}
 
