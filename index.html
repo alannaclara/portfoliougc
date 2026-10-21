@@ -835,7 +835,7 @@ const FOTOS_SOBRE = [
 ];
 
 // Tempo (em milissegundos) que cada foto fica parada na frente antes do círculo girar de novo.
-const TEMPO_FOTO_SOBRE = 2600;
+const TEMPO_FOTO_SOBRE = 1800;
 
 // MÉTRICAS: os três números da capa.
 // valor = número final do contador | casas = casas decimais | prefixo e sufixo = o que vem antes e depois.
@@ -1217,7 +1217,7 @@ function girarRoda() {
   rodaGirando = true;
   const inicio = posicaoRoda;
   const comeco = performance.now();
-  const duracao = 1300;
+  const duracao = 1000;
   const passo = (agora) => {
     const p = Math.min((agora - comeco) / duracao, 1);
     const suave = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
