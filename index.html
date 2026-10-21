@@ -102,7 +102,7 @@ section{padding-block:var(--secao)}
 .btn-claro:hover{background:#fff;transform:translateY(-2px)}
 
 /* ===== MENU FIXO ===== */
-.topo{position:fixed;inset:0 0 auto;z-index:100;height:var(--topo);border-bottom:1px solid transparent;transition:background-color .35s,border-color .35s}
+.topo{position:fixed;inset:0 0 auto;z-index:100;height:var(--topo);border-bottom:1px solid transparent;transition:background-color .35s,border-color .35s,color .35s}
 .topo.rolou,.topo.menu-aberto{background:rgba(243,238,233,.9);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-bottom-color:var(--linha)}
 .topo .container{height:100%;display:flex;align-items:center;gap:clamp(16px,2.2vw,28px)}
 .logo{font-family:var(--serif);font-size:1.5rem;line-height:1;text-decoration:none;white-space:nowrap;letter-spacing:-.01em}
@@ -115,13 +115,27 @@ section{padding-block:var(--secao)}
 .idioma button{min-width:38px;padding:6px 10px;border:0;border-radius:999px;background:transparent;color:var(--tinta-2);font-size:.76rem;font-weight:700;letter-spacing:.06em;line-height:1;cursor:pointer;transition:background-color .25s,color .25s}
 .idioma button[aria-pressed="true"]{background:var(--tinta);color:var(--creme)}
 .idioma button:not([aria-pressed="true"]):hover{color:var(--tinta)}
-.btn-topo{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 18px;border-radius:var(--raio-sm);background:var(--tinta);color:var(--creme);font-size:.9rem;font-weight:600;line-height:1.1;text-decoration:none;white-space:nowrap;transition:background-color .25s,transform .25s var(--ease)}
+.btn-topo{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 18px;border-radius:var(--raio-sm);background:var(--tinta);color:var(--creme);font-size:.9rem;font-weight:600;line-height:1.1;text-decoration:none;white-space:nowrap;transition:background-color .25s,color .25s,transform .25s var(--ease)}
 .btn-topo:hover{background:#0f2a30;transform:translateY(-1px)}
 .topo :focus-visible{outline-color:var(--tinta)}
 .menu a{position:relative;isolation:isolate;display:inline-block;padding-block:8px;font-size:.93rem;font-weight:500;text-decoration:none}
 .menu a::after{content:"";position:absolute;z-index:-1;left:-3px;right:-3px;bottom:9px;height:.5em;border-radius:2px;background:var(--azul);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
 .menu a:hover::after,.menu a[aria-current="true"]::after{transform:scaleX(1)}
 .sanduiche{display:none}
+/* COR DA BARRA DE CIMA: muda conforme o fundo que está passando por baixo dela.
+   Fundo claro (creme ou azul): barra #173b43 transparente, com letras claras.
+   Fundo escuro (Serviços e rodapé): barra creme transparente, como antes.
+   Com o menu do celular aberto, ela fica sempre clara, igual ao menu. */
+.topo.em-fundo-claro:not(.menu-aberto){background:rgba(23,59,67,.86);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);border-bottom-color:rgba(243,238,233,.12);color:var(--creme)}
+.topo.em-fundo-claro:not(.menu-aberto) .menu a::after{background:rgba(167,235,242,.32)}
+.topo.em-fundo-claro:not(.menu-aberto) .idioma{border-color:rgba(243,238,233,.25);background:rgba(243,238,233,.08)}
+.topo.em-fundo-claro:not(.menu-aberto) .idioma button{color:rgba(243,238,233,.75)}
+.topo.em-fundo-claro:not(.menu-aberto) .idioma button:not([aria-pressed="true"]):hover{color:var(--creme)}
+.topo.em-fundo-claro:not(.menu-aberto) .idioma button[aria-pressed="true"]{background:var(--creme);color:var(--tinta)}
+.topo.em-fundo-claro:not(.menu-aberto) .topo-acoes .btn-topo{background:var(--azul);color:var(--tinta)}
+.topo.em-fundo-claro:not(.menu-aberto) .topo-acoes .btn-topo:hover{background:var(--creme)}
+.topo.em-fundo-claro:not(.menu-aberto) .sanduiche{border-color:rgba(243,238,233,.25);background:rgba(243,238,233,.08);color:var(--creme)}
+.topo.em-fundo-claro:not(.menu-aberto) :focus-visible{outline-color:var(--azul)}
 
 /* ===== CAPA ===== */
 .capa{padding-top:calc(var(--topo) + clamp(16px,3vw,32px));padding-bottom:0}
@@ -410,7 +424,7 @@ div.video:not([data-video]){cursor:default}
   .sanduiche[aria-expanded="true"] span{background:transparent}
   .sanduiche[aria-expanded="true"] span::before{transform:translateY(6px) rotate(45deg)}
   .sanduiche[aria-expanded="true"] span::after{transform:translateY(-6px) rotate(-45deg)}
-  .menu{position:fixed;top:var(--topo);left:0;right:0;max-height:calc(100dvh - var(--topo));overflow-y:auto;padding:8px var(--gutter) 28px;background:var(--creme);border-bottom:1px solid var(--linha);box-shadow:var(--sombra);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .3s,transform .3s var(--ease),visibility 0s .3s}
+  .menu{position:fixed;top:var(--topo);left:0;right:0;max-height:calc(100dvh - var(--topo));overflow-y:auto;padding:8px var(--gutter) 28px;background:var(--creme);color:var(--tinta);border-bottom:1px solid var(--linha);box-shadow:var(--sombra);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .3s,transform .3s var(--ease),visibility 0s .3s}
   .menu.aberto{opacity:1;visibility:visible;transform:none;transition:opacity .3s,transform .3s var(--ease)}
   .menu ul{flex-direction:column;align-items:stretch;gap:0}
   .menu li+li{border-top:1px solid var(--linha)}
@@ -1651,8 +1665,23 @@ const aoMudarTela = (e) => { if (e.matches) fecharMenu(); };
 if (telaGrande.addEventListener) telaGrande.addEventListener("change", aoMudarTela);
 else if (telaGrande.addListener) telaGrande.addListener(aoMudarTela);
 
-const aoRolar = () => topo.classList.toggle("rolou", window.scrollY > 12);
+// A barra fica escura sobre fundo claro e clara sobre os fundos escuros (Serviços e rodapé).
+// Vale o fundo que está passando pelo meio da altura da barra.
+const fundosEscuros = $$(".servicos, .rodape");
+function corDaBarra() {
+  const meio = topo.offsetHeight / 2;
+  const escuro = fundosEscuros.some((el) => {
+    const r = el.getBoundingClientRect();
+    return r.top <= meio && r.bottom >= meio;
+  });
+  topo.classList.toggle("em-fundo-claro", !escuro);
+}
+const aoRolar = () => {
+  topo.classList.toggle("rolou", window.scrollY > 12);
+  corDaBarra();
+};
 window.addEventListener("scroll", aoRolar, { passive: true });
+window.addEventListener("resize", corDaBarra);
 aoRolar();
 
 // Destaca no menu a seção que está na tela
