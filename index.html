@@ -46,6 +46,8 @@
   --secao:clamp(64px,8vw,112px);
   /* Espaço vazio entre duas seções de fundo claro */
   --entre:clamp(36px,4.5vw,64px);
+  /* Espaço em cima e embaixo da faixa de logos */
+  --faixa-respiro:clamp(36px,5vw,60px);
   --ease:cubic-bezier(.22,.61,.36,1);
 }
 
@@ -136,11 +138,7 @@ section{padding-block:var(--secao)}
 .numeros-capa .num{font-size:clamp(1.7rem,3.4vw,2.7rem);white-space:nowrap}
 .num-rotulo{display:block;margin-top:10px;font-size:.84rem;line-height:1.35;color:var(--tinta-2)}
 
-/* ===== FOTOS (espaços reservados com degradê) ===== */
-.foto{position:relative;overflow:hidden;border-radius:var(--raio);box-shadow:var(--sombra-forte);isolation:isolate}
-.foto img{width:100%;height:100%;object-fit:cover}
-.foto-ph{aspect-ratio:4/5;display:flex;align-items:flex-end;padding:18px}
-.foto-sobre{background:radial-gradient(80% 60% at 80% 18%,rgba(255,255,255,.5),transparent 60%),linear-gradient(200deg,#f6e2c9 0%,#e9b98a 40%,#c9e6de 72%,#a7ebf2 100%)}
+/* ===== ETIQUETA DOS ESPAÇOS RESERVADOS ===== */
 .legenda{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(23,59,67,.6);color:#fff;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .capa-foto{position:relative;max-width:620px;justify-self:end;width:100%}
 /* Rosto na capa: duas fotos com fundo transparente, uma em cima da outra.
@@ -160,7 +158,7 @@ section{padding-block:var(--secao)}
 @keyframes brincadeira{0%,60%{transform:none}64%{transform:rotate(3deg) scale(1.04)}70%,84%{transform:rotate(2deg) scale(1.02)}90%,100%{transform:none}}
 
 /* ===== FAIXA DE MARCAS ===== */
-.faixa{overflow:hidden;padding-block:clamp(36px,5vw,60px);background:var(--creme)}
+.faixa{overflow:hidden;padding-block:var(--faixa-respiro);background:var(--creme)}
 .faixa-titulo{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:clamp(22px,3vw,32px);padding-inline:var(--gutter);font-size:.72rem;font-weight:600;letter-spacing:.3em;text-transform:uppercase;text-align:center;color:var(--tinta-2)}
 .faixa-titulo::before,.faixa-titulo::after{content:"";width:40px;height:1px;flex:none;background:currentColor;opacity:.5}
 /* A velocidade vem do script (--duracao): quanto mais marcas, mais longo o trilho.
@@ -178,8 +176,22 @@ section{padding-block:var(--secao)}
 
 /* ===== SOBRE MIM ===== */
 .sobre-grade{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1fr);gap:clamp(44px,8vw,120px);align-items:center}
-.sobre-foto{position:relative;max-width:480px}
-.sobre-foto::before{content:"";position:absolute;top:22px;left:22px;right:-22px;bottom:-22px;background:var(--azul);border-radius:var(--raio);z-index:-1}
+/* Círculo de fotos que gira ao lado do texto. A da frente fica nítida, as vizinhas
+   um pouco desfocadas e as de trás desfocadas. Em cima, as fotos passam por trás da
+   faixa de logos: o recorte começa logo abaixo das logos, então elas nunca ficam escondidas. */
+.sobre-roda{position:relative;align-self:stretch;min-height:420px}
+.roda{position:absolute;top:calc(-1 * (var(--entre) + var(--faixa-respiro)));bottom:calc(-1 * var(--entre));left:0;right:0;pointer-events:none;clip-path:polygon(-100vw 0,200vw 0,200vw 100%,-100vw 100%)}
+.roda-foto{position:absolute;left:0;top:0;overflow:hidden;border-radius:var(--raio);background:var(--creme-2);box-shadow:var(--sombra-forte);visibility:hidden;will-change:transform,filter,opacity}
+.roda-foto img{width:100%;height:100%;object-fit:cover}
+/* Espaço colorido no lugar de cada foto, enquanto a lista FOTOS_SOBRE estiver vazia */
+.roda-ph{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:calc(var(--w,300px) * .07)}
+.roda-num{font-family:var(--serif);font-style:italic;font-weight:300;font-size:calc(var(--w,300px) * .36);line-height:.9;letter-spacing:-.03em;color:var(--tinta)}
+.roda-ph[data-cor="1"]{background:radial-gradient(80% 60% at 80% 18%,rgba(255,255,255,.5),transparent 60%),linear-gradient(200deg,#f6e2c9 0%,#e9b98a 40%,#c9e6de 72%,#a7ebf2 100%)}
+.roda-ph[data-cor="2"]{background:radial-gradient(70% 50% at 20% 20%,rgba(255,255,255,.55),transparent 60%),linear-gradient(165deg,#a7ebf2 0%,#dcf6f9 45%,#f6e2c9 100%)}
+.roda-ph[data-cor="3"]{background:radial-gradient(80% 60% at 75% 15%,rgba(255,255,255,.45),transparent 60%),linear-gradient(200deg,#f4b8a8 0%,#f6e2c9 55%,#ebe3da 100%)}
+.roda-ph[data-cor="4"]{background:radial-gradient(70% 55% at 25% 18%,rgba(255,255,255,.5),transparent 60%),linear-gradient(180deg,#c9e6de 0%,#a7ebf2 55%,#86dde7 100%)}
+.roda-ph[data-cor="5"]{background:radial-gradient(80% 60% at 80% 20%,rgba(255,255,255,.5),transparent 60%),linear-gradient(210deg,#ebe3da 0%,#f4b8a8 60%,#e9b98a 100%)}
+.roda-ph[data-cor="6"]{background:radial-gradient(75% 55% at 30% 15%,rgba(255,255,255,.5),transparent 60%),linear-gradient(170deg,#dcf6f9 0%,#c9e6de 40%,#f4b8a8 100%)}
 /* Texto do Sobre mim: cinza, com as palavras-chave em negrito escuro */
 .sobre-corpo{margin-top:clamp(20px,2.6vw,30px);color:var(--tinta-2)}
 .sobre-corpo p+p{margin-top:16px}
@@ -385,7 +397,8 @@ div.video:not([data-video]){cursor:default}
 @media (max-width:960px){
   .capa-grade,.sobre-grade,.contato-grade{grid-template-columns:minmax(0,1fr)}
   .capa-foto{justify-self:center;max-width:420px}
-  .sobre-foto{max-width:420px;margin-inline:auto;width:calc(100% - 22px)}
+  /* No celular o círculo fica em cima do texto; a altura vem do script */
+  .sobre-roda{min-height:0}
 }
 @media (max-width:880px){
   .sanduiche{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel);color:var(--tinta);cursor:pointer}
@@ -415,7 +428,6 @@ div.video:not([data-video]){cursor:default}
 @media (max-width:760px){
   .video{--por-tela:2.4}
   .servicos-grade,.depoimentos{grid-template-columns:minmax(0,1fr)}
-  .sobre-foto::before{top:14px;left:14px;right:-14px;bottom:-14px}
 }
 @media (max-width:480px){
   .numeros-capa li{padding-right:8px}
@@ -537,14 +549,9 @@ div.video:not([data-video]){cursor:default}
 <!-- ================= 2. SOBRE MIM ================= -->
 <section class="sobre" id="sobre" aria-labelledby="sobre-titulo">
   <div class="container sobre-grade">
-    <div class="sobre-foto revelar">
-      <!-- FOTO DO SOBRE MIM
-           Troque o bloco div abaixo por:
-           <div class="foto"><img src="foto-sobre.jpg" alt="Alanna Clara gravando um vídeo em casa" width="800" height="1000" loading="lazy"></div>
-           Formato ideal: vertical 4:5. -->
-      <div class="foto foto-ph foto-sobre" role="img" aria-label="Espaço para a foto da Alanna Clara gravando" data-i18n-attr="aria-label:sobre.foto">
-        <span class="legenda" data-i18n="sobre.legenda">foto da creator · 4:5</span>
-      </div>
+    <!-- FOTOS DO SOBRE MIM: as fotos que giram vêm da lista FOTOS_SOBRE no script -->
+    <div class="sobre-roda revelar">
+      <div class="roda" id="roda" role="img" aria-label="Fotos da Alanna Clara" data-i18n-attr="aria-label:sobre.fotos"></div>
     </div>
 
     <div class="sobre-texto">
@@ -813,6 +820,16 @@ const MARCAS = [
   { nome: "Tour Curitiba",         logo: "logos/tour-curitiba.png" }
 ];
 
+// FOTOS DO SOBRE MIM: as fotos que giram no círculo ao lado do texto "Sobre mim", na ordem daqui.
+// Como adicionar: salve a foto na pasta "fotos" e escreva o nome dela entre aspas, uma por linha,
+// com vírgula no fim (ex.: "fotos/sobre-1.webp",). Formato ideal: vertical 2:3, como 1000 x 1500.
+// Enquanto a lista estiver vazia, aparecem espaços coloridos numerados no lugar das fotos.
+const FOTOS_SOBRE = [
+];
+
+// Tempo (em milissegundos) que cada foto fica parada na frente antes do círculo girar de novo.
+const TEMPO_FOTO_SOBRE = 2600;
+
 // MÉTRICAS: os três números da capa.
 // valor = número final do contador | casas = casas decimais | prefixo e sufixo = o que vem antes e depois.
 // Os campos terminados em _en são a versão em inglês.
@@ -932,8 +949,7 @@ const INGLES = {
   "capa.foto": "Photo of Alanna Clara winking",
   "faixa.titulo": "Brands I've worked with",
 
-  "sobre.foto": "Space for a photo of Alanna Clara filming",
-  "sobre.legenda": "creator photo · 4:5",
+  "sobre.fotos": "Photos of Alanna Clara",
   "sobre.rotulo": "About me",
   "sobre.titulo": "Hi, I'm <em>Alanna Clara</em>",
   "sobre.corpo":
@@ -1100,6 +1116,130 @@ function montarNumerosCapa(jaAnimado) {
     .map((m) => `<li>${contador(m, jaAnimado)}<span class="num-rotulo">${esc(doIdioma(m, "rotulo"))}</span></li>`).join("");
 }
 montarNumerosCapa(false);
+
+/* ---------- Sobre mim: círculo de fotos que gira ----------
+   Cada foto ocupa um lugar na volta (k). A da frente (k = 0) fica grande e nítida,
+   as vizinhas (k = ±1) menores e um pouco desfocadas, e as seguintes (k = ±2) ainda
+   menores e desfocadas. A volta gira para cima: a de baixo vem para a frente e a de
+   cima passa por trás das logos e some. */
+const roda = $("#roda");
+const celulaRoda = roda.parentElement;
+const umaColuna = window.matchMedia("(max-width: 960px)");
+const PASSO_RODA = 40 * Math.PI / 180; // distância entre duas fotos na volta
+let cartoesRoda = [];
+let posicaoRoda = 0;
+let medidasRoda = null;
+
+function legendasRoda() {
+  $$(".roda-ph .legenda", roda).forEach((el) => { el.textContent = tr("foto ", "photo ") + el.dataset.numero; });
+}
+
+function montarRoda() {
+  let fotos = FOTOS_SOBRE.filter(Boolean).map((foto) => ({ foto }));
+  if (!fotos.length) fotos = [1, 2, 3, 4, 5, 6].map((numero) => ({ numero }));
+  // A volta precisa de pelo menos 6 lugares para girar sem buraco: se faltar foto, elas se repetem
+  let lugares = fotos.slice();
+  while (lugares.length < 6) lugares = lugares.concat(fotos);
+  roda.innerHTML = lugares.map((f) => f.foto
+    ? `<div class="roda-foto"><img src="${esc(f.foto)}" alt="" decoding="async"></div>`
+    : `<div class="roda-foto roda-ph" data-cor="${(f.numero - 1) % 6 + 1}"><span class="roda-num">${String(f.numero).padStart(2, "0")}</span><span class="legenda" data-numero="${f.numero}"></span></div>`
+  ).join("");
+  cartoesRoda = Array.from(roda.children);
+  legendasRoda();
+}
+
+// Mede a coluna e decide o tamanho das fotos e onde fica o centro da volta
+function medirRoda() {
+  const larg = celulaRoda.clientWidth;
+  if (!larg) return;
+  let W, cx, cy, rx, ry;
+  if (umaColuna.matches) {
+    // Celular e tablet: o círculo fica em cima do texto, com altura própria
+    W = Math.min(larg * 0.5, 230);
+    rx = W * 0.7;
+    ry = W * 1.42;
+    cx = larg / 2 + W * 0.2;
+    const altura = Math.round(W * 2.95);
+    if (celulaRoda.style.height !== altura + "px") celulaRoda.style.height = altura + "px";
+    cy = -roda.offsetTop + W * 1.12;
+  } else {
+    if (celulaRoda.style.height) celulaRoda.style.height = "";
+    const alt = celulaRoda.clientHeight;
+    const vao = parseFloat(getComputedStyle(celulaRoda.parentElement).columnGap) || 0;
+    W = Math.min(larg * 0.7, alt / 3, 350);
+    rx = W * 0.75;
+    ry = W * 1.55;
+    cx = larg + vao * 0.45 - W / 2;
+    cy = -roda.offsetTop + W * 1.08 + Math.max(0, alt - W * 3) * 0.35;
+  }
+  medidasRoda = { W, cx, cy, rx, ry };
+  roda.style.setProperty("--w", W + "px");
+  cartoesRoda.forEach((el) => { el.style.width = W + "px"; el.style.height = W * 1.5 + "px"; });
+  desenharRoda();
+}
+
+function desenharRoda() {
+  if (!medidasRoda) return;
+  const { W, cx, cy, rx, ry } = medidasRoda;
+  const n = cartoesRoda.length;
+  cartoesRoda.forEach((el, i) => {
+    let k = (((i - posicaoRoda) % n) + n) % n;
+    if (k >= n / 2) k -= n;
+    const d = Math.abs(k);
+    const angulo = k * PASSO_RODA;
+    const escala = 0.46 + 0.54 / (1 + 1.3 * k * k);
+    const x = cx - rx * (1 - Math.cos(angulo)) - W / 2;
+    const y = cy + ry * Math.sin(angulo) - W * 0.75;
+    // Desfoque: 0 na da frente, um pouco nas vizinhas e bem mais nas de trás
+    const desfoque = 2.4 * Math.pow(d, 1.6) * (W / 300);
+    const opacidade = Math.max(0, Math.min(1, (2.5 - d) / 0.5));
+    el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scale(${escala.toFixed(4)})`;
+    el.style.filter = desfoque > 0.05 ? `blur(${desfoque.toFixed(2)}px)` : "none";
+    el.style.opacity = opacidade.toFixed(3);
+    el.style.zIndex = String(100 - Math.round(d * 10));
+    el.style.visibility = opacidade > 0 ? "visible" : "hidden";
+  });
+}
+
+// Gira um lugar, devagar no começo e no fim, e espera o tempo de TEMPO_FOTO_SOBRE para girar de novo
+let rodaVisivel = false;
+let rodaGirando = false;
+let esperaRoda = null;
+function girarRoda() {
+  if (rodaGirando || !cartoesRoda.length) return;
+  rodaGirando = true;
+  const inicio = posicaoRoda;
+  const comeco = performance.now();
+  const duracao = 1300;
+  const passo = (agora) => {
+    const p = Math.min((agora - comeco) / duracao, 1);
+    const suave = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+    posicaoRoda = inicio + suave;
+    desenharRoda();
+    if (p < 1) { requestAnimationFrame(passo); return; }
+    posicaoRoda = (inicio + 1) % cartoesRoda.length;
+    rodaGirando = false;
+    agendarRoda();
+  };
+  requestAnimationFrame(passo);
+}
+function agendarRoda() {
+  clearTimeout(esperaRoda);
+  if (animar && rodaVisivel && !document.hidden) esperaRoda = setTimeout(girarRoda, TEMPO_FOTO_SOBRE);
+}
+
+montarRoda();
+medirRoda();
+if ("ResizeObserver" in window) new ResizeObserver(medirRoda).observe(celulaRoda);
+else window.addEventListener("resize", medirRoda);
+// Só gira quando o Sobre mim está na tela (e a aba está aberta)
+if (animar) {
+  new IntersectionObserver((entradas) => {
+    rodaVisivel = entradas[0].isIntersecting;
+    agendarRoda();
+  }).observe(celulaRoda);
+  document.addEventListener("visibilitychange", agendarRoda);
+}
 
 /* ---------- Trabalhos: um carrossel por nicho ---------- */
 // Pega o código do vídeo de qualquer link do YouTube (shorts, watch, youtu.be ou embed)
@@ -1805,6 +1945,7 @@ function trocarIdioma(novo) {
   try { localStorage.setItem("idioma", idioma); } catch (e) { /* navegação privada */ }
   traduzirFixos();
   montarNumerosCapa(true);
+  legendasRoda();
   montarServicos();
   montarDepoimentos(true);
   if (listaTrabalhos) montarTrabalhos(listaTrabalhos);
