@@ -8,7 +8,7 @@
   const P = window.Painel;
 
   // Mesmos nichos do site. A chave (à esquerda) é o que fica gravado no banco.
-  const NICHOS = { beleza: "Beleza", skincare: "Skincare", comida: "Comida", tech: "Tech" };
+  const NICHOS = { beleza: "Beleza", skincare: "Skincare", comida: "Comida", tech: "Tech", casa: "Casa & Decoração" };
   const FORMATOS = ["Vídeo UGC", "Reels", "TikTok", "Anúncio", "Unboxing", "Fotos do produto", "Publicação no perfil"];
 
   let secao = null;
