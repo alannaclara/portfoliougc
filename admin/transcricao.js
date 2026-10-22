@@ -183,6 +183,51 @@
     return lerConteudo(r.corpo);
   }
 
+  /* ---------- A capa do vídeo ----------
+     O serviço manda o endereço da capa, mas esse endereço expira em poucos dias.
+     Por isso a capa é reduzida e guardada no banco, na coluna "capa".
+     Custa 1 crédito por vídeo, uma vez só. */
+  const LARGURA_CAPA = 320;
+  const capasTentadas = new Set();
+
+  async function buscarCapa(url) {
+    try {
+      const { resposta, corpo } = await pedir("/metadata?url=" + encodeURIComponent(url));
+      const endereco = resposta.ok && corpo && corpo.media && corpo.media.thumbnailUrl;
+      if (!endereco) return "";
+      const imagem = await createImageBitmap(await (await fetch(endereco)).blob());
+      const escala = Math.min(1, LARGURA_CAPA / imagem.width);
+      const tela = document.createElement("canvas");
+      tela.width = Math.round(imagem.width * escala);
+      tela.height = Math.round(imagem.height * escala);
+      tela.getContext("2d").drawImage(imagem, 0, 0, tela.width, tela.height);
+      return tela.toDataURL("image/jpeg", 0.8);
+    } catch (e) {
+      return "";
+    }
+  }
+
+  // Sem a coluna "capa" no banco, não busca nada, para não gastar crédito à toa
+  const bancoTemCapa = () => itens.length > 0 && Object.prototype.hasOwnProperty.call(itens[0], "capa");
+
+  async function guardarCapa(item) {
+    if (!chave || !item || !item.url || item.capa || !embedDe(item) || capasTentadas.has(item.id) || !bancoTemCapa()) return;
+    capasTentadas.add(item.id);
+    const capa = await buscarCapa(item.url);
+    if (!capa) return;
+    item.capa = capa;
+    await atualizar(item.id, { capa });
+    // Põe a capa só nesse card, sem redesenhar a lista (não fecha vídeo que esteja tocando)
+    const caixa = secao && secao.querySelector(`[data-capa="${CSS.escape(String(item.id))}"]`);
+    if (caixa && !caixa.querySelector("iframe, img")) caixa.insertAdjacentHTML("afterbegin", imagemDaCapa(item));
+  }
+
+  async function completarCapas() {
+    for (const item of itens.filter((i) => i.status === "pronto")) await guardarCapa(item);
+  }
+
+  const imagemDaCapa = (i) => i.capa ? `<img class="tr-capa-img" src="${P.esc(i.capa)}" alt="" loading="lazy">` : "";
+
   /* =========================================================
      A CHAVE E O SALDO
      ========================================================= */
@@ -355,7 +400,7 @@
     P.$("#tr-chave-resumo", secao).textContent = chave ? `guardada, termina em ${fimDaChave(chave)}` : "ainda não salva";
     if (!chave) P.$("#tr-config", secao).open = true;
     desenharLista();
-    if (chave) mostrarSaldo();
+    if (chave) { mostrarSaldo(); completarCapas(); }
   }
 
   /* ---------- A chave ---------- */
@@ -503,7 +548,7 @@
     avisar("ok", "✅ Pronto. Revisa, dá um nome e salva.");
     desenharLista();
     abrirEdicao(linha);
-    mostrarSaldo();
+    guardarCapa(linha).then(mostrarSaldo);
   }
 
   /* =========================================================
@@ -574,6 +619,7 @@
       capa = `<div class="tr-capa-video tr-capa-espera">${P.icone("relogio")}<span>Ouvindo…</span></div>`;
     } else if (temEmbed) {
       capa = `<div class="tr-capa-video" data-capa="${P.esc(i.id)}">
+        ${imagemDaCapa(i)}
         <button class="botao tr-ver" type="button" data-acao="ver">${P.icone("play", "ico-p")}ver vídeo</button>
       </div>`;
     } else {
