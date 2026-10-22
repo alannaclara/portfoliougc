@@ -8,7 +8,8 @@
   const P = window.Painel;
 
   // Mesmos nichos do site. A chave (à esquerda) é o que fica gravado no banco.
-  const NICHOS = { beleza: "Beleza", skincare: "Skincare", comida: "Comida", tech: "Tech", casa: "Casa & Decoração" };
+  // "comida" continua sendo a chave de Gastronomia & Bebidas, para os vídeos antigos não perderem o nicho.
+  const NICHOS = { beleza: "Beleza", comida: "Gastronomia & Bebidas", tech: "Tech", casa: "Casa & Decoração" };
   const FORMATOS = ["Vídeo UGC", "Reels", "TikTok", "Anúncio", "Unboxing", "Fotos do produto", "Publicação no perfil"];
 
   let secao = null;
