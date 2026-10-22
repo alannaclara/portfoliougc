@@ -329,7 +329,6 @@ div.video:not([data-video]){cursor:default}
 .depoimento cite{font-family:var(--serif);font-style:normal;font-weight:600;font-size:1.12rem;line-height:1.3;color:var(--tinta)}
 .dep-arroba{margin-top:2px;font-size:.88rem;font-weight:500;color:var(--tinta-2);text-decoration:none}
 .dep-arroba:hover{color:var(--tinta);text-decoration:underline}
-.estrelas{margin-top:10px;font-size:1rem;letter-spacing:.18em;line-height:1;color:var(--tinta)}
 .dep-tag{margin-top:12px;font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-2)}
 .depoimento blockquote{margin:18px 0 0;font-size:.95rem;line-height:1.6;color:var(--tinta-2)}
 .dep-resultado{width:100%;margin-top:auto;padding-top:22px}
@@ -967,7 +966,6 @@ const SERVICOS = [
 // empresa = a linha pequena em maiúsculas
 // logo = opcional, imagem da logo da marca (ex.: "logos/dove.png"). Sem logo, aparece a sigla do nome.
 // logo_cheio = true quando a imagem já tem fundo colorido e deve ocupar o círculo todo.
-// estrelas = opcional, de 1 a 5 (sem preencher, ficam 5)
 // resultado e resultado_rotulo = opcionais, o número embaixo do card (ex.: "+45%" e "vendas com ads").
 //   Só aparecem quando preenchidos. Use apenas números reais que a marca te passou.
 // PLACEHOLDER: textos de exemplo, troque pelos depoimentos reais dos seus clientes.
@@ -1431,13 +1429,11 @@ function montarDepoimentos() {
   const lista = $("#lista-depoimentos");
   lista.innerHTML = DEPOIMENTOS.map((d) => {
     const nome = doIdioma(d, "nome");
-    const nota = Math.max(1, Math.min(5, Number(d.estrelas) || 5));
     const resultado = doIdioma(d, "resultado");
     return `<figure class="depoimento">
         <span class="dep-logo${d.logo_cheio ? " cheio" : ""}" aria-hidden="true">${d.logo ? `<img src="${esc(d.logo)}" alt="" decoding="async">` : esc(sigla(nome))}</span>
         <cite>${esc(nome)}</cite>
         ${d.arroba ? `<a class="dep-arroba" href="https://www.instagram.com/${encodeURIComponent(d.arroba)}/" target="_blank" rel="noopener">@${esc(d.arroba)}<span class="sr">${tr(" no Instagram (abre em nova aba)", " on Instagram (opens in a new tab)")}</span></a>` : ""}
-        <span class="estrelas" role="img" aria-label="${tr(nota + " de 5 estrelas", nota + " out of 5 stars")}">${"★".repeat(nota)}</span>
         ${doIdioma(d, "empresa") ? `<span class="dep-tag">${esc(doIdioma(d, "empresa"))}</span>` : ""}
         <blockquote><p>${esc(doIdioma(d, "texto"))}</p></blockquote>
         ${resultado ? `<figcaption class="dep-resultado"><div><strong>${esc(resultado)}</strong><span>${esc(doIdioma(d, "resultado_rotulo") || "")}</span></div></figcaption>` : ""}
