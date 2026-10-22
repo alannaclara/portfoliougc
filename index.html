@@ -450,8 +450,9 @@ div.video:not([data-video]){cursor:default}
 #kit-corpo h2{margin-bottom:22px}
 .modal .campo{gap:6px;margin-bottom:14px}
 .modal .campo label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-2)}
-.modal .campo input{padding:12px 16px;border-color:rgba(23,59,67,.45);background:#fff}
-.modal .campo input::placeholder{color:rgba(85,75,65,.7)}
+.modal .campo input,.modal .campo textarea{padding:12px 16px;border-color:rgba(23,59,67,.45);background:#fff}
+.modal .campo textarea{min-height:96px}
+.modal .campo input::placeholder,.modal .campo textarea::placeholder{color:rgba(85,75,65,.7)}
 .modal form .btn{width:100%;margin-top:8px}
 .fechar{position:absolute;top:16px;right:16px;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:transparent;color:var(--tinta);cursor:pointer;transition:background-color .25s}
 .fechar:hover{background:var(--creme-2)}
@@ -848,8 +849,8 @@ div.video:not([data-video]){cursor:default}
   <div class="modal-card" tabindex="-1">
     <button class="fechar" type="button" id="fechar-kit" aria-label="Fechar" data-i18n-attr="aria-label:kit.fechar"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
     <div id="kit-corpo">
-      <h2 id="kit-titulo" data-i18n="kit.titulo">Quer meu mídia kit <em>completo</em>?</h2>
-      <p class="sr" id="kit-desc" data-i18n="kit.desc">Deixe seus dados que eu te envio meus formatos, números e condições para parcerias.</p>
+      <h2 id="kit-titulo" data-i18n="kit.titulo">No que eu posso te <em>ajudar</em>?</h2>
+      <p class="sr" id="kit-desc" data-i18n="kit.desc">Deixe seus dados e me conte o que você precisa.</p>
       <form id="form-kit" novalidate>
         <div class="campo">
           <label for="k-nome" data-i18n="kit.nome">Nome</label>
@@ -869,13 +870,17 @@ div.video:not([data-video]){cursor:default}
           <label for="k-whats">WhatsApp</label>
           <input id="k-whats" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="(00) 00000-0000">
         </div>
-        <button class="btn btn-azul" type="submit" data-i18n="kit.botao">Quero receber</button>
+        <div class="campo">
+          <label for="k-mensagem" data-i18n="kit.mensagem">Mensagem</label>
+          <textarea id="k-mensagem" name="mensagem" rows="3" placeholder="objetivo da campanha, prazo, referências" data-i18n-attr="placeholder:kit.mensagem.ph"></textarea>
+        </div>
+        <button class="btn btn-azul" type="submit" data-i18n="kit.botao">Enviar</button>
       </form>
     </div>
     <div class="confirmacao" id="ok-kit" role="status" tabindex="-1" hidden>
       <div class="check" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></div>
-      <h3 data-i18n="kit.ok">Pedido <em>anotado</em>!</h3>
-      <p id="ok-kit-texto">Em breve o mídia kit chega no seu e-mail.</p>
+      <h3 data-i18n="kit.ok">Mensagem <em>recebida</em>!</h3>
+      <p id="ok-kit-texto">Te respondo em até 48h.</p>
       <button class="btn btn-linha" type="button" id="fechar-kit-ok" data-i18n="kit.fechar">Fechar</button>
     </div>
   </div>
@@ -1138,16 +1143,18 @@ const INGLES = {
   "player.fechar": "Close video",
 
   "kit.fechar": "Close",
-  "kit.titulo": "Want my <em>full</em> media kit?",
-  "kit.desc": "Leave your details and I'll send you my formats, numbers and partnership terms.",
+  "kit.titulo": "How can I <em>help</em> you?",
+  "kit.desc": "Leave your details and tell me what you need.",
+  "kit.mensagem": "Message",
+  "kit.mensagem.ph": "campaign goal, deadline, references",
   "kit.nome": "Name",
   "kit.nome.ph": "your name",
   "kit.empresa": "Company",
   "kit.empresa.ph": "brand name",
   "kit.email": "Email",
   "kit.email.ph": "email@company.com",
-  "kit.botao": "Send it to me",
-  "kit.ok": "Request <em>received</em>!"
+  "kit.botao": "Send",
+  "kit.ok": "Message <em>received</em>!"
 };
 
 /* =========================================================
@@ -2010,15 +2017,17 @@ formKit.addEventListener("submit", async (e) => {
   const nomeKit = String(dados.get("nome") || "").trim();
   const empresaKit = String(dados.get("empresa") || "").trim();
   const whatsKit = String(dados.get("whatsapp") || "").trim();
+  const mensagemKit = String(dados.get("mensagem") || "").trim();
   await salvarLead(empresaKit || nomeKit, dados.get("email"), [
-    idioma === "en" ? "Pediu o mídia kit pelo site, em inglês." : "Pediu o mídia kit pelo site.",
+    idioma === "en" ? "Escreveu pelo pop-up do site, em inglês." : "Escreveu pelo pop-up do site.",
     `Contato: ${nomeKit}`,
     empresaKit ? `Empresa: ${empresaKit}` : "",
-    whatsKit ? `WhatsApp: ${whatsKit}` : ""
+    whatsKit ? `WhatsApp: ${whatsKit}` : "",
+    mensagemKit ? `Mensagem: ${mensagemKit}` : ""
   ].filter(Boolean).join("\n"));
   $("#ok-kit-texto").textContent = tr(
-    `Obrigada, ${primeiroNome(dados.get("nome"))}! O mídia kit vai chegar em ${String(dados.get("email")).trim()} em breve.`,
-    `Thank you, ${primeiroNome(dados.get("nome"))}! The media kit will arrive at ${String(dados.get("email")).trim()} soon.`);
+    `Obrigada, ${primeiroNome(dados.get("nome"))}! Vou ler com carinho e te respondo em até 48h.`,
+    `Thank you, ${primeiroNome(dados.get("nome"))}! I'll read it carefully and reply within 48 hours.`);
   $("#kit-corpo").hidden = true;
   const ok = $("#ok-kit");
   ok.hidden = false;
