@@ -140,9 +140,9 @@ section{padding-block:var(--secao)}
 .topo.em-fundo-claro:not(.menu-aberto) :focus-visible{outline-color:var(--azul)}
 
 /* ===== CAPA ===== */
-.capa{padding-top:calc(var(--topo) + clamp(16px,3vw,32px));padding-bottom:0}
-/* Pouco espaço em cima (a faixa que ficava aqui foi tirada) e o respiro normal embaixo */
-.capa-grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:center;padding-top:clamp(10px,1.5vw,20px);padding-bottom:clamp(44px,7vw,96px)}
+.capa{padding-top:calc(var(--topo) + clamp(16px,2.4vw,32px));padding-bottom:0}
+/* O nome começa logo abaixo da barra de cima (sem o "UGC Creator" e sem espaço vazio) */
+.capa-grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:center;padding-bottom:clamp(44px,7vw,96px)}
 .capa h1{font-size:clamp(3.6rem,12.4vw,9.6rem);line-height:.88;letter-spacing:-.04em;margin-bottom:clamp(24px,3vw,36px)}
 .capa h1 span{display:block}
 .capa h1 em{display:inline-block;margin-left:.55em}
@@ -552,7 +552,6 @@ div.video:not([data-video]){cursor:default}
   <div class="container">
     <div class="capa-grade">
       <div class="capa-texto">
-        <p class="rotulo entrada" style="--atraso:.1s">UGC Creator</p>
         <h1 id="capa-titulo" class="entrada" style="--atraso:.2s"><span>Alanna</span> <em>Clara</em></h1>
         <p class="capa-frase entrada" style="--atraso:.35s" data-i18n="capa.frase">Eu gravo conteúdos criativos que <em>conectam</em> a sua marca a quem compra, com a naturalidade de uma indicação de amiga.</p>
         <div class="botoes entrada" style="--atraso:.5s">
