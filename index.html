@@ -320,6 +320,8 @@ div.video:not([data-video]){cursor:default}
 .dep-carrossel{position:relative}
 .depoimentos{display:flex;gap:clamp(16px,2vw,28px);overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding:52px 4px 8px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
 .depoimentos::-webkit-scrollbar{display:none}
+/* Poucos cards (todos cabem na tela): ficam no meio, sem o esmaecido nas pontas */
+.depoimentos.poucos{justify-content:center;-webkit-mask-image:none;mask-image:none}
 .depoimento{--cards:3;position:relative;flex:0 0 calc((100% - (var(--cards) - 1) * clamp(16px,2vw,28px)) / var(--cards));scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;margin:0;padding:64px clamp(22px,2.4vw,32px) clamp(24px,2.6vw,32px);border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);text-align:center}
 /* Logo da marca num círculo, metade para fora do card */
 .dep-logo{position:absolute;top:0;left:50%;width:96px;height:96px;display:grid;place-items:center;overflow:hidden;border:6px solid var(--creme);border-radius:50%;background:#fff;box-shadow:0 10px 24px -14px rgba(23,59,67,.4);transform:translate(-50%,-50%);font-family:var(--serif);font-size:1.5rem;color:var(--tinta)}
@@ -968,19 +970,11 @@ const SERVICOS = [
 // logo_cheio = true quando a imagem já tem fundo colorido e deve ocupar o círculo todo.
 // resultado e resultado_rotulo = opcionais, o número embaixo do card (ex.: "+45%" e "vendas com ads").
 //   Só aparecem quando preenchidos. Use apenas números reais que a marca te passou.
-// PLACEHOLDER: textos de exemplo, troque pelos depoimentos reais dos seus clientes.
+// Enquanto couberem todos na tela, os cards ficam centralizados e as setas somem.
 const DEPOIMENTOS = [
   { texto: "Entregando sempre com consistência e com aquela estética só sua, que casa demais com o Tour em!! 😁", nome: "Tour Curitiba", arroba: "tourcuritiba", empresa: "",
     logo: "logos/depoimento-tour-curitiba.png", logo_cheio: true, resultado: "+64 MIL", resultado_rotulo: "views em campanha",
-    texto_en: "Always delivering with consistency and that aesthetic that's all yours, which matches Tour so well!! 😁", resultado_en: "64K+", resultado_rotulo_en: "campaign views" },
-  { texto: "Entendeu o briefing de primeira e entregou antes do prazo. O vídeo parecia recomendação de amiga, do jeito que a gente queria.", nome: "Cliente 01", empresa: "Marca 01",
-    texto_en: "She got the brief right away and delivered ahead of schedule. The video felt like a friend's recommendation, exactly what we wanted.", nome_en: "Client 01", empresa_en: "Brand 01" },
-  { texto: "Roteiro claro, resposta rápida e um cuidado enorme com cada detalhe do produto. Já estamos planejando a próxima campanha.", nome: "Cliente 02", empresa: "Marca 02",
-    texto_en: "A clear script, quick replies and great care for every detail of the product. We're already planning the next campaign.", nome_en: "Client 02", empresa_en: "Brand 02" },
-  { texto: "O conteúdo ficou natural e bonito ao mesmo tempo. Usamos nos anúncios e no feed da marca.", nome: "Cliente 03", empresa: "Marca 03",
-    texto_en: "The content came out natural and beautiful at the same time. We used it in our ads and on the brand's feed.", nome_en: "Client 03", empresa_en: "Brand 03" },
-  { texto: "Profissionalismo, criatividade e uma parceria muito fácil. Recomendo para qualquer marca que queira conteúdo com verdade.", nome: "Cliente 04", empresa: "Marca 04",
-    texto_en: "Professional, creative and so easy to work with. I'd recommend her to any brand that wants honest content.", nome_en: "Client 04", empresa_en: "Brand 04" }
+    texto_en: "Always delivering with consistency and that aesthetic that's all yours, which matches Tour so well!! 😁", resultado_en: "64K+", resultado_rotulo_en: "campaign views" }
 ];
 
 // INGLÊS: a versão em inglês de cada texto fixo do site.
@@ -1453,6 +1447,7 @@ function passoDepoimento() {
 function setasDepoimentos() {
   const sobra = listaDep.scrollWidth - listaDep.clientWidth > 4;
   $$(".dep-seta").forEach((b) => { b.hidden = !sobra; });
+  listaDep.classList.toggle("poucos", !sobra);
 }
 function andarDepoimentos(direcao) {
   const fim = listaDep.scrollWidth - listaDep.clientWidth;
