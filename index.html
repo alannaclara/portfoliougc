@@ -313,18 +313,31 @@ div.video:not([data-video]){cursor:default}
 .servicos-cta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-top:clamp(40px,5vw,64px)}
 .servicos-cta p{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(1.3rem,2.4vw,1.75rem)}
 
-/* ===== NÚMEROS E DEPOIMENTOS ===== */
-.depoimentos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,2.4vw,28px)}
-.depoimento{display:flex;flex-direction:column;gap:28px;margin:0;padding:clamp(28px,3.4vw,44px);border:1px solid var(--linha);border-radius:var(--raio)}
-.depoimento:first-child{background:var(--azul);border-color:var(--azul);color:var(--tinta)}
-.depoimento::before{content:"\201C";height:.5em;font-family:var(--serif);font-size:4.6rem;line-height:1;color:var(--laranja)}
-.depoimento blockquote{margin:0;font-family:var(--serif);font-weight:300;font-size:clamp(1.18rem,1.8vw,1.42rem);line-height:1.45}
-.depoimento figcaption{display:flex;align-items:center;gap:14px;margin-top:auto}
-.avatar{width:46px;height:46px;flex:none;display:grid;place-items:center;border-radius:50%;background:var(--azul);color:var(--tinta);font-size:.82rem;font-weight:700}
-.depoimento:first-child .avatar{background:var(--tinta);color:var(--azul)}
-.depoimento cite{display:block;font-style:normal;font-weight:600;line-height:1.3}
-.depoimento .empresa{display:block;font-size:.88rem;color:var(--tinta-2)}
-.depoimento:first-child .empresa{color:var(--tinta-2)}
+/* ===== DEPOIMENTOS (carrossel) =====
+   Três cards por vez no computador, dois no tablet e um no celular.
+   As setas passam um card; no fim, a seta volta para o começo.
+   As bordas da faixa somem aos poucos, para mostrar que tem mais card dos lados. */
+.dep-carrossel{position:relative}
+.depoimentos{display:flex;gap:clamp(16px,2vw,28px);overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding:52px 4px 8px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.depoimentos::-webkit-scrollbar{display:none}
+.depoimento{--cards:3;position:relative;flex:0 0 calc((100% - (var(--cards) - 1) * clamp(16px,2vw,28px)) / var(--cards));scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;margin:0;padding:64px clamp(22px,2.4vw,32px) clamp(24px,2.6vw,32px);border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);text-align:center}
+/* Logo da marca num círculo, metade para fora do card */
+.dep-logo{position:absolute;top:0;left:50%;width:96px;height:96px;display:grid;place-items:center;overflow:hidden;border:6px solid var(--creme);border-radius:50%;background:#fff;box-shadow:0 10px 24px -14px rgba(23,59,67,.4);transform:translate(-50%,-50%);font-family:var(--serif);font-size:1.5rem;color:var(--tinta)}
+.dep-logo img{width:70%;height:70%;object-fit:contain}
+.depoimento cite{font-family:var(--serif);font-style:normal;font-weight:600;font-size:1.12rem;line-height:1.3;color:var(--tinta)}
+.estrelas{margin-top:10px;font-size:1rem;letter-spacing:.18em;line-height:1;color:var(--tinta)}
+.dep-tag{margin-top:12px;font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-2)}
+.depoimento blockquote{margin:18px 0 0;font-size:.95rem;line-height:1.6;color:var(--tinta-2)}
+.dep-resultado{width:100%;margin-top:auto;padding-top:22px}
+.dep-resultado div{padding-top:18px;border-top:1px solid var(--linha)}
+.dep-resultado strong{display:block;font-family:var(--serif);font-size:1.35rem;font-weight:600;line-height:1.1;color:var(--tinta)}
+.dep-resultado span{display:block;margin-top:6px;font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-2)}
+/* Setas redondas nas laterais */
+.dep-seta{position:absolute;top:calc(50% + 22px);z-index:2;width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:var(--papel);color:var(--tinta);box-shadow:0 10px 24px -12px rgba(23,59,67,.35);cursor:pointer;transform:translateY(-50%);transition:background-color .25s,transform .25s var(--ease)}
+.dep-seta:hover{background:#fff;transform:translateY(-50%) scale(1.06)}
+.dep-seta[hidden]{display:none}
+.dep-ant{left:-10px}
+.dep-prox{right:-10px}
 
 /* ===== BORA CRIAR JUNTOS ===== */
 .contato{background:var(--azul);color:var(--tinta)}
@@ -407,6 +420,7 @@ div.video:not([data-video]){cursor:default}
 /* ===== RESPONSIVO ===== */
 @media (max-width:1040px){
   .video{--por-tela:4}
+  .depoimento{--cards:2}
   .servicos-grade{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:960px){
@@ -442,7 +456,11 @@ div.video:not([data-video]){cursor:default}
 }
 @media (max-width:760px){
   .video{--por-tela:2.4}
-  .servicos-grade,.depoimentos{grid-template-columns:minmax(0,1fr)}
+  .servicos-grade{grid-template-columns:minmax(0,1fr)}
+  .depoimento{--cards:1.15}
+  .dep-seta{width:44px;height:44px}
+  .dep-ant{left:-6px}
+  .dep-prox{right:-6px}
 }
 @media (max-width:480px){
   .numeros-capa li{padding-right:8px}
@@ -651,7 +669,11 @@ div.video:not([data-video]){cursor:default}
       </div>
     </header>
     <!-- Os depoimentos vêm do array DEPOIMENTOS no script -->
-    <div class="depoimentos" id="lista-depoimentos"></div>
+    <div class="dep-carrossel revelar">
+      <button class="dep-seta dep-ant" type="button" aria-controls="lista-depoimentos" aria-label="Depoimento anterior" data-i18n-attr="aria-label:dep.ant"><svg class="ico" aria-hidden="true"><use href="#i-esq"/></svg></button>
+      <div class="depoimentos" id="lista-depoimentos" tabindex="0" role="region" aria-label="Depoimentos" data-i18n-attr="aria-label:dep.rotulo"></div>
+      <button class="dep-seta dep-prox" type="button" aria-controls="lista-depoimentos" aria-label="Próximo depoimento" data-i18n-attr="aria-label:dep.prox"><svg class="ico" aria-hidden="true"><use href="#i-dir"/></svg></button>
+    </div>
   </div>
 </section>
 
@@ -936,7 +958,12 @@ const SERVICOS = [
     titulo_en: "Monthly package", descricao_en: "A fixed amount of content every month, with an agreed calendar and priority in my schedule." }
 ];
 
-// DEPOIMENTOS: quatro cards. A sigla do avatar é gerada a partir do nome.
+// DEPOIMENTOS: os cards do carrossel. Pode ter quantos quiser.
+// nome = aparece em destaque (ex.: "@marca") | empresa = a linha pequena em maiúsculas
+// logo = opcional, imagem da logo da marca (ex.: "logos/dove.png"). Sem logo, aparece a sigla do nome.
+// estrelas = opcional, de 1 a 5 (sem preencher, ficam 5)
+// resultado e resultado_rotulo = opcionais, o número embaixo do card (ex.: "+45%" e "vendas com ads").
+//   Só aparecem quando preenchidos. Use apenas números reais que a marca te passou.
 // PLACEHOLDER: textos de exemplo, troque pelos depoimentos reais dos seus clientes.
 const DEPOIMENTOS = [
   { texto: "Entendeu o briefing de primeira e entregou antes do prazo. O vídeo parecia recomendação de amiga, do jeito que a gente queria.", nome: "Cliente 01", empresa: "Marca 01",
@@ -1002,6 +1029,8 @@ const INGLES = {
 
   "dep.rotulo": "Testimonials",
   "dep.titulo": "What <em>brands</em> say",
+  "dep.ant": "Previous testimonial",
+  "dep.prox": "Next testimonial",
 
   "cont.rotulo": "Contact",
   "cont.titulo": "Shall we create <em>together</em>?",
@@ -1389,18 +1418,46 @@ function montarServicos() {
 montarServicos();
 
 // jaVisivel = true quando remonta depois de trocar o idioma (a seção já apareceu na tela)
-function montarDepoimentos(jaVisivel) {
-  $("#lista-depoimentos").innerHTML = DEPOIMENTOS.map((d, i) =>
-    `<figure class="depoimento revelar${jaVisivel ? " visivel" : ""}" style="--atraso:${(i % 2) * 0.1}s">
+function montarDepoimentos() {
+  const lista = $("#lista-depoimentos");
+  lista.innerHTML = DEPOIMENTOS.map((d) => {
+    const nome = doIdioma(d, "nome");
+    const nota = Math.max(1, Math.min(5, Number(d.estrelas) || 5));
+    const resultado = doIdioma(d, "resultado");
+    return `<figure class="depoimento">
+        <span class="dep-logo" aria-hidden="true">${d.logo ? `<img src="${esc(d.logo)}" alt="" decoding="async">` : esc(sigla(nome))}</span>
+        <cite>${esc(nome)}</cite>
+        <span class="estrelas" role="img" aria-label="${tr(nota + " de 5 estrelas", nota + " out of 5 stars")}">${"★".repeat(nota)}</span>
+        <span class="dep-tag">${esc(doIdioma(d, "empresa"))}</span>
         <blockquote><p>${esc(doIdioma(d, "texto"))}</p></blockquote>
-        <figcaption>
-          <span class="avatar" aria-hidden="true">${esc(sigla(doIdioma(d, "nome")))}</span>
-          <span><cite>${esc(doIdioma(d, "nome"))}</cite><span class="empresa">${esc(doIdioma(d, "empresa"))}</span></span>
-        </figcaption>
-      </figure>`
-  ).join("");
+        ${resultado ? `<figcaption class="dep-resultado"><div><strong>${esc(resultado)}</strong><span>${esc(doIdioma(d, "resultado_rotulo") || "")}</span></div></figcaption>` : ""}
+      </figure>`;
+  }).join("");
+  lista.scrollLeft = 0;
+  setasDepoimentos();
 }
-montarDepoimentos(false);
+
+// Setas: passam um card por vez. No último, a seta da direita volta para o primeiro (e vice-versa).
+// Se todos os cards já cabem na tela, as setas somem.
+const listaDep = $("#lista-depoimentos");
+function passoDepoimento() {
+  const card = $(".depoimento", listaDep);
+  return card ? card.offsetWidth + parseFloat(getComputedStyle(listaDep).columnGap || 0) : listaDep.clientWidth;
+}
+function setasDepoimentos() {
+  const sobra = listaDep.scrollWidth - listaDep.clientWidth > 4;
+  $$(".dep-seta").forEach((b) => { b.hidden = !sobra; });
+}
+function andarDepoimentos(direcao) {
+  const fim = listaDep.scrollWidth - listaDep.clientWidth;
+  if (direcao > 0 && listaDep.scrollLeft >= fim - 4) listaDep.scrollTo({ left: 0 });
+  else if (direcao < 0 && listaDep.scrollLeft <= 4) listaDep.scrollTo({ left: fim });
+  else listaDep.scrollBy({ left: direcao * passoDepoimento() });
+}
+$(".dep-ant").addEventListener("click", () => andarDepoimentos(-1));
+$(".dep-prox").addEventListener("click", () => andarDepoimentos(1));
+window.addEventListener("resize", setasDepoimentos);
+montarDepoimentos();
 
 /* ---------- Filtro de trabalhos por nicho ---------- */
 const filtros = $("#filtros");
