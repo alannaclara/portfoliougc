@@ -446,7 +446,13 @@ div.video:not([data-video]){cursor:default}
 .modal[open]::backdrop{animation:esmaecer .4s ease}
 .modal-card{position:relative;overflow:hidden;padding:clamp(30px,5vw,44px);border-radius:var(--raio);background:var(--papel);box-shadow:var(--sombra-forte)}
 .modal-card:focus{outline:none}
-.modal-card::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:linear-gradient(90deg,var(--azul) 0 72%,var(--laranja) 72% 100%)}
+/* Formulário do mídia kit: rótulos pequenos em maiúsculas e campos brancos com contorno */
+#kit-corpo h2{margin-bottom:22px}
+.modal .campo{gap:6px;margin-bottom:14px}
+.modal .campo label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-2)}
+.modal .campo input{padding:12px 16px;border-color:rgba(23,59,67,.45);background:#fff}
+.modal .campo input::placeholder{color:rgba(85,75,65,.7)}
+.modal form .btn{width:100%;margin-top:8px}
 .fechar{position:absolute;top:16px;right:16px;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:transparent;color:var(--tinta);cursor:pointer;transition:background-color .25s}
 .fechar:hover{background:var(--creme-2)}
 .modal h2{margin-bottom:12px;padding-right:36px;font-size:clamp(1.9rem,6vw,2.5rem);line-height:1.05}
@@ -842,19 +848,26 @@ div.video:not([data-video]){cursor:default}
   <div class="modal-card" tabindex="-1">
     <button class="fechar" type="button" id="fechar-kit" aria-label="Fechar" data-i18n-attr="aria-label:kit.fechar"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
     <div id="kit-corpo">
-      <p class="rotulo" data-i18n="kit.rotulo">Mídia kit</p>
       <h2 id="kit-titulo" data-i18n="kit.titulo">Quer meu mídia kit <em>completo</em>?</h2>
-      <p class="modal-desc" id="kit-desc" data-i18n="kit.desc">Deixe seu nome e e-mail que eu te envio meus formatos, números e condições para parcerias.</p>
+      <p class="sr" id="kit-desc" data-i18n="kit.desc">Deixe seus dados que eu te envio meus formatos, números e condições para parcerias.</p>
       <form id="form-kit" novalidate>
         <div class="campo">
-          <label for="k-nome" data-i18n="kit.nome">Seu nome</label>
-          <input id="k-nome" name="nome" type="text" autocomplete="name" required aria-describedby="k-nome-erro">
+          <label for="k-nome" data-i18n="kit.nome">Nome</label>
+          <input id="k-nome" name="nome" type="text" autocomplete="name" required placeholder="seu nome" data-i18n-attr="placeholder:kit.nome.ph" aria-describedby="k-nome-erro">
           <span class="erro" id="k-nome-erro"></span>
         </div>
         <div class="campo">
-          <label for="k-email" data-i18n="kit.email">Seu e-mail</label>
-          <input id="k-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="k-email-erro">
+          <label for="k-empresa" data-i18n="kit.empresa">Empresa</label>
+          <input id="k-empresa" name="empresa" type="text" autocomplete="organization" placeholder="nome da marca" data-i18n-attr="placeholder:kit.empresa.ph">
+        </div>
+        <div class="campo">
+          <label for="k-email" data-i18n="kit.email">E-mail</label>
+          <input id="k-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="email@empresa.com" data-i18n-attr="placeholder:kit.email.ph" aria-describedby="k-email-erro">
           <span class="erro" id="k-email-erro"></span>
+        </div>
+        <div class="campo">
+          <label for="k-whats">WhatsApp</label>
+          <input id="k-whats" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="(00) 00000-0000">
         </div>
         <button class="btn btn-azul" type="submit" data-i18n="kit.botao">Quero receber</button>
       </form>
@@ -1125,11 +1138,14 @@ const INGLES = {
   "player.fechar": "Close video",
 
   "kit.fechar": "Close",
-  "kit.rotulo": "Media kit",
   "kit.titulo": "Want my <em>full</em> media kit?",
-  "kit.desc": "Leave your name and email and I'll send you my formats, numbers and partnership terms.",
-  "kit.nome": "Your name",
-  "kit.email": "Your email",
+  "kit.desc": "Leave your details and I'll send you my formats, numbers and partnership terms.",
+  "kit.nome": "Name",
+  "kit.nome.ph": "your name",
+  "kit.empresa": "Company",
+  "kit.empresa.ph": "brand name",
+  "kit.email": "Email",
+  "kit.email.ph": "email@company.com",
   "kit.botao": "Send it to me",
   "kit.ok": "Request <em>received</em>!"
 };
@@ -1990,8 +2006,16 @@ formKit.addEventListener("submit", async (e) => {
   if (!validar(formKit)) return;
   const dados = new FormData(formKit);
   // Quem pede o mídia kit também entra na sua base de marcas como Lead
-  await salvarLead(dados.get("nome"), dados.get("email"),
-    idioma === "en" ? "Pediu o mídia kit pelo site, em inglês." : "Pediu o mídia kit pelo site.");
+  // Com empresa preenchida, o recado aparece no painel com o nome da marca (igual ao formulário de contato)
+  const nomeKit = String(dados.get("nome") || "").trim();
+  const empresaKit = String(dados.get("empresa") || "").trim();
+  const whatsKit = String(dados.get("whatsapp") || "").trim();
+  await salvarLead(empresaKit || nomeKit, dados.get("email"), [
+    idioma === "en" ? "Pediu o mídia kit pelo site, em inglês." : "Pediu o mídia kit pelo site.",
+    `Contato: ${nomeKit}`,
+    empresaKit ? `Empresa: ${empresaKit}` : "",
+    whatsKit ? `WhatsApp: ${whatsKit}` : ""
+  ].filter(Boolean).join("\n"));
   $("#ok-kit-texto").textContent = tr(
     `Obrigada, ${primeiroNome(dados.get("nome"))}! O mídia kit vai chegar em ${String(dados.get("email")).trim()} em breve.`,
     `Thank you, ${primeiroNome(dados.get("nome"))}! The media kit will arrive at ${String(dados.get("email")).trim()} soon.`);
