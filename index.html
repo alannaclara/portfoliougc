@@ -108,12 +108,20 @@ section{padding-block:var(--secao)}
    Fica presa no topo, em cima do menu. Só aparece enquanto a data não passou. */
 .aviso{position:fixed;top:0;left:0;right:0;z-index:101;height:var(--aviso);display:none;align-items:center;justify-content:center;gap:clamp(8px,1.4vw,16px);padding-inline:var(--gutter);background:var(--azul);color:var(--tinta);font-size:.9rem;line-height:1.2;white-space:nowrap;overflow:hidden}
 .aviso.ligado{display:flex}
-.aviso-selo{padding:4px 10px;border-radius:999px;background:var(--tinta);color:var(--azul);font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+/* Selo "Black Friday" como texto selecionado (bloco escuro, barrinhas e bolinhas nas pontas) */
+.aviso-selo{position:relative;padding:3px 10px;background:var(--tinta);color:var(--azul);font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.aviso-selo::before,.aviso-selo::after{content:"";position:absolute;width:2px;height:calc(100% + 5px);background:var(--tinta)}
+.aviso-selo::before{left:-2px;bottom:0}
+.aviso-selo::after{right:-2px;top:0}
+.aviso-selo i{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--tinta)}
+.aviso-selo i:first-child{left:-5px;top:-7px}
+.aviso-selo i:last-child{right:-5px;bottom:-7px}
 .aviso strong{font-weight:700}
 .aviso-sep{opacity:.5}
 .aviso-cta{margin-left:clamp(4px,1vw,12px);font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .aviso-cta:hover{text-decoration-thickness:2px}
-@media (max-width:760px){.aviso-sep,.aviso-extra{display:none}.aviso{font-size:.82rem}}
+@media (max-width:1000px){.aviso-sep,.aviso-extra{display:none}}
+@media (max-width:760px){.aviso{font-size:.82rem}}
 @media (max-width:420px){.aviso-selo{display:none}.aviso{font-size:.76rem;gap:6px}}
 
 /* ===== MENU FIXO ===== */
@@ -537,7 +545,7 @@ div.video:not([data-video]){cursor:default}
 <!-- ================= MENU FIXO ================= -->
 <!-- BARRA DE AVISO: o texto e a data ficam no script (AVISO) -->
 <div class="aviso" id="aviso" role="region" aria-label="Aviso" data-i18n-attr="aria-label:aviso.aria">
-  <span class="aviso-selo">Black Friday</span>
+  <span class="aviso-selo"><i aria-hidden="true"></i>Black Friday<i aria-hidden="true"></i></span>
   <strong id="aviso-titulo"></strong>
   <span class="aviso-sep" aria-hidden="true">·</span>
   <span class="aviso-extra" id="aviso-extra"></span>
