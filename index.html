@@ -324,6 +324,8 @@ div.video:not([data-video]){cursor:default}
 /* Logo da marca num círculo, metade para fora do card */
 .dep-logo{position:absolute;top:0;left:50%;width:96px;height:96px;display:grid;place-items:center;overflow:hidden;border:6px solid var(--creme);border-radius:50%;background:#fff;box-shadow:0 10px 24px -14px rgba(23,59,67,.4);transform:translate(-50%,-50%);font-family:var(--serif);font-size:1.5rem;color:var(--tinta)}
 .dep-logo img{width:70%;height:70%;object-fit:contain}
+/* logo_cheio: a imagem ocupa o círculo todo (para logos que já vêm com fundo colorido) */
+.dep-logo.cheio img{width:100%;height:100%;object-fit:cover}
 .depoimento cite{font-family:var(--serif);font-style:normal;font-weight:600;font-size:1.12rem;line-height:1.3;color:var(--tinta)}
 .estrelas{margin-top:10px;font-size:1rem;letter-spacing:.18em;line-height:1;color:var(--tinta)}
 .dep-tag{margin-top:12px;font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-2)}
@@ -961,11 +963,15 @@ const SERVICOS = [
 // DEPOIMENTOS: os cards do carrossel. Pode ter quantos quiser.
 // nome = aparece em destaque (ex.: "@marca") | empresa = a linha pequena em maiúsculas
 // logo = opcional, imagem da logo da marca (ex.: "logos/dove.png"). Sem logo, aparece a sigla do nome.
+// logo_cheio = true quando a imagem já tem fundo colorido e deve ocupar o círculo todo.
 // estrelas = opcional, de 1 a 5 (sem preencher, ficam 5)
 // resultado e resultado_rotulo = opcionais, o número embaixo do card (ex.: "+45%" e "vendas com ads").
 //   Só aparecem quando preenchidos. Use apenas números reais que a marca te passou.
 // PLACEHOLDER: textos de exemplo, troque pelos depoimentos reais dos seus clientes.
 const DEPOIMENTOS = [
+  { texto: "Entregando sempre com consistência e com aquela estética só sua, que casa demais com o Tour em!! 😁", nome: "Tour Curitiba", empresa: "",
+    logo: "logos/depoimento-tour-curitiba.png", logo_cheio: true, resultado: "+64 MIL", resultado_rotulo: "views em campanha",
+    texto_en: "Always delivering with consistency and that aesthetic that's all yours, which matches Tour so well!! 😁", resultado_en: "64K+", resultado_rotulo_en: "campaign views" },
   { texto: "Entendeu o briefing de primeira e entregou antes do prazo. O vídeo parecia recomendação de amiga, do jeito que a gente queria.", nome: "Cliente 01", empresa: "Marca 01",
     texto_en: "She got the brief right away and delivered ahead of schedule. The video felt like a friend's recommendation, exactly what we wanted.", nome_en: "Client 01", empresa_en: "Brand 01" },
   { texto: "Roteiro claro, resposta rápida e um cuidado enorme com cada detalhe do produto. Já estamos planejando a próxima campanha.", nome: "Cliente 02", empresa: "Marca 02",
@@ -1425,10 +1431,10 @@ function montarDepoimentos() {
     const nota = Math.max(1, Math.min(5, Number(d.estrelas) || 5));
     const resultado = doIdioma(d, "resultado");
     return `<figure class="depoimento">
-        <span class="dep-logo" aria-hidden="true">${d.logo ? `<img src="${esc(d.logo)}" alt="" decoding="async">` : esc(sigla(nome))}</span>
+        <span class="dep-logo${d.logo_cheio ? " cheio" : ""}" aria-hidden="true">${d.logo ? `<img src="${esc(d.logo)}" alt="" decoding="async">` : esc(sigla(nome))}</span>
         <cite>${esc(nome)}</cite>
         <span class="estrelas" role="img" aria-label="${tr(nota + " de 5 estrelas", nota + " out of 5 stars")}">${"★".repeat(nota)}</span>
-        <span class="dep-tag">${esc(doIdioma(d, "empresa"))}</span>
+        ${doIdioma(d, "empresa") ? `<span class="dep-tag">${esc(doIdioma(d, "empresa"))}</span>` : ""}
         <blockquote><p>${esc(doIdioma(d, "texto"))}</p></blockquote>
         ${resultado ? `<figcaption class="dep-resultado"><div><strong>${esc(resultado)}</strong><span>${esc(doIdioma(d, "resultado_rotulo") || "")}</span></div></figcaption>` : ""}
       </figure>`;
