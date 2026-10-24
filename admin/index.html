@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css?v=25">
+<link rel="stylesheet" href="admin.css?v=26">
 </head>
 <!-- A página fica escondida até o script confirmar que você está logada -->
 <body hidden>
@@ -80,6 +80,7 @@
         <p class="menu-rotulo">Minha rotina</p>
         <a class="menu-item" href="#roteiro" data-aba="roteiro"><svg class="ico"><use href="#i-roteiro"/></svg>Roteiro</a>
         <a class="menu-item" href="#transcricao" data-aba="transcricao"><svg class="ico"><use href="#i-legenda"/></svg>Transcrição</a>
+        <a class="menu-item" href="#edicao" data-aba="edicao"><svg class="ico"><use href="#i-play"/></svg>Edição</a>
         <a class="menu-item" href="#calendario" data-aba="calendario"><svg class="ico"><use href="#i-calendario"/></svg>Calendário</a>
         <a class="menu-item" href="#campanhas" data-aba="campanhas"><svg class="ico"><use href="#i-campanhas"/></svg>Campanhas</a>
         <a class="menu-item" href="#checklist" data-aba="checklist"><svg class="ico"><use href="#i-checklist"/></svg>Checklist</a>
@@ -120,6 +121,7 @@
       <section class="aba" id="aba-midiakit" hidden></section>
       <section class="aba" id="aba-roteiro" hidden></section>
       <section class="aba" id="aba-transcricao" hidden></section>
+      <section class="aba" id="aba-edicao" hidden></section>
       <section class="aba" id="aba-calendario" hidden></section>
       <section class="aba" id="aba-campanhas" hidden></section>
       <section class="aba" id="aba-checklist" hidden></section>
@@ -193,12 +195,13 @@ window.PAINEL_PRONTO = (async function conferirSessao() {
 </script>
 
 <!-- O painel em si, dividido por aba -->
-<script src="nucleo.js?v=24"></script>
+<script src="nucleo.js?v=25"></script>
 <script src="portfolio.js?v=26"></script>
 <script src="marcas.js?v=24"></script>
 <script src="prospeccao.js?v=24"></script>
 <script src="roteiro.js?v=24"></script>
 <script src="transcricao.js?v=25"></script>
+<script src="edicao.js?v=1"></script>
 <script src="calendario.js?v=24"></script>
 <script src="campanhas.js?v=24"></script>
 <script src="checklist.js?v=24"></script>

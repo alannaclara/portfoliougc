@@ -292,6 +292,7 @@
     midiakit: "Mídia kit",
     roteiro: "Roteiro",
     transcricao: "Transcrições",
+    edicao: "Edição de vídeos",
     calendario: "Calendário",
     campanhas: "Campanhas",
     checklist: "Checklist portfólio",
