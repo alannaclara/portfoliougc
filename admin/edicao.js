@@ -107,6 +107,11 @@
       s.innerHTML = `<div class="avisos"></div><div id="ed-tela"></div>`;
       s.addEventListener("click", aoClicar);
       s.addEventListener("change", aoMudar);
+      // Mostra a porcentagem enquanto arrasta o volume
+      s.addEventListener("input", (ev) => {
+        const txt = ev.target.id && P.$(`#${ev.target.id}-txt`, s);
+        if (txt) txt.textContent = ev.target.value + "%";
+      });
       await carregar();
     },
     async aoMostrar() { if (!atual) await carregar(); }
@@ -136,7 +141,7 @@
       config: Object.assign({
         hook: "", legendas: [], idioma: "",
         corMarca: "", palavrasPorVez: 0, palavrasNaCor: [], palavras: [],
-        elementos: [], apagarBrutos: true
+        elementos: [], apagarBrutos: true, musica: null, somClipes: 100
       }, c)
     });
   }
@@ -180,6 +185,7 @@
     lista.forEach((e) => {
       (Array.isArray(e.clips) ? e.clips : []).forEach((c) => { if (!c.apagado) total += P.num(c.tamanho); });
       if (e.final) total += P.num(e.final.tamanho);
+      if (e.config && e.config.musica) total += P.num(e.config.musica.tamanho);
     });
     return total;
   }
@@ -278,6 +284,8 @@
           </div></div>
         <div class="cartao-corpo">${camposVisual(c, e.modelo)}</div></div>` : ""}
 
+      ${e.modelo !== "airlearn" ? camposSom(c, ocupado) : ""}
+
       <div class="cartao bloco">
         <div class="cartao-topo"><h2>Vídeo final em 4K</h2>
           <button class="botao botao-principal" type="button" data-acao="pedir-render"${!temClipes || ocupado ? " disabled" : ""}>${P.icone("play", "ico-p")}Gerar vídeo 4K</button></div>
@@ -367,6 +375,31 @@
     </div>`;
   }
 
+  function camposSom(c, ocupado) {
+    const m = c.musica;
+    const bloqueio = enviando || ocupado;
+    return `<div class="cartao bloco">
+      <div class="cartao-topo"><h2>Música e som</h2>
+        <label class="botao${bloqueio ? " ed-desligado" : ""}">${P.icone("subir", "ico-p")}${m ? "Trocar música" : "Enviar música"}
+          <input type="file" id="ed-musica" accept="audio/*,.mp3,.m4a,.wav,.aac" hidden${bloqueio ? " disabled" : ""}></label></div>
+      <div id="ed-envio-musica"></div>
+      <div class="cartao-corpo grade-campos">
+        ${m ? `<div class="campo largo"><label>Música de fundo</label>
+            <div class="ed-musica"><b>${P.esc(m.nome)}</b> <span class="mudo pequeno">${tamanho(m.tamanho)}</span>
+              <button class="botao botao-icone botao-perigo" type="button" data-acao="tirar-musica" aria-label="Tirar música">${P.icone("lixo", "ico-p")}</button></div>
+            <span class="campo-ajuda">Ela toca o vídeo todo (repete se for curta) e entra e sai suave.</span></div>
+          <div class="campo"><label for="ed-vol-musica">Volume da música: <span id="ed-vol-musica-txt">${P.num(m.volume)}%</span></label>
+            <input id="ed-vol-musica" type="range" min="0" max="100" step="5" value="${P.num(m.volume)}"></div>
+          <div class="campo"><label for="ed-musica-inicio">Começar a música em (segundos)</label>
+            <input id="ed-musica-inicio" type="text" inputmode="decimal" value="${P.num(m.inicio)}">
+            <span class="campo-ajuda">Para pular a introdução e cair direto no refrão.</span></div>`
+        : `<p class="mudo pequeno largo">Sem música. Envie um MP3 ou M4A, de preferência sem direitos autorais (ou poste sem música e escolha um áudio do próprio Instagram).</p>`}
+        <div class="campo"><label for="ed-vol-clipes">Som original dos clipes: <span id="ed-vol-clipes-txt">${P.num(c.somClipes)}%</span></label>
+          <input id="ed-vol-clipes" type="range" min="0" max="100" step="5" value="${P.num(c.somClipes)}">
+          <span class="campo-ajuda">0% = mudo. Em vídeo sem fala, deixe baixinho para ouvir só o secador ao fundo.</span></div>
+      </div></div>`;
+  }
+
   function camposVisual(c, modelo) {
     const nicho = NICHOS[modelo] || NICHOS.ugctech;
     const opcoes = (tipo) => Object.entries(TIPOS).map(([v, [t]]) => `<option value="${v}"${v === tipo ? " selected" : ""}>${t}</option>`).join("");
@@ -402,6 +435,10 @@
 
     c.idioma = v("ed-idioma") || "";
     c.apagarBrutos = !!(P.$("#ed-apagar-brutos", secao) || {}).checked;
+    if (P.$("#ed-vol-clipes", secao)) c.somClipes = n(v("ed-vol-clipes"));
+    if (c.musica && P.$("#ed-vol-musica", secao)) {
+      c.musica = Object.assign({}, c.musica, { volume: n(v("ed-vol-musica")), inicio: n(v("ed-musica-inicio")) });
+    }
 
     if (e.modelo === "airlearn") {
       c.hook = (v("ed-hook") || "").trim();
@@ -467,6 +504,60 @@
     });
   }
 
+  // Sobe um arquivo em pedaços de 45 MB (3 tentativas por pedaço). Devolve a mensagem de erro, ou null.
+  async function subirEmPedacos(arquivo, caminho, aoPedaco) {
+    const qtd = Math.max(1, Math.ceil(arquivo.size / PEDACO));
+    for (let i = 0; i < qtd; i++) {
+      if (aoPedaco) aoPedaco(i, qtd);
+      const pedaco = arquivo.slice(i * PEDACO, Math.min(arquivo.size, (i + 1) * PEDACO));
+      let erro = null;
+      for (let tentativa = 0; tentativa < 3; tentativa++) {
+        const r = await banco.storage.from(BALDE).upload(`${caminho}/parte-${String(i).padStart(3, "0")}`, pedaco,
+          { upsert: true, contentType: "application/octet-stream", cacheControl: "3600" });
+        erro = r.error;
+        if (!erro) break;
+      }
+      if (erro) {
+        await apagarArquivos(Array.from({ length: i }, (_, k) => `${caminho}/parte-${String(k).padStart(3, "0")}`));
+        return P.explicarErro(erro, "balde edicao");
+      }
+    }
+    return null;
+  }
+
+  async function enviarMusica(arquivo) {
+    if (!arquivo || enviando) return;
+    if (arquivo.size > 60 * 1024 * 1024) return P.toast("Essa música passa de 60 MB. Use um MP3 ou M4A.", "erro");
+    absorver();
+    enviando = true;
+    desenharEditor();
+    const caixa = P.$("#ed-envio-musica", secao);
+    if (caixa) caixa.innerHTML = `<div class="ed-envio">Enviando <b>${P.esc(arquivo.name)}</b>…</div>`;
+    const caminho = `${atual.id}/musica/${novoId()}`;
+    const erro = await subirEmPedacos(arquivo, caminho);
+    enviando = false;
+    if (erro) { P.toast(`Não consegui enviar a música: ${erro}`, "erro"); return desenharEditor(); }
+    const antiga = atual.config.musica;
+    if (antiga && antiga.caminho) await apagarArquivos(caminhosDe(antiga));
+    const ext = (arquivo.name.match(/\.(\w+)$/) || ["", "mp3"])[1].toLowerCase();
+    atual.config.musica = {
+      nome: arquivo.name, tamanho: arquivo.size, partes: Math.max(1, Math.ceil(arquivo.size / PEDACO)), caminho, ext,
+      volume: antiga ? antiga.volume : 60, inicio: 0
+    };
+    // Vídeo sem fala: o som ambiente dos clipes fica bem baixinho por padrão
+    if (!antiga && !atual.config.palavras.length) atual.config.somClipes = 10;
+    if (await salvar({ config: atual.config })) { P.toast("Música enviada."); desenharEditor(); }
+  }
+
+  async function tirarMusica() {
+    const m = atual.config.musica;
+    if (!m || !confirm(`Tirar a música "${m.nome}"?`)) return;
+    absorver();
+    await apagarArquivos(caminhosDe(m));
+    atual.config.musica = null;
+    if (await salvar({ config: atual.config })) desenharEditor();
+  }
+
   async function enviarClipes(arquivos) {
     if (!arquivos.length || enviando) return;
     await salvarTela(true);
@@ -485,23 +576,14 @@
       const caminho = `${atual.id}/clips/${id}`;
       const qtd = Math.max(1, Math.ceil(arquivo.size / PEDACO));
       const duracao = await duracaoDoArquivo(arquivo);
-      for (let i = 0; i < qtd; i++) {
-        const pedaco = arquivo.slice(i * PEDACO, Math.min(arquivo.size, (i + 1) * PEDACO));
+      const erro = await subirEmPedacos(arquivo, caminho, (i) => {
         if (caixa()) caixa().innerHTML = `<div class="ed-envio">Enviando <b>${P.esc(arquivo.name)}</b> · pedaço ${i + 1} de ${qtd}
           <div class="progresso"><span style="width:${Math.round(((mandados + i * PEDACO) / total) * 100)}%"></span></div></div>`;
-        let erro = null;
-        for (let tentativa = 0; tentativa < 3; tentativa++) {
-          const r = await banco.storage.from(BALDE).upload(`${caminho}/parte-${String(i).padStart(3, "0")}`, pedaco,
-            { upsert: true, contentType: "application/octet-stream", cacheControl: "3600" });
-          erro = r.error;
-          if (!erro) break;
-        }
-        if (erro) {
-          await apagarArquivos(Array.from({ length: i }, (_, k) => `${caminho}/parte-${String(k).padStart(3, "0")}`));
-          P.toast(`Não consegui enviar ${arquivo.name}: ${P.explicarErro(erro, "balde edicao")}`, "erro");
-          enviando = false;
-          return desenharEditor();
-        }
+      });
+      if (erro) {
+        P.toast(`Não consegui enviar ${arquivo.name}: ${erro}`, "erro");
+        enviando = false;
+        return desenharEditor();
       }
       mandados += arquivo.size;
       atual.clips.push({ id, nome: arquivo.name, tipo: arquivo.type || "video/mp4", tamanho: arquivo.size, partes: qtd, caminho, duracao, inicio: null, fim: null });
@@ -558,6 +640,7 @@
       return desenharEditor();
     }
     if (acao === "tirar-legenda") { botao.closest("tr").remove(); return; }
+    if (acao === "tirar-musica") return tirarMusica();
     if (acao === "tirar-elemento") { botao.closest("tr").remove(); absorver(); return desenharEditor(); }
     if (acao === "mais-elemento") {
       absorver();
@@ -574,6 +657,11 @@
   }
 
   function aoMudar(ev) {
+    if (ev.target.id === "ed-musica") {
+      const arquivo = (ev.target.files || [])[0];
+      ev.target.value = "";
+      enviarMusica(arquivo);
+    }
     if (ev.target.id === "ed-arquivos") {
       const arquivos = Array.from(ev.target.files || []);
       ev.target.value = "";
@@ -646,6 +734,7 @@
     const caminhos = [];
     atual.clips.forEach((x) => { if (!x.apagado) caminhos.push(...caminhosDe(x)); });
     if (atual.final) caminhos.push(...caminhosDe(atual.final));
+    if (atual.config.musica && atual.config.musica.caminho) caminhos.push(...caminhosDe(atual.config.musica));
     const erroArq = await apagarArquivos(caminhos);
     if (erroArq) return P.toast(erroArq, "erro");
     const erro = await P.gravar(TABELA, "apagar", null, atual.id);
