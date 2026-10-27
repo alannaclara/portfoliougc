@@ -88,11 +88,25 @@
     legendando: ["Gerando legenda", "ciano"],
     renderizar: ["4K na fila", "amarelo"],
     renderizando: ["Gerando 4K", "ciano"],
+    estagiario: ["Com o estagiário", "amarelo"],
+    trabalhando: ["Estagiário editando", "ciano"],
     pronto: ["Pronto", "verde"],
     erro: ["Deu erro", "vermelho"]
   };
-  const NA_FILA = ["legendar", "renderizar"];
-  const TRABALHANDO = ["legendando", "renderizando"];
+  const NA_FILA = ["legendar", "renderizar", "estagiario"];
+  const TRABALHANDO = ["legendando", "renderizando", "trabalhando"];
+
+  // As etapas que o estagiário vai marcando (tools/estagiario.mjs usa as mesmas chaves)
+  const ETAPAS = [
+    ["transcreve", "Transcreve a fala"],
+    ["tomadas", "Escolhe as melhores tomadas"],
+    ["pausas", "Corta pausas e repetições"],
+    ["legendas", "Coloca as legendas"],
+    ["zoom", "Zoom e textos na tela"],
+    ["musica", "Música e som"],
+    ["render", "Renderiza em 4K e confere"]
+  ];
+  const linkDrive = (u) => /^https:\/\/drive\.google\.com\/drive\/(u\/\d+\/)?folders\/[\w-]+/.test(String(u || "").trim());
 
   let secao = null;
   let lista = [];
@@ -138,6 +152,8 @@
     const c = Object.assign({}, e.config || {});
     return Object.assign({}, e, {
       clips: Array.isArray(e.clips) ? e.clips : [],
+      conversa: Array.isArray(e.conversa) ? e.conversa : [],
+      etapas: e.etapas && typeof e.etapas === "object" ? e.etapas : {},
       config: Object.assign({
         hook: "", legendas: [], idioma: "",
         corMarca: "", palavrasPorVez: 0, palavrasNaCor: [], palavras: [],
@@ -206,12 +222,12 @@
           <div class="numero-sub">em 4K, para assistir e baixar</div></div>
         <div class="numero"><div class="numero-rotulo">Esperando o computador</div>
           <div class="numero-valor">${P.inteiro(fila)}</div>
-          <div class="numero-sub">${fila ? "rode o renderizar.cmd" : "nada na fila"}</div></div>
+          <div class="numero-sub">${fila ? "deixe o estagiario.cmd aberto" : "nada na fila"}</div></div>
       </div>
       <div class="ferramentas">
         <p class="mudo pequeno" style="flex:1 1 260px;min-width:0">
-          Os clipes sobem sem perder qualidade. A legenda e o vídeo final em 4K são feitos no seu computador
-          quando você roda o <b>renderizar.cmd</b> (pasta meu-video).
+          Crie um pedido com o link da pasta do Google Drive e explique o que quer. O estagiário (o
+          <b>estagiario.cmd</b>, na pasta meu-video) edita no seu computador e o vídeo em 4K aparece aqui.
         </p>
         <div class="grupo-botoes empurra">
           <button class="botao botao-principal" type="button" data-acao="novo">${P.icone("mais", "ico-p")}Novo vídeo</button>
@@ -221,9 +237,10 @@
         ${lista.length ? `<ul class="lista-simples">${lista.map((e) => {
           const [txt, cor] = SITUACAO[e.status] || SITUACAO.rascunho;
           const n = (Array.isArray(e.clips) ? e.clips : []).length;
+          const origem = e.drive_url ? "pasta do Drive" : P.plural(n, "clipe", "clipes");
           return `<li class="ed-linha" data-abrir="${P.esc(e.id)}" tabindex="0">
             <div class="cresce"><b>${P.esc(e.titulo)}</b>
-              <div class="mudo pequeno">${MODELOS[e.modelo] || e.modelo} · ${P.plural(n, "clipe", "clipes")} · mexido em ${P.dataBR(e.atualizado_em)}</div></div>
+              <div class="mudo pequeno">${MODELOS[e.modelo] || e.modelo} · ${origem} · mexido em ${P.dataBR(e.atualizado_em)}</div></div>
             ${P.pilula(txt, cor)}
           </li>`;
         }).join("")}</ul>`
@@ -254,7 +271,16 @@
         <div class="campo"><label for="ed-modelo">Modelo</label>
           <select id="ed-modelo">${Object.entries(MODELOS).map(([v, t]) => `<option value="${v}"${e.modelo === v ? " selected" : ""}>${t}</option>`).join("")}</select>
           <span class="campo-ajuda">${e.modelo === "airlearn" ? "Só para vídeos da Airlearn: hook do Snapchat e legenda dupla." : P.esc((NICHOS[e.modelo] || NICHOS.ugctech).receita)}</span></div>
+        <div class="campo largo"><label for="ed-drive">Pasta do Google Drive com os vídeos</label>
+          <input id="ed-drive" type="url" value="${P.esc(e.drive_url || "")}" placeholder="https://drive.google.com/drive/folders/…">
+          <span class="campo-ajuda">Compartilhe a pasta como “qualquer pessoa com o link pode ver”. Pode pôr a música na mesma pasta. Dê nomes aos b-rolls (ex.: “b-roll cabide fechando.mov”).</span></div>
       </div></div>
+
+      ${blocoEstagiario(e, ocupado)}
+
+      <details class="ed-ajustes"${e.drive_url ? "" : " open"}>
+      <summary>Ajustes finos (manual)</summary>
+      <p class="mudo pequeno" style="margin:6px 2px 12px">Aqui aparece o que o estagiário montou: cortes, legenda, textos e música. Dá para mexer à mão e gerar o 4K de novo.</p>
 
       <div class="cartao bloco">
         <div class="cartao-topo"><h2>Clipes <span class="mudo pequeno">(na ordem em que aparecem)</span></h2>
@@ -291,29 +317,82 @@
           <button class="botao botao-principal" type="button" data-acao="pedir-render"${!temClipes || ocupado ? " disabled" : ""}>${P.icone("play", "ico-p")}Gerar vídeo 4K</button></div>
         <div class="cartao-corpo">
           <label class="campo campo-marcar"><input type="checkbox" id="ed-apagar-brutos"${c.apagarBrutos ? " checked" : ""}>
-            Apagar os clipes brutos depois que o 4K ficar pronto (libera espaço no Supabase)</label>
-          ${e.final ? `<div class="ed-final">
-            <p><b>Pronto em ${new Date(e.final.gerado_em).toLocaleString("pt-BR")}</b>
-              <span class="mudo">· ${P.esc(e.final.largura)}×${P.esc(e.final.altura)} · ${seg(e.final.duracao)} · ${tamanho(e.final.tamanho)}</span></p>
+            Apagar os clipes brutos depois que o 4K ficar pronto (libera espaço no Supabase; os do Drive nunca são apagados)</label>
+          <p class="mudo pequeno">Gera o 4K com o que está nestes ajustes, sem o estagiário replanejar. O vídeo pronto aparece lá em cima.</p>
+        </div>
+      </div>
+      </details>`;
+
+    if (TRABALHANDO.includes(e.status) || NA_FILA.includes(e.status)) ligarRelogio();
+  }
+
+  /* ---------- O estagiário: conversa, etapas e o vídeo pronto ---------- */
+  function blocoEstagiario(e, ocupado) {
+    const hora = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); };
+    const bolhas = e.conversa.length ? e.conversa.map((m) => `
+        <div class="ed-msg ed-msg-${m.autor === "voce" ? "voce" : "estagiario"}">
+          <span class="ed-msg-quem">${m.autor === "voce" ? "Você" : "Estagiário"} <span class="mudo">${hora(m.em)}</span></span>
+          <div>${P.esc(m.texto).replace(/\n/g, "<br>")}</div></div>`).join("")
+      : `<p class="mudo pequeno">Escreva o pedido como se fosse para uma pessoa: o que é o vídeo, o gancho, o que cortar, a música, o que a marca pediu.</p>`;
+    const estado = (k) => e.etapas[k] || "pendente";
+    const icone = { feito: "check", fazendo: "recarregar", pulado: "x", pendente: "relogio" };
+    const etapas = ETAPAS.map(([k, nome]) => `<li class="ed-etapa ed-etapa-${estado(k)}">${P.icone(icone[estado(k)] || "relogio", "ico-p")}<span>${nome}</span></li>`).join("");
+    const f = e.final;
+    return `<div class="ed-estagiario bloco">
+      <div class="cartao ed-conversa">
+        <div class="cartao-topo"><h2>${P.icone("caneta", "ico-p")} Estagiário <span class="mudo pequeno">de edição · trabalha no seu computador</span></h2></div>
+        <div class="ed-mensagens" id="ed-mensagens">${bolhas}</div>
+        <div class="ed-escrever">
+          <textarea id="ed-texto" rows="3" placeholder="${e.conversa.length ? "Peça um ajuste: “tira o 2º corte”, “texto maior”, “música mais baixa”…" : "Ex.: gancho falado, depois narração. Os b-rolls estão com nome. Corta as pausas, música baixinha e um CTA pra comentar LINK."}"${ocupado ? " disabled" : ""}></textarea>
+          <button class="botao botao-principal" type="button" data-acao="enviar-pedido"${ocupado ? " disabled" : ""}>${P.icone("dir", "ico-p")}${e.conversa.length ? "Enviar" : "Mandar para o estagiário"}</button>
+        </div>
+      </div>
+      <div class="ed-lado">
+        <div class="cartao"><div class="cartao-corpo"><ul class="ed-etapas">${etapas}</ul>
+          ${TRABALHANDO.includes(e.status) ? `<div class="progresso" style="margin-top:10px"><span style="width:${Math.min(100, P.num(e.progresso))}%"></span></div>` : ""}</div></div>
+        <div class="cartao ed-previa">
+          ${f ? `<div class="cartao-corpo ed-final">
+            <p><b>Pronto</b> <span class="mudo pequeno">${new Date(f.gerado_em).toLocaleString("pt-BR")} · ${P.esc(f.largura)}×${P.esc(f.altura)} · ${seg(f.duracao)} · ${tamanho(f.tamanho)}</span></p>
             <div class="grupo-botoes">
               <button class="botao" type="button" data-acao="assistir">${P.icone("play", "ico-p")}Assistir</button>
               <button class="botao" type="button" data-acao="baixar">${P.icone("baixar", "ico-p")}Baixar MP4</button>
-              <button class="botao botao-perigo" type="button" data-acao="apagar-final">${P.icone("lixo", "ico-p")}Apagar o 4K</button>
+              <button class="botao botao-icone botao-perigo" type="button" data-acao="apagar-final" aria-label="Apagar o 4K">${P.icone("lixo", "ico-p")}</button>
             </div>
-            <div id="ed-player"></div>
-          </div>` : `<p class="mudo pequeno">Ainda não foi gerado.</p>`}
+            <div id="ed-player"></div></div>`
+          : `<div class="ed-previa-vazia"><b>${P.esc(e.titulo)}</b><span class="mudo pequeno">${TRABALHANDO.includes(e.status) ? "editando…" : "o vídeo aparece aqui"}</span></div>`}
         </div>
-      </div>`;
+      </div>
+    </div>`;
+  }
 
-    if (TRABALHANDO.includes(e.status) || NA_FILA.includes(e.status)) ligarRelogio();
+  async function enviarPedido() {
+    const caixa = P.$("#ed-texto", secao);
+    const texto = (caixa && caixa.value || "").trim();
+    if (!texto) return P.toast("Escreva o pedido primeiro.", "erro");
+    absorver();
+    if (!linkDrive(atual.drive_url) && !atual.clips.some((x) => !x.apagado)) {
+      return P.toast("Cole o link da pasta do Google Drive (drive.google.com/drive/folders/…) ou envie clipes nos ajustes finos.", "erro");
+    }
+    const conversa = [...atual.conversa, { autor: "voce", texto, em: new Date().toISOString() }];
+    const campos = { titulo: atual.titulo, modelo: atual.modelo, drive_url: atual.drive_url, config: atual.config, clips: atual.clips,
+      conversa, status: "estagiario", mensagem: null, progresso: 0 };
+    if (!atual.pedido) campos.pedido = texto;
+    if (await salvar(campos)) {
+      P.toast("Pedido enviado. Deixe o estagiario.cmd aberto no seu computador.");
+      desenharEditor();
+    }
   }
 
   function faixaDeStatus(e) {
     const msg = P.esc(e.mensagem || "");
     if (e.status === "erro") return `<div class="aviso-banco">${P.icone("alerta")}<div><b>Deu erro no seu computador.</b> ${msg}<br>
       <button class="botao" type="button" data-acao="limpar-erro" style="margin-top:6px">Entendi, voltar a editar</button></div></div>`;
+    if (e.status === "estagiario") return `<div class="ed-faixa">${P.icone("relogio")}<div>
+      <b>Na fila do estagiário.</b> Ele começa assim que o <b>estagiario.cmd</b> estiver aberto no seu computador (pasta meu-video).
+      <button class="botao" type="button" data-acao="cancelar" style="margin-left:8px">Cancelar pedido</button></div></div>`;
+    if (e.status === "trabalhando") return "";
     if (NA_FILA.includes(e.status)) return `<div class="ed-faixa">${P.icone("relogio")}<div>
-      <b>Na fila.</b> Agora dê dois cliques no <b>renderizar.cmd</b> (pasta meu-video) para o seu computador fazer o trabalho.
+      <b>Na fila.</b> Deixe o <b>estagiario.cmd</b> aberto (pasta meu-video) para o seu computador fazer o trabalho.
       <button class="botao" type="button" data-acao="cancelar" style="margin-left:8px">Cancelar pedido</button></div></div>`;
     if (TRABALHANDO.includes(e.status)) return `<div class="ed-faixa">${P.icone("recarregar")}<div style="flex:1">
       <b>${e.status === "legendando" ? "Gerando a legenda" : "Gerando o vídeo em 4K"} no seu computador…</b> ${msg}
@@ -327,14 +406,14 @@
     return `<li data-clip="${P.esc(x.id)}">
       <span class="ed-ordem">${i + 1}</span>
       <div class="cresce"><b>${P.esc(x.nome)}</b>
-        <div class="mudo pequeno">${tamanho(x.tamanho)}${x.duracao ? " · " + seg(x.duracao) : ""}${x.partes > 1 ? ` · ${x.partes} pedaços` : ""}
+        <div class="mudo pequeno">${x.origem === "drive" ? `${P.pilula("Drive", "ciano")}${P.num(x.zoom) > 1 ? ` · zoom ${P.num(x.zoom).toFixed(2).replace(".", ",")}×` : ""}` : tamanho(x.tamanho)}${x.duracao ? " · " + seg(x.duracao) : ""}${x.partes > 1 ? ` · ${x.partes} pedaços` : ""}
           ${x.apagado ? ` · ${P.pilula("bruto apagado", "cinza")}` : ""}</div></div>
       <label class="ed-tempo">início <input type="text" inputmode="decimal" data-tempo="inicio" value="${x.inicio ?? ""}" placeholder="0"${bloqueio}></label>
       <label class="ed-tempo">fim <input type="text" inputmode="decimal" data-tempo="fim" value="${x.fim ?? ""}" placeholder="${x.duracao ? P.num(x.duracao).toFixed(1) : "fim"}"${bloqueio}></label>
       <div class="grupo-botoes">
         <button class="botao botao-icone" type="button" data-mover="-1" aria-label="Subir"${i === 0 || ocupado ? " disabled" : ""}>${P.icone("subir", "ico-p")}</button>
         <button class="botao botao-icone" type="button" data-mover="1" aria-label="Descer"${i === total - 1 || ocupado ? " disabled" : ""}>${P.icone("baixar", "ico-p")}</button>
-        <button class="botao botao-icone" type="button" data-acao="ver-clipe" aria-label="Assistir"${x.apagado ? " disabled" : ""}>${P.icone("olho", "ico-p")}</button>
+        <button class="botao botao-icone" type="button" data-acao="ver-clipe" aria-label="Assistir"${x.apagado || x.origem === "drive" ? " disabled" : ""}>${P.icone("olho", "ico-p")}</button>
         <button class="botao botao-icone botao-perigo" type="button" data-acao="tirar-clipe" aria-label="Tirar"${bloqueio}>${P.icone("lixo", "ico-p")}</button>
       </div></li>`;
   }
@@ -474,7 +553,10 @@
       return Object.assign({}, x, { inicio: vazio(ini) ? null : n(ini), fim: vazio(fim) ? null : n(fim) });
     });
 
-    return { titulo: (v("ed-titulo") || "").trim() || "Vídeo sem nome", modelo: v("ed-modelo") || e.modelo, config: c, clips };
+    return {
+      titulo: (v("ed-titulo") || "").trim() || "Vídeo sem nome", modelo: v("ed-modelo") || e.modelo, config: c, clips,
+      drive_url: v("ed-drive") !== undefined ? v("ed-drive").trim() || null : e.drive_url
+    };
   }
 
   // Guarda na memória o que está digitado na tela, antes de redesenhar
@@ -640,6 +722,7 @@
       return desenharEditor();
     }
     if (acao === "tirar-legenda") { botao.closest("tr").remove(); return; }
+    if (acao === "enviar-pedido") return enviarPedido();
     if (acao === "tirar-musica") return tirarMusica();
     if (acao === "tirar-elemento") { botao.closest("tr").remove(); absorver(); return desenharEditor(); }
     if (acao === "mais-elemento") {
@@ -675,18 +758,28 @@
 
   function criar() {
     P.formulario({
-      titulo: "Novo vídeo",
+      titulo: "Novo pedido para o estagiário",
       valores: { modelo: "ugctech" },
       campos: [
-        { nome: "titulo", rotulo: "Nome do vídeo", tipo: "texto", obrigatorio: true, largo: true, ajuda: "Ex.: Airlearn turco 03 ou HostGator site" },
-        { nome: "modelo", rotulo: "Modelo", tipo: "escolha", largo: true, opcoes: Object.entries(MODELOS) }
+        { nome: "titulo", rotulo: "Nome do vídeo", tipo: "texto", obrigatorio: true, largo: true, ajuda: "Ex.: Cabide a vácuo ou Airlearn turco 03" },
+        { nome: "modelo", rotulo: "Nicho / modelo", tipo: "escolha", largo: true, opcoes: Object.entries(MODELOS) },
+        { nome: "drive", rotulo: "Link da pasta do Google Drive", tipo: "url", largo: true,
+          ajuda: "Pasta compartilhada como “qualquer pessoa com o link pode ver”. Deixe em branco para enviar os clipes pelo painel." },
+        { nome: "pedido", rotulo: "O que você quer nesse vídeo", tipo: "texto-longo", largo: true,
+          ajuda: "Escreva como se fosse para uma pessoa: gancho, narração, b-rolls, o que cortar, música, o que a marca pediu." }
       ],
       textoSalvar: "Criar",
       aoSalvar: async (v) => {
+        if (v.drive && !linkDrive(v.drive)) return "Esse link não parece de uma pasta do Drive. Ele começa com https://drive.google.com/drive/folders/…";
         try {
-          // Já começa com os elementos que mais aparecem no nicho escolhido
+          // Os elementos sugeridos do nicho ficam de ponto de partida para os ajustes finos
           const config = SUGESTOES[v.modelo] ? { elementos: SUGESTOES[v.modelo] } : {};
-          const { data, error } = await banco.from(TABELA).insert({ titulo: v.titulo, modelo: v.modelo, config }).select().single();
+          const novo = { titulo: v.titulo, modelo: v.modelo, config, drive_url: v.drive || null };
+          // Com pasta do Drive e pedido escrito, já vai direto para a fila do estagiário
+          if (v.drive && v.pedido) {
+            Object.assign(novo, { pedido: v.pedido, status: "estagiario", conversa: [{ autor: "voce", texto: v.pedido, em: new Date().toISOString() }] });
+          }
+          const { data, error } = await banco.from(TABELA).insert(novo).select().single();
           if (error) return P.explicarErro(error, TABELA);
           await carregar();
           atual = normalizar(data);
@@ -814,11 +907,16 @@
       const r = await P.ler(TABELA, (q) => q.eq("id", atual.id));
       const novo = r.dados[0];
       if (!novo) return;
-      const mudou = novo.status !== atual.status || novo.progresso !== atual.progresso || novo.mensagem !== atual.mensagem;
+      const mudou = novo.status !== atual.status || novo.progresso !== atual.progresso || novo.mensagem !== atual.mensagem
+        || (novo.conversa || []).length !== atual.conversa.length || JSON.stringify(novo.etapas || {}) !== JSON.stringify(atual.etapas);
       if (mudou) {
         const terminou = !NA_FILA.includes(novo.status) && !TRABALHANDO.includes(novo.status);
+        // não perde o que você está digitando na conversa quando a tela atualiza
+        const rascunho = (P.$("#ed-texto", secao) || {}).value || "";
         atual = normalizar(novo);
         desenharEditor();
+        const caixa = P.$("#ed-texto", secao);
+        if (caixa && rascunho) caixa.value = rascunho;
         if (terminou) {
           pararRelogio();
           if (novo.status === "pronto") P.toast("Vídeo 4K pronto!");

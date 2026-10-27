@@ -730,6 +730,32 @@ tr.deslizando:hover{background:transparent}
   .ed-elementos td:nth-child(5){grid-row:4;grid-column:1/-1}
   .ed-elementos td:nth-child(6){grid-row:1;grid-column:3}
 }
+/* Estagiário: conversa à esquerda, etapas e vídeo à direita */
+.ed-estagiario{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
+.ed-conversa{display:flex;flex-direction:column;min-height:420px}
+.ed-mensagens{flex:1;display:flex;flex-direction:column;gap:10px;padding:14px;max-height:460px;overflow-y:auto}
+.ed-msg{max-width:88%;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.5}
+.ed-msg-voce{align-self:flex-end;background:var(--azul-suave);border-bottom-right-radius:4px}
+.ed-msg-estagiario{align-self:flex-start;background:#fff;border:1px solid var(--linha);border-bottom-left-radius:4px}
+.ed-msg-quem{display:block;margin-bottom:2px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--tinta-2)}
+.ed-msg-quem .mudo{font-weight:500;text-transform:none;letter-spacing:0}
+.ed-escrever{display:flex;gap:8px;align-items:flex-end;padding:12px 14px;border-top:1px solid var(--linha)}
+.ed-escrever textarea{flex:1;min-height:64px;padding:8px 10px;border:1px solid var(--linha-forte);border-radius:var(--raio-sm);background:#fff;font-size:14px;resize:vertical}
+.ed-lado{display:flex;flex-direction:column;gap:16px;min-width:0}
+.ed-etapas{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ed-etapa{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tinta-2)}
+.ed-etapa .ico{width:22px;height:22px;padding:3px;border:1px solid var(--linha-forte);border-radius:50%}
+.ed-etapa-feito{color:var(--tinta);font-weight:600}
+.ed-etapa-feito .ico{background:var(--verde-fundo);border-color:var(--verde);color:var(--verde)}
+.ed-etapa-fazendo{color:var(--tinta);font-weight:700}
+.ed-etapa-fazendo .ico{background:var(--azul);border-color:var(--tinta);animation:ed-gira 1.4s linear infinite}
+.ed-etapa-pulado{text-decoration:line-through;opacity:.6}
+@keyframes ed-gira{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ed-etapa-fazendo .ico{animation:none}}
+.ed-previa-vazia{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:220px;margin:14px;border:2px dashed var(--linha-forte);border-radius:var(--raio);text-align:center}
+.ed-ajustes{margin-top:8px}
+.ed-ajustes>summary{cursor:pointer;padding:10px 4px;font-weight:700;font-size:14px}
+@media (max-width:980px){.ed-estagiario{grid-template-columns:minmax(0,1fr)}}
 .ed-musica{display:flex;align-items:center;gap:10px;min-height:36px}
 .campo input[type=range]{padding:0;min-height:28px;border:0;background:transparent;accent-color:var(--tinta)}
 .ed-elementos select{width:100%;min-height:32px;padding:5px 8px;border:1px solid var(--linha-forte);border-radius:8px;background:#fff}
