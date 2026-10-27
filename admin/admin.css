@@ -760,3 +760,70 @@ tr.deslizando:hover{background:transparent}
 .campo input[type=range]{padding:0;min-height:28px;border:0;background:transparent;accent-color:var(--tinta)}
 .ed-elementos select{width:100%;min-height:32px;padding:5px 8px;border:1px solid var(--linha-forte);border-radius:8px;background:#fff}
 .ed-elementos td:nth-child(2){min-width:220px}
+
+/* Fotos e prints na conversa do estagiário */
+.ed-fotos{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ed-foto{padding:0;border:1px solid var(--linha);border-radius:8px;overflow:hidden;background:var(--creme-2);cursor:zoom-in;width:120px;height:90px}
+.ed-foto img{display:block;width:100%;height:100%;object-fit:cover}
+.ed-anexos{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px 0;border-top:1px solid var(--linha)}
+.ed-anexos[hidden]{display:none}
+.ed-anexos+.ed-escrever{border-top:0}
+.ed-anexo{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--linha-forte)}
+.ed-anexo img{width:100%;height:100%;object-fit:cover;display:block}
+.ed-anexo-tirar{position:absolute;top:2px;right:2px;display:grid;place-items:center;width:20px;height:20px;padding:0;border:0;border-radius:50%;background:rgba(23,59,67,.85);color:#fff;cursor:pointer}
+.ed-anexo-tirar .ico{width:12px;height:12px}
+.ed-escrever>label.botao-icone{align-self:flex-end}
+
+/* Linha do tempo (estilo CapCut): uma faixa por camada, régua no topo e cursor vermelho */
+.lt-cartao .cartao-topo{flex-wrap:wrap;gap:10px}
+.lt-zoom{display:inline-flex;align-items:center;gap:6px;padding:0 6px}
+.lt-zoom input{width:110px;accent-color:var(--tinta)}
+.lt-aviso{margin:0 16px 8px}
+.lt-rolagem{position:relative;overflow-x:auto;overflow-y:hidden;margin:0 0 4px;padding-bottom:6px;background:#1e2326;border-top:1px solid var(--linha);border-bottom:1px solid var(--linha);user-select:none;-webkit-user-select:none}
+.lt-travada .lt-bloco{cursor:default;opacity:.75}
+.lt-trilha{display:flex;align-items:stretch;min-height:40px;width:max-content}
+.lt-trilha+.lt-trilha{border-top:1px solid rgba(255,255,255,.06)}
+.lt-trilha-video{min-height:54px}
+.lt-trilha-regua{min-height:26px}
+.lt-nome{position:sticky;left:0;z-index:3;flex:0 0 96px;width:96px;display:flex;align-items:center;padding:0 10px;background:#262c30;color:#c9d3d6;font-size:11.5px;font-weight:700;letter-spacing:.02em;border-right:1px solid rgba(255,255,255,.08)}
+.lt-pista{position:relative;flex:none}
+.lt-regua{cursor:pointer;background:#262c30}
+.lt-traco{position:absolute;bottom:0;width:1px;height:6px;background:rgba(255,255,255,.25)}
+.lt-traco-forte{height:11px;background:rgba(255,255,255,.5)}
+.lt-traco b{position:absolute;bottom:12px;left:3px;font-size:10px;font-weight:600;color:#c9d3d6;white-space:nowrap}
+.lt-vazio{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11.5px;color:rgba(255,255,255,.4);white-space:nowrap}
+.lt-bloco{position:absolute;top:5px;bottom:5px;display:flex;align-items:center;min-width:8px;padding:0 10px;border-radius:6px;font-size:11.5px;font-weight:600;color:#14181a;cursor:grab;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18);touch-action:none}
+.lt-bloco:hover{filter:brightness(1.07)}
+.lt-rotulo{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;pointer-events:none}
+.lt-texto{background:#f3c35c}
+.lt-flash{background:#ffffff;padding:0;justify-content:center}
+.lt-clipe{background:linear-gradient(180deg,#5fc5d0,#3e9fab);color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.3)}
+.lt-apagado{background:repeating-linear-gradient(45deg,#6b7276,#6b7276 6px,#5b6266 6px,#5b6266 12px)}
+.lt-legenda{background:#b9a6f2}
+.lt-musica{background:#7fd38f;cursor:pointer}
+.lt-efeito{background:#f4a28c;padding:0 6px;font-size:10.5px}
+.lt-fixo{cursor:pointer}
+.lt-sel{box-shadow:inset 0 0 0 2px #fff,0 0 0 2px #fff;z-index:2}
+.lt-arrastando{opacity:.85;z-index:4;cursor:grabbing}
+.lt-ponta{position:absolute;top:0;bottom:0;width:9px;cursor:ew-resize;z-index:1}
+.lt-ponta-e{left:0}
+.lt-ponta-d{right:0}
+.lt-sel .lt-ponta{background:rgba(255,255,255,.9)}
+.lt-sel .lt-ponta-e{border-radius:6px 0 0 6px}
+.lt-sel .lt-ponta-d{border-radius:0 6px 6px 0}
+.lt-cursor{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#ff4d4d;z-index:5;pointer-events:none}
+.lt-cursor::before{content:"";position:absolute;top:0;left:-5px;border:6px solid transparent;border-top-color:#ff4d4d}
+.lt-inspetor{padding:12px 16px 4px}
+.lt-campos{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:0;padding:12px 14px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel);min-width:0}
+.lt-campos legend{padding:0 6px;font-weight:700;font-size:13px}
+.lt-campos .campo{flex:0 1 120px;min-width:0}
+.lt-campos .campo>span{display:block;font-size:12px;font-weight:600;color:var(--tinta-2);margin-bottom:3px}
+.lt-campos .campo input,.lt-campos .campo select{width:100%}
+.lt-campos .lt-largo{flex:1 1 260px}
+.lt-campos p.lt-largo{flex-basis:100%;margin:0}
+.lt-botoes{flex-basis:100%}
+.lt-dica{margin:6px 16px 14px}
+@media (max-width:640px){
+  .lt-nome{flex-basis:64px;width:64px;padding:0 6px;font-size:10.5px}
+  .lt-campos .campo{flex:1 1 40%}
+}
