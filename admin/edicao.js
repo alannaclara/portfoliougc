@@ -827,7 +827,8 @@
       if (u) P.ver("Foto da conversa", `<img src="${u}" alt="" style="display:block;max-width:100%;max-height:75vh;margin:auto;border-radius:10px">`);
       return;
     }
-    if (ev.target.closest("#lt")) return cliqueNaLinha(ev);
+    // botões comuns (data-acao, como "Gerar 4K") que moram dentro da linha do tempo seguem para baixo
+    if (ev.target.closest("#lt") && !ev.target.closest("[data-acao]")) return cliqueNaLinha(ev);
 
     const mover = ev.target.closest("[data-mover]");
     if (mover) return moverClipe(mover.closest("[data-clip]").dataset.clip, Number(mover.dataset.mover));
@@ -968,7 +969,7 @@
       if (!confirm("O hook do Snapchat está vazio. Gerar mesmo assim?")) return;
     }
     if (await salvar({ status, mensagem: null, progresso: 0 })) {
-      P.toast("Pedido na fila. Agora rode o renderizar.cmd no seu computador.");
+      P.toast(status === "renderizar" ? "4K na fila. O estagiário começa em alguns segundos." : "Legenda na fila. O estagiário começa em alguns segundos.");
       desenharEditor();
     }
   }
