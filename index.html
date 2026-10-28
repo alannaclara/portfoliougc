@@ -249,7 +249,9 @@ section{padding-block:var(--secao)}
 .faixa-titulo::before,.faixa-titulo::after{content:"";width:40px;height:1px;flex:none;background:currentColor;opacity:.5}
 /* A velocidade vem do script (--duracao): quanto mais marcas, mais longo o trilho.
    Com o mouse em cima, o script só diminui a velocidade, sem parar. */
-.faixa-trilho{display:flex;width:max-content;padding-block:14px;animation:rolar var(--duracao,30s) linear infinite}
+/* z-index: as logos ficam por cima do círculo de fotos do Sobre, que começa logo
+   abaixo delas. Sem isso a sombra da logo com o mouse em cima era cortada numa linha reta. */
+.faixa-trilho{position:relative;z-index:1;display:flex;width:max-content;padding-block:14px;animation:rolar var(--duracao,30s) linear infinite}
 .faixa ul{display:flex;flex:none}
 .faixa li{position:relative;flex:none;padding-right:clamp(12px,1.4vw,18px)}
 .faixa li:hover{z-index:1}
@@ -267,7 +269,7 @@ section{padding-block:var(--secao)}
    um pouco desfocadas e as de trás desfocadas. Em cima, as fotos passam por trás da
    faixa de logos: o recorte começa logo abaixo das logos, então elas nunca ficam escondidas. */
 .sobre-roda{position:relative;align-self:stretch;min-height:420px}
-.roda{position:absolute;top:calc(-1 * (var(--entre) + var(--faixa-respiro)));bottom:calc(-1 * var(--entre));left:0;right:0;pointer-events:none;clip-path:polygon(-100vw 0,200vw 0,200vw 100%,-100vw 100%)}
+.roda{position:absolute;top:calc(-1 * (var(--entre) + var(--faixa-respiro)));bottom:calc(-1 * var(--entre));left:0;right:0;pointer-events:none;clip-path:polygon(-100vw 2px,200vw 2px,200vw 100%,-100vw 100%)}
 /* As fotos aparecem aos poucos logo abaixo das logos, em vez de cortadas numa linha reta */
 .roda::before{content:"";position:absolute;top:0;left:-100vw;right:-100vw;height:clamp(60px,7vw,100px);background:linear-gradient(var(--creme) 10%,rgba(243,238,233,0));z-index:200}
 .roda-foto{position:absolute;left:0;top:0;overflow:hidden;border-radius:var(--raio);background:var(--creme-2);box-shadow:var(--sombra-forte);visibility:hidden;will-change:transform,filter,opacity}
