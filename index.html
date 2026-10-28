@@ -85,7 +85,32 @@ section{padding-block:var(--secao)}
    dentro do próprio bloco de cor.
    Se um dia eu tirar alguma parte do site, é esta regra que evita
    sobrar um buraco no lugar. */
-#sobre,#trabalhos,#case,#depoimentos{padding-block:var(--entre)}
+#sobre,#trabalhos,#case,#metricas,#depoimentos{padding-block:var(--entre)}
+
+/* ===== MÉTRICAS DO PERFIL ===== */
+.met-grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,2.4vw,32px);align-items:start}
+.met-numeros li{min-height:150px}
+.met-numeros{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,1.6vw,20px)}
+.met-numeros li{display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(20px,2.4vw,28px);border-radius:var(--raio);background:var(--azul-claro);border:1px solid var(--azul-2)}
+.met-numeros strong{font-family:var(--serif);font-weight:400;font-size:clamp(2.2rem,4vw,3.2rem);line-height:1;letter-spacing:-.02em;color:var(--tinta)}
+.met-numeros span{margin-top:8px;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-2)}
+.met-publico{padding:clamp(22px,2.6vw,32px);border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
+.met-bloco+.met-bloco{margin-top:22px;padding-top:20px;border-top:1px dashed var(--linha)}
+.met-bloco h3{font-family:var(--sans);font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2)}
+.met-barra{display:flex;height:12px;margin:12px 0 10px;overflow:hidden;border-radius:999px;background:var(--creme-2)}
+.met-barra i{display:block;height:100%;background:var(--bloco)}
+.met-barra i+i{background:var(--azul)}
+.met-legenda{display:flex;justify-content:space-between;gap:12px;font-size:.92rem}
+.met-legenda b{font-weight:700}
+.met-lista{margin-top:10px}
+.met-lista li{display:grid;grid-template-columns:minmax(0,1fr) 3.5em;gap:12px;align-items:center;padding:7px 0;font-size:.92rem}
+.met-lista li+li{border-top:1px solid var(--linha)}
+.met-lista b{font-family:var(--serif);font-weight:400;font-size:1.15rem;text-align:right;color:var(--tinta)}
+.met-lista .met-mini{grid-column:1/-1;height:6px;margin-top:-2px;border-radius:999px;background:var(--creme-2);overflow:hidden}
+.met-lista .met-mini i{display:block;height:100%;background:var(--azul-2)}
+.met-nota{margin-top:6px;font-size:.78rem;color:var(--tinta-2)}
+.met-data{margin-top:16px;font-size:.82rem;color:var(--tinta-2)}
+@media (max-width:860px){.met-grade{grid-template-columns:minmax(0,1fr)}}
 
 /* ===== CASE (uma campanha contada do começo ao resultado) ===== */
 .case-grade{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(32px,5vw,72px);align-items:center}
@@ -787,6 +812,27 @@ div.video:not([data-video]){cursor:default}
   </div>
 </section>
 
+<!-- ================= MÉTRICAS DO PERFIL =================
+     Os números vêm do banco (função metricas_publicas), atualizados quando
+     você clica em atualizar na aba Visão Geral do painel. Se o banco não
+     responder, a seção inteira fica escondida. -->
+<section class="metricas" id="metricas" aria-labelledby="metricas-titulo" hidden>
+  <div class="container">
+    <header class="cabeca">
+      <div>
+        <p class="rotulo revelar"><span class="estrela" aria-hidden="true"></span> <span data-i18n="met.rotulo">Métricas</span></p>
+        <h2 class="titulo revelar" id="metricas-titulo" data-i18n="met.titulo">Quem me <em>acompanha</em></h2>
+      </div>
+      <p class="intro revelar" data-i18n="met.intro">Dados reais do meu Instagram, puxados direto da Meta.</p>
+    </header>
+    <div class="met-grade revelar">
+      <ul class="met-numeros" id="met-numeros"></ul>
+      <div class="met-publico" id="met-publico"></div>
+    </div>
+    <p class="met-data" id="met-data"></p>
+  </div>
+</section>
+
 <!-- ================= 5. DEPOIMENTOS ================= -->
 <section id="depoimentos" aria-labelledby="depoimentos-titulo">
   <div class="container">
@@ -1182,6 +1228,9 @@ const INGLES = {
   "trab.intro": "Pick a niche and see how I adapt language, setting and pace to each product. Hover over a video to watch a silent preview, and click to play it with sound. On your phone, swipe sideways to see the others.",
   "trab.filtros": "Filter work by niche",
 
+  "met.rotulo": "Metrics",
+  "met.titulo": "Who <em>follows</em> me",
+  "met.intro": "Real data from my Instagram, pulled straight from Meta.",
   "case.rotulo": "Case",
   "case.titulo": "Tour Curitiba in <em>three</em> videos",
   "case.desc": "Three videos for the same brand, each with its own role: showing the experience, talking to the audience and presenting the benefits.",
@@ -1862,6 +1911,68 @@ function montarCase() {
   })).join("");
 }
 montarCase();
+
+/* ---------- Métricas do perfil (Instagram) ----------
+   Lê a função metricas_publicas() do banco. Sem resposta, a seção fica escondida. */
+let dadosMetricas = null;
+const compacto = (n) => new Intl.NumberFormat(tr("pt-BR", "en-US"), { notation: "compact", maximumFractionDigits: 1 }).format(n);
+const pct = (parte, total) => (total > 0 ? Math.round((parte / total) * 100) : 0);
+function montarMetricas() {
+  const d = dadosMetricas;
+  if (!d || !d.conta || !d.conta.seguidores) return;
+  const numeros = [
+    [compacto(d.conta.seguidores), tr("seguidores no Instagram", "Instagram followers")],
+    [compacto(d.alcance_30 || 0), tr("contas alcançadas em 30 dias", "accounts reached in 30 days")],
+    [compacto(d.medias?.views || 0), tr("views em média por post", "average views per post")],
+    [`${String(d.medias?.engajamento ?? 0).replace(".", tr(",", "."))}%`, tr("de engajamento", "engagement rate")]
+  ];
+  $("#met-numeros").innerHTML = numeros.map(([n, r]) => `<li><strong>${esc(n)}</strong><span>${esc(r)}</span></li>`).join("");
+
+  const p = d.publico || {};
+  const blocos = [];
+  const gen = Object.fromEntries((p.genero || []).map((g) => [g.nome, g.valor]));
+  const informados = (gen.F || 0) + (gen.M || 0);
+  if (informados) {
+    const f = pct(gen.F || 0, informados);
+    blocos.push(`<div class="met-bloco"><h3>${tr("Gênero", "Gender")}</h3>
+      <div class="met-barra" aria-hidden="true"><i style="width:${f}%"></i><i style="width:${100 - f}%"></i></div>
+      <p class="met-legenda"><span>${tr("Feminino", "Female")} <b>${f}%</b></span><span>${tr("Masculino", "Male")} <b>${100 - f}%</b></span></p>
+      <p class="met-nota">${tr("Entre quem informou o gênero.", "Among followers who shared their gender.")}</p></div>`);
+  }
+  const idades = p.idade || [];
+  const totalIdade = idades.reduce((s, x) => s + x.valor, 0);
+  if (totalIdade) {
+    const valorDe = (nomes) => idades.filter((x) => nomes.includes(x.nome)).reduce((s, x) => s + x.valor, 0);
+    const faixas = [["18-24", ["18-24"]], ["25-34", ["25-34"]], ["35-44", ["35-44"]], ["45+", ["45-54", "55-64", "65+"]]];
+    blocos.push(`<div class="met-bloco"><h3>${tr("Faixa de idade", "Age range")}</h3><ul class="met-lista">${faixas.map(([rotulo, nomes]) => {
+      const v = pct(valorDe(nomes), totalIdade);
+      return `<li><span>${esc(rotulo)} ${tr("anos", "years")}</span><b>${v}%</b><span class="met-mini" aria-hidden="true"><i style="width:${v}%"></i></span></li>`;
+    }).join("")}</ul></div>`);
+  }
+  const cidades = [...(p.cidade || [])].sort((a, b) => b.valor - a.valor).slice(0, 3);
+  if (cidades.length) {
+    blocos.push(`<div class="met-bloco"><h3>${tr("Cidades que mais me assistem", "Top cities")}</h3><ul class="met-lista">${cidades.map((c) => {
+      const v = pct(c.valor, d.conta.seguidores);
+      return `<li><span>${esc(String(c.nome).split(",")[0])}</span><b>${v}%</b><span class="met-mini" aria-hidden="true"><i style="width:${Math.min(100, v * 4)}%"></i></span></li>`;
+    }).join("")}</ul><p class="met-nota">${tr("Porcentagem do total de seguidores.", "Share of all followers.")}</p></div>`);
+  }
+  $("#met-publico").innerHTML = blocos.join("") || "";
+  $("#met-publico").hidden = !blocos.length;
+  const quando = d.conta.visto_em ? new Date(d.conta.visto_em) : null;
+  $("#met-data").textContent = quando ? tr(`Atualizado em ${quando.toLocaleDateString("pt-BR")}.`, `Updated on ${quando.toLocaleDateString("en-US")}.`) : "";
+  $("#metricas").hidden = false;
+}
+async function carregarMetricas() {
+  if (!window.banco) return;
+  try {
+    const { data, error } = await banco.rpc("metricas_publicas");
+    if (error || !data) return;
+    dadosMetricas = data;
+    montarMetricas();
+  } catch (e) { /* sem banco: a seção continua escondida */ }
+}
+carregarMetricas();
+
 areaCase.addEventListener("click", (e) => {
   const card = e.target.closest(".video[data-video]");
   if (card) abrirVideo(card);
@@ -2276,6 +2387,7 @@ function trocarIdioma(novo) {
   montarNumerosCapa(true);
   montarAviso();
   montarCase();
+  montarMetricas();
   legendasRoda();
   montarServicos();
   montarDepoimentos(true);
