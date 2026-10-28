@@ -930,6 +930,10 @@ div.video:not([data-video]){cursor:default}
           <span class="erro" id="c-marca-erro"></span>
         </div>
         <div class="campo">
+          <label for="c-orcamento" data-i18n="form.orcamento">Orçamento estimado</label>
+          <input id="c-orcamento" name="orcamento" type="text" maxlength="120" placeholder="Ex.: R$ 1.000 a R$ 5.000" data-i18n-attr="placeholder:form.orcamento.ph">
+        </div>
+        <div class="campo">
           <label for="c-mensagem" data-i18n="form.mensagem">Mensagem</label>
           <textarea id="c-mensagem" name="mensagem" rows="5" required placeholder="Conta sobre a marca, o produto e o formato que você procura." data-i18n-attr="placeholder:form.mensagem.ph" aria-describedby="c-mensagem-erro"></textarea>
           <span class="erro" id="c-mensagem-erro"></span>
@@ -1289,6 +1293,8 @@ const INGLES = {
   "form.email.ph": "you@brand.com",
   "form.marca": "Brand / Company",
   "form.marca.ph": "Brand name",
+  "form.orcamento": "Estimated budget",
+  "form.orcamento.ph": "E.g.: US$ 200 to US$ 1,000",
   "form.mensagem": "Message",
   "form.mensagem.ph": "Tell me about the brand, the product and the format you're looking for.",
   "form.enviar": "Send message",
@@ -2194,6 +2200,7 @@ formContato.addEventListener("submit", async (e) => {
   const obs = [
     `Contato: ${nome}`,
     marca ? `Marca: ${marca}` : "",
+    String(dados.get("orcamento") || "").trim() ? `Orçamento estimado: ${String(dados.get("orcamento")).trim()}` : "",
     idioma === "en" ? "Escreveu pelo site em inglês." : "",
     `Mensagem pelo site: ${dados.get("mensagem")}`
   ].filter(Boolean).join("\n");
