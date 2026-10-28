@@ -309,6 +309,7 @@ section{padding-block:var(--secao)}
 .video .ph{align-items:center;justify-content:center}
 div.video:not([data-video]){cursor:default}
 .video-nicho{display:block;margin-top:6px;font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85)}
+.video-tipo{color:var(--azul)}
 @keyframes surgir{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
 /* Player que abre o vídeo com som no próprio site */
@@ -339,6 +340,7 @@ div.video:not([data-video]){cursor:default}
    Cada cartão começa o balanço num momento diferente, para não balançarem todos juntos. */
 .servico-papel{padding:clamp(24px,2.6vw,32px) clamp(20px,2.4vw,30px);border-radius:4px;background:var(--creme);color:var(--tinta);box-shadow:0 22px 34px -16px rgba(0,0,0,.55),0 4px 10px -4px rgba(0,0,0,.25);transform-origin:50% 0;animation:balanco 7s ease-in-out infinite;animation-delay:var(--balanco,0s)}
 .servico-papel p{color:var(--tinta-2)}
+.servico-papel p strong{display:block;margin-bottom:4px;font-weight:700;color:var(--tinta)}
 @keyframes balanco{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.4deg)}}
 /* O título de cada serviço parece um texto selecionado: fundo azul-claro transparente,
    uma barrinha de cada lado e uma bolinha em cima à esquerda e embaixo à direita */
@@ -1029,20 +1031,21 @@ const TRABALHOS = [
   { nicho: "tech",     marca: "Marca 03", video: "", views: "" }
 ];
 
-// SERVIÇOS: os seis cards da seção Como eu te ajudo. O número (01, 02...) é gerado sozinho.
+// SERVIÇOS: os seis cards da seção Como eu te ajudo.
+// objetivo = o que a marca ganha com o serviço (aparece em negrito, antes da descrição)
 const SERVICOS = [
-  { titulo: "Vídeo UGC", descricao: "Vídeo vertical com roteiro pensado para o seu produto e linguagem de gente de verdade, pronto para postar.",
-    titulo_en: "UGC video", descricao_en: "A vertical video with a script built around your product and the voice of real people, ready to post." },
-  { titulo: "Corte para anúncio", descricao: "Versões curtas com gancho forte nos primeiros segundos, prontas para testar nas campanhas pagas.",
-    titulo_en: "Ad cuts", descricao_en: "Short versions with a strong hook in the first seconds, ready to test in paid campaigns." },
-  { titulo: "Fotos do produto", descricao: "Fotos com luz natural e cenário real para usar no site, no feed e nos anúncios.",
-    titulo_en: "Product photos", descricao_en: "Photos with natural light and a real setting, for your website, feed and ads." },
-  { titulo: "Unboxing", descricao: "A primeira impressão do seu produto, da embalagem ao uso, com reação sincera e os detalhes que vendem.",
-    titulo_en: "Unboxing", descricao_en: "Your product's first impression, from the packaging to first use, with an honest reaction and the details that sell." },
-  { titulo: "Publicidade", descricao: "O conteúdo vai ao ar no meu Instagram, com legenda e marcação, para chegar em quem já me acompanha.",
-    titulo_en: "Sponsored post", descricao_en: "The content goes live on my Instagram, with caption and tag, reaching the people who already follow me." },
-  { titulo: "Pacote mensal", descricao: "Uma quantidade fixa de conteúdos por mês, com calendário combinado e prioridade na minha agenda.",
-    titulo_en: "Monthly package", descricao_en: "A fixed amount of content every month, with an agreed calendar and priority in my schedule." }
+  { titulo: "Vídeo UGC", objetivo: "Para vender mais no site e nas redes.", descricao: "Vídeo vertical com roteiro pensado para o seu produto e o jeito de uma indicação de amiga.",
+    titulo_en: "UGC video", objetivo_en: "To sell more on your website and socials.", descricao_en: "A vertical video with a script built around your product and the feel of a friend's recommendation." },
+  { titulo: "Corte para anúncio", objetivo: "Para achar o anúncio que mais converte.", descricao: "Versões curtas com ganchos diferentes nos primeiros segundos, prontas para testar nas campanhas pagas.",
+    titulo_en: "Ad cuts", objetivo_en: "To find the ad that converts best.", descricao_en: "Short versions with different hooks in the first seconds, ready to test in paid campaigns." },
+  { titulo: "Fotos do produto", objetivo: "Para deixar sua loja e seu feed mais desejáveis.", descricao: "Fotos com luz natural e cenário real, prontas para o site, o feed e os anúncios.",
+    titulo_en: "Product photos", objetivo_en: "To make your store and feed more desirable.", descricao_en: "Photos with natural light and a real setting, ready for your website, feed and ads." },
+  { titulo: "Unboxing", objetivo: "Para tirar a dúvida de quem ainda não comprou.", descricao: "A primeira impressão do produto, da embalagem ao uso, com reação sincera e os detalhes que vendem.",
+    titulo_en: "Unboxing", objetivo_en: "To win over people who haven't bought yet.", descricao_en: "Your product's first impression, from the packaging to first use, with an honest reaction and the details that sell." },
+  { titulo: "Publicidade", objetivo: "Para chegar em quem já confia em mim.", descricao: "O conteúdo vai ao ar no meu Instagram, com legenda e marcação da sua marca.",
+    titulo_en: "Sponsored post", objetivo_en: "To reach people who already trust me.", descricao_en: "The content goes live on my Instagram, with a caption and your brand tagged." },
+  { titulo: "Pacote mensal", objetivo: "Para nunca ficar sem conteúdo novo.", descricao: "Uma quantidade fixa de conteúdos por mês, com calendário combinado e prioridade na minha agenda.",
+    titulo_en: "Monthly package", objetivo_en: "To never run out of fresh content.", descricao_en: "A fixed amount of content every month, with an agreed calendar and priority in my schedule." }
 ];
 
 // DEPOIMENTOS: os cards do carrossel. Pode ter quantos quiser.
@@ -1414,12 +1417,25 @@ const nomeNicho = (n) => {
 };
 const fraseNicho = (n) => (idioma === "en" ? FRASES_NICHOS_EN[n] : FRASES_NICHOS[n]) || "";
 
+// Tipo de vídeo (escolhido no painel, campo "Tipo de vídeo"): aparece ao lado do nicho, ex.: "Beleza · Review".
+// Em inglês, os tipos da lista do painel são traduzidos; os outros aparecem como foram escritos.
+const TIPOS_EN = {
+  "review": "Review", "problema × solução": "Problem × solution", "tutorial": "Tutorial", "unboxing": "Unboxing",
+  "antes e depois": "Before & after", "rotina": "Routine", "depoimento": "Testimonial", "trend": "Trend",
+  "storytelling": "Storytelling", "anúncio": "Ad", "publicação no perfil": "Post on my profile"
+};
+const nomeTipo = (f) => {
+  const tipo = String(f || "").trim();
+  return idioma === "en" ? TIPOS_EN[tipo.toLowerCase()] || tipo : tipo;
+};
+
 function cardVideo(t) {
   const id = idYoutube(t.video);
   const nicho = nomeNicho(t.nicho);
   const titulo = t.titulo || t.marca || nicho;
   const etiquetas = `<span class="etiquetas">${t.marca ? `<span class="etiqueta">${esc(t.marca)}</span>` : ""}${t.views ? `<span class="etiqueta etiqueta-views">${esc(t.views)}</span>` : ""}</span>`;
-  const info = `<span class="video-info"><span class="video-titulo">${esc(titulo)}</span><span class="video-nicho">${esc(nicho)}</span></span>`;
+  const tipo = nomeTipo(t.formato);
+  const info = `<span class="video-info"><span class="video-titulo">${esc(titulo)}</span><span class="video-nicho">${esc(nicho)}${tipo ? ` · <span class="video-tipo">${esc(tipo)}</span>` : ""}</span></span>`;
   const linkSeguro = /^https?:\/\//i.test(String(t.video || "")) ? t.video : "";
   if (!id && linkSeguro) {
     // Link que não é do YouTube (Instagram, TikTok, Drive): abre numa aba nova
@@ -1519,7 +1535,7 @@ $$(".nicho", areaNichos).forEach((bloco) => {
 
 function montarServicos() {
   $("#grade-servicos").innerHTML = SERVICOS.map((s, i) =>
-    `<li class="servico"><div class="servico-papel" style="--balanco:${(i % 3) * -2.1 - i * 0.7}s"><h3>${esc(doIdioma(s, "titulo"))}</h3><p>${esc(doIdioma(s, "descricao"))}</p></div></li>`
+    `<li class="servico"><div class="servico-papel" style="--balanco:${(i % 3) * -2.1 - i * 0.7}s"><h3>${esc(doIdioma(s, "titulo"))}</h3><p>${s.objetivo ? `<strong>${esc(doIdioma(s, "objetivo"))}</strong> ` : ""}${esc(doIdioma(s, "descricao"))}</p></div></li>`
   ).join("");
 }
 montarServicos();
@@ -2045,6 +2061,7 @@ const doBanco = (v) => ({
   titulo: v.titulo || "",
   video: v.link || "",
   views: v.destaque || "",
+  formato: v.formato || "",
   capa: ""
 });
 
