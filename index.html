@@ -613,7 +613,8 @@ div.video:not([data-video]){cursor:default}
 .servicos .rotulo,.servicos .intro{color:rgba(255,255,255,.9)}
 .servicos .titulo em{color:var(--clara-no-bloco)}
 .servicos :focus-visible,.rodape :focus-visible{outline-color:#fff}
-.servicos-grade{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.25)}
+/* Sem linhas entre os quadrados de Serviços */
+.servicos-grade{background:none;border:0}
 .rodape{background:var(--bloco);color:#fff}
 .rodape-nome em{color:var(--clara-no-bloco)}
 .rodape-desc,.rodape-base{color:rgba(255,255,255,.9)}
@@ -791,23 +792,6 @@ div.video:not([data-video]){cursor:default}
   </div>
 </section>
 
-<!-- ================= 3. TRABALHOS POR NICHO ================= -->
-<section class="trabalhos" id="trabalhos" aria-labelledby="trabalhos-titulo">
-  <div class="container">
-    <header class="cabeca">
-      <div>
-        <p class="rotulo revelar"><span class="estrela" aria-hidden="true"></span> <span data-i18n="trab.rotulo">Trabalhos</span></p>
-        <h2 class="titulo revelar" id="trabalhos-titulo" data-i18n="trab.titulo">Trabalhos por <em>nicho</em></h2>
-      </div>
-      <p class="intro revelar" data-i18n="trab.intro">Escolha um nicho e veja como eu adapto linguagem, cenário e ritmo para cada produto. Passe o mouse sobre um vídeo para ver a prévia sem som e clique para assistir com som. No celular, arraste para o lado para ver os outros.</p>
-    </header>
-    <!-- Os botões de filtro e os carrosséis vêm do painel (tabela videos). Reserva: array TRABALHOS no script -->
-    <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho" data-i18n-attr="aria-label:trab.filtros"></div>
-    <p class="sr" id="status-filtro" aria-live="polite"></p>
-    <div class="nichos" id="nichos"></div>
-  </div>
-</section>
-
 <!-- ================= CASE: TOUR CURITIBA =================
      Os vídeos e o papel de cada um ficam no objeto CASE, no script. -->
 <section class="case" id="case" aria-labelledby="case-titulo">
@@ -828,6 +812,25 @@ div.video:not([data-video]){cursor:default}
     <div class="case-videos revelar" id="case-videos"></div>
   </div>
 </section>
+
+<!-- ================= 3. TRABALHOS POR NICHO ================= -->
+<section class="trabalhos" id="trabalhos" aria-labelledby="trabalhos-titulo">
+  <div class="container">
+    <header class="cabeca">
+      <div>
+        <p class="rotulo revelar"><span class="estrela" aria-hidden="true"></span> <span data-i18n="trab.rotulo">Trabalhos</span></p>
+        <h2 class="titulo revelar" id="trabalhos-titulo" data-i18n="trab.titulo">Trabalhos por <em>nicho</em></h2>
+      </div>
+      <p class="intro revelar" data-i18n="trab.intro">Escolha um nicho e veja como eu adapto linguagem, cenário e ritmo para cada produto. Passe o mouse sobre um vídeo para ver a prévia sem som e clique para assistir com som. No celular, arraste para o lado para ver os outros.</p>
+    </header>
+    <!-- Os botões de filtro e os carrosséis vêm do painel (tabela videos). Reserva: array TRABALHOS no script -->
+    <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho" data-i18n-attr="aria-label:trab.filtros"></div>
+    <p class="sr" id="status-filtro" aria-live="polite"></p>
+    <div class="nichos" id="nichos"></div>
+  </div>
+</section>
+
+
 
 <!-- ================= 4. COMO EU TE AJUDO ================= -->
 <section class="servicos" id="servicos" aria-labelledby="servicos-titulo">
