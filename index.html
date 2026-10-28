@@ -598,7 +598,10 @@ div.video:not([data-video]){cursor:default}
 .servicos::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
   background:url("fotos/padrao-servicos.png") 0 0/176px 88px repeat;opacity:.22}
 .servico{background:transparent}
-.servico:hover{background:rgba(79,157,171,.7)}
+/* Com o mouse em cima, o fundo não muda: só o cartãozinho sobe um pouco */
+.servico:hover{background:transparent}
+.servico-papel{transition:translate .35s ease,box-shadow .35s ease}
+.servico:hover .servico-papel{translate:0 -8px;box-shadow:0 30px 40px -16px rgba(0,0,0,.5),0 8px 16px -6px rgba(0,0,0,.25)}
 .rodape{background:var(--bloco);color:#fff}
 .rodape-nome em{color:var(--clara-no-bloco)}
 .rodape-desc,.rodape-base{color:rgba(255,255,255,.9)}
