@@ -592,6 +592,13 @@ div.video:not([data-video]){cursor:default}
 .servicos :focus-visible,.rodape :focus-visible{outline-color:#fff}
 /* Sem linhas entre os quadrados de Serviços */
 .servicos-grade{background:none;border:0}
+/* Fundo de Serviços: estrela, rosto, estrela, piscadinha, bem pequeno e
+   clarinho. A imagem é um ladrilho que se repete (fotos/padrao-servicos.png). */
+.servicos{position:relative;isolation:isolate}
+.servicos::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:url("fotos/padrao-servicos.png") 0 0/176px 88px repeat;opacity:.22}
+.servico{background:transparent}
+.servico:hover{background:rgba(79,157,171,.7)}
 .rodape{background:var(--bloco);color:#fff}
 .rodape-nome em{color:var(--clara-no-bloco)}
 .rodape-desc,.rodape-base{color:rgba(255,255,255,.9)}
