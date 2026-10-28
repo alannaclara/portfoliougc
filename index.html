@@ -70,6 +70,11 @@ h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.05;margin:0;lett
 p{margin:0}
 ul,ol{margin:0;padding:0;list-style:none}
 button{font:inherit}
+/* Cursor do mouse: a estrela azul (a ponta fica no centro dela).
+   Nos campos de digitar continua a barrinha de texto, para a pessoa ver onde está escrevendo. */
+html,body,*{cursor:url("fotos/cursor-estrela.png") 16 16,auto}
+a,button,label,select,summary,[role="button"],.video{cursor:url("fotos/cursor-estrela.png") 16 16,pointer}
+input,textarea,[contenteditable="true"]{cursor:text}
 ::selection{background:var(--azul);color:var(--tinta)}
 :focus-visible{outline:2px solid var(--tinta);outline-offset:3px;border-radius:4px}
 .ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -141,7 +146,7 @@ section{padding-block:var(--secao)}
 
 /* ===== BOTÕES ===== */
 .botoes{display:flex;flex-wrap:wrap;gap:12px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:14px 26px;border:1.5px solid transparent;border-radius:var(--raio-sm);font:600 1rem/1.1 var(--sans);text-decoration:none;cursor:pointer;transition:transform .3s var(--ease),background-color .3s,color .3s,border-color .3s,box-shadow .3s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:14px 26px;border:1.5px solid transparent;border-radius:var(--raio-sm);font:600 1rem/1.1 var(--sans);text-decoration:none;cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transition:transform .3s var(--ease),background-color .3s,color .3s,border-color .3s,box-shadow .3s}
 .btn .ico{width:18px;height:18px;transition:transform .3s var(--ease)}
 .btn:hover .ico{transform:translateX(3px)}
 .btn-azul{background:var(--azul);color:var(--tinta);border-color:var(--tinta);box-shadow:0 12px 26px -16px rgba(23,59,67,.45)}
@@ -184,7 +189,7 @@ section{padding-block:var(--secao)}
 /* Idioma (PT/EN) e botão Trabalhe comigo, no canto direito */
 .topo-acoes{display:flex;align-items:center;gap:14px}
 .idioma{display:inline-flex;padding:3px;border:1px solid var(--linha);border-radius:999px;background:var(--papel)}
-.idioma button{min-width:38px;padding:6px 10px;border:0;border-radius:999px;background:transparent;color:var(--tinta-2);font-size:.76rem;font-weight:700;letter-spacing:.06em;line-height:1;cursor:pointer;transition:background-color .25s,color .25s}
+.idioma button{min-width:38px;padding:6px 10px;border:0;border-radius:999px;background:transparent;color:var(--tinta-2);font-size:.76rem;font-weight:700;letter-spacing:.06em;line-height:1;cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transition:background-color .25s,color .25s}
 .idioma button[aria-pressed="true"]{background:var(--tinta);color:var(--creme)}
 .idioma button:not([aria-pressed="true"]):hover{color:var(--tinta)}
 .btn-topo{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 18px;border-radius:var(--raio-sm);background:var(--tinta);color:var(--creme);font-size:.9rem;font-weight:600;line-height:1.1;text-decoration:none;white-space:nowrap;transition:background-color .25s,color .25s,transform .25s var(--ease)}
@@ -323,7 +328,7 @@ section{padding-block:var(--secao)}
 
 /* ===== TRABALHOS POR NICHO ===== */
 .filtros{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:clamp(32px,4vw,48px)}
-.filtro{min-height:44px;padding:10px 20px;border:1px solid var(--tinta);border-radius:999px;background:transparent;color:var(--tinta);font-size:.92rem;font-weight:600;cursor:pointer;transition:background-color .25s,color .25s}
+.filtro{min-height:44px;padding:10px 20px;border:1px solid var(--tinta);border-radius:999px;background:transparent;color:var(--tinta);font-size:.92rem;font-weight:600;cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transition:background-color .25s,color .25s}
 .filtro:hover{background:var(--creme-2)}
 .filtro[aria-pressed="true"]{background:var(--tinta);color:var(--creme)}
 .filtro .qtd{margin-left:6px;font-size:.75rem;font-weight:500;opacity:.75}
@@ -337,13 +342,13 @@ section{padding-block:var(--secao)}
 .nicho-sub{margin-top:10px;font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(1.05rem,1.6vw,1.2rem);color:var(--tinta-2)}
 .setas{display:flex;gap:10px;flex:none}
 .setas[hidden]{display:none}
-.seta{width:50px;height:50px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:var(--papel);color:var(--tinta);cursor:pointer;box-shadow:var(--sombra);transition:background-color .25s,color .25s,opacity .25s}
+.seta{width:50px;height:50px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:var(--papel);color:var(--tinta);cursor:url("fotos/cursor-estrela.png") 16 16,pointer;box-shadow:var(--sombra);transition:background-color .25s,color .25s,opacity .25s}
 .seta:hover:not(:disabled){background:var(--tinta);color:var(--creme)}
 .seta:disabled{opacity:.35;cursor:default;box-shadow:none}
 .seta .ico{width:20px;height:20px}
 .trilho{--gap:clamp(14px,2vw,26px);display:flex;gap:var(--gap);overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-width:none;padding:8px 4px 22px;margin:-8px -4px -22px}
 .trilho::-webkit-scrollbar{display:none}
-.video{--por-tela:5;position:relative;isolation:isolate;flex:0 0 calc((100% - (var(--por-tela) - 1) * var(--gap)) / var(--por-tela));aspect-ratio:9/16;display:block;overflow:hidden;padding:0;border:0;border-radius:var(--raio);background:var(--tinta);color:#fff;font:inherit;text-align:left;text-decoration:none;cursor:pointer;scroll-snap-align:start;box-shadow:var(--sombra);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.video{--por-tela:5;position:relative;isolation:isolate;flex:0 0 calc((100% - (var(--por-tela) - 1) * var(--gap)) / var(--por-tela));aspect-ratio:9/16;display:block;overflow:hidden;padding:0;border:0;border-radius:var(--raio);background:var(--tinta);color:#fff;font:inherit;text-align:left;text-decoration:none;cursor:url("fotos/cursor-estrela.png") 16 16,pointer;scroll-snap-align:start;box-shadow:var(--sombra);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
 .video:hover{transform:translateY(-4px);box-shadow:var(--sombra-forte)}
 .video:focus-visible{outline-offset:4px}
 .video-capa{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
@@ -379,7 +384,7 @@ div.video:not([data-video]){cursor:default}
 .player-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .player-legenda{min-width:0;font-family:var(--serif);font-size:1.35rem;line-height:1.15}
 .player-legenda small{display:block;margin-bottom:4px;font-family:var(--sans);font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--azul)}
-.player-fechar{width:44px;height:44px;flex:none;display:grid;place-items:center;border:1px solid rgba(243,238,233,.4);border-radius:50%;background:transparent;color:var(--creme);cursor:pointer;transition:background-color .25s,color .25s}
+.player-fechar{width:44px;height:44px;flex:none;display:grid;place-items:center;border:1px solid rgba(243,238,233,.4);border-radius:50%;background:transparent;color:var(--creme);cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transition:background-color .25s,color .25s}
 .player-fechar:hover{background:var(--creme);color:var(--tinta)}
 .player-caixa{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:var(--raio);background:#000;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
 /* Mesma ideia no player: o quadro nasce no dobro do tamanho da tela e
@@ -438,7 +443,7 @@ div.video:not([data-video]){cursor:default}
 .dep-resultado strong{display:block;font-family:var(--serif);font-size:1.35rem;font-weight:600;line-height:1.1;color:var(--tinta)}
 .dep-resultado span{display:block;margin-top:6px;font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-2)}
 /* Setas redondas nas laterais */
-.dep-seta{position:absolute;top:calc(50% + 22px);z-index:2;width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:var(--papel);color:var(--tinta);box-shadow:0 10px 24px -12px rgba(23,59,67,.35);cursor:pointer;transform:translateY(-50%);transition:background-color .25s,transform .25s var(--ease)}
+.dep-seta{position:absolute;top:calc(50% + 22px);z-index:2;width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:var(--papel);color:var(--tinta);box-shadow:0 10px 24px -12px rgba(23,59,67,.35);cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transform:translateY(-50%);transition:background-color .25s,transform .25s var(--ease)}
 .dep-seta:hover{background:#fff;transform:translateY(-50%) scale(1.06)}
 .dep-seta[hidden]{display:none}
 .dep-ant{left:-10px}
@@ -514,7 +519,7 @@ div.video:not([data-video]){cursor:default}
 .modal .campo textarea{min-height:96px}
 .modal .campo input::placeholder,.modal .campo textarea::placeholder{color:rgba(85,75,65,.7)}
 .modal form .btn{width:100%;margin-top:8px}
-.fechar{position:absolute;top:16px;right:16px;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:transparent;color:var(--tinta);cursor:pointer;transition:background-color .25s}
+.fechar{position:absolute;top:16px;right:16px;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:transparent;color:var(--tinta);cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transition:background-color .25s}
 .fechar:hover{background:var(--creme-2)}
 .modal h2{margin-bottom:12px;padding-right:36px;font-size:clamp(1.9rem,6vw,2.5rem);line-height:1.05}
 .modal-desc{margin-bottom:24px;font-size:.98rem;color:var(--tinta-2)}
@@ -542,7 +547,7 @@ div.video:not([data-video]){cursor:default}
   .sobre-roda{min-height:0}
 }
 @media (max-width:880px){
-  .sanduiche{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel);color:var(--tinta);cursor:pointer}
+  .sanduiche{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel);color:var(--tinta);cursor:url("fotos/cursor-estrela.png") 16 16,pointer}
   .sanduiche span,.sanduiche span::before,.sanduiche span::after{display:block;width:20px;height:1.5px;background:currentColor;transition:transform .3s var(--ease),background-color .2s}
   .sanduiche span{position:relative}
   .sanduiche span::before,.sanduiche span::after{content:"";position:absolute;left:0}
