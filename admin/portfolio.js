@@ -10,7 +10,8 @@
   // Mesmos nichos do site. A chave (à esquerda) é o que fica gravado no banco.
   // "comida" continua sendo a chave de Gastronomia & Bebidas, para os vídeos antigos não perderem o nicho.
   const NICHOS = { beleza: "Beleza", comida: "Gastronomia & Bebidas", tech: "Tech", casa: "Casa & Decoração" };
-  const FORMATOS = ["Vídeo UGC", "Reels", "TikTok", "Anúncio", "Unboxing", "Fotos do produto", "Publicação no perfil"];
+  // Tipo de vídeo (ângulo): aparece no site embaixo do nome de cada vídeo, ex.: "Beleza · Review"
+  const FORMATOS = ["Review", "Problema × solução", "Tutorial", "Unboxing", "Antes e depois", "Rotina", "Depoimento", "Trend", "Storytelling", "Anúncio", "Publicação no perfil"];
 
   let secao = null;
   let videos = [];
@@ -87,7 +88,7 @@
           </div>
           <div class="tabela-rolagem">
             <table class="tabela">
-              <thead><tr><th><span class="sr">Ordem</span></th><th>Vídeo</th><th>Nicho</th><th>Formato</th><th>Destaque</th><th>Link</th><th class="acoes">Ações</th></tr></thead>
+              <thead><tr><th><span class="sr">Ordem</span></th><th>Vídeo</th><th>Nicho</th><th>Tipo</th><th>Destaque</th><th>Link</th><th class="acoes">Ações</th></tr></thead>
               <tbody id="pf-lista"><tr><td colspan="7" class="carregando">Carregando...</td></tr></tbody>
             </table>
           </div>
@@ -418,7 +419,7 @@
         { nome: "marca", rotulo: "Marca", tipo: "texto" },
         { nome: "titulo", rotulo: "Título", tipo: "texto", ajuda: "Opcional. Vazio, o site mostra o nome da marca." },
         { nome: "nicho", rotulo: "Nicho", tipo: "escolha", opcoes: opcoesNicho },
-        { nome: "formato", rotulo: "Formato", tipo: "texto", lista: FORMATOS },
+        { nome: "formato", rotulo: "Tipo de vídeo", tipo: "texto", lista: FORMATOS, ajuda: "Aparece no site embaixo do nome, ex.: Beleza · Review. Escolha da lista ou escreva outro." },
         { nome: "destaque", rotulo: "Destaque", tipo: "texto", largo: true, ajuda: "Ex.: 2,4M views. Aparece como etiqueta no vídeo do site." },
         { nome: "visivel", rotulo: "Mostrar no site", tipo: "marcar", largo: true }
       ],
