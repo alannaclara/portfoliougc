@@ -339,7 +339,7 @@ div.video:not([data-video]){cursor:default}
 /* Cartão creme atrás do texto de cada serviço, com sombra, balançando devagar.
    Cada cartão começa o balanço num momento diferente, para não balançarem todos juntos. */
 .servico-papel{padding:clamp(24px,2.6vw,32px) clamp(20px,2.4vw,30px);border-radius:4px;background:var(--creme);color:var(--tinta);box-shadow:0 22px 34px -16px rgba(0,0,0,.55),0 4px 10px -4px rgba(0,0,0,.25);transform-origin:50% 0;animation:balanco 7s ease-in-out infinite;animation-delay:var(--balanco,0s)}
-.servico-papel p{color:var(--tinta-2)}
+.servico .servico-papel p{color:var(--tinta-2)}
 .servico-papel p strong{display:block;margin-bottom:4px;font-weight:700;color:var(--tinta)}
 @keyframes balanco{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.4deg)}}
 /* O título de cada serviço parece um texto selecionado: fundo azul-claro transparente,
@@ -694,7 +694,7 @@ div.video:not([data-video]){cursor:default}
         <p class="rotulo revelar"><span class="estrela" aria-hidden="true"></span> <span data-i18n="trab.rotulo">Trabalhos</span></p>
         <h2 class="titulo revelar" id="trabalhos-titulo" data-i18n="trab.titulo">Trabalhos por <em>nicho</em></h2>
       </div>
-      <p class="intro revelar" data-i18n="trab.intro">Escolha um nicho e veja como eu adapto a linguagem, o cenário e o ritmo para cada tipo de produto. Cada linha é uma especialidade. Passe o mouse sobre um vídeo para ver a prévia sem som e clique para assistir com som. Deslize pro lado pra ver mais.</p>
+      <p class="intro revelar" data-i18n="trab.intro">Escolha um nicho e veja como eu adapto linguagem, cenário e ritmo para cada produto. Passe o mouse sobre um vídeo para ver a prévia sem som e clique para assistir com som. No celular, arraste para o lado para ver os outros.</p>
     </header>
     <!-- Os botões de filtro e os carrosséis vêm do painel (tabela videos). Reserva: array TRABALHOS no script -->
     <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho" data-i18n-attr="aria-label:trab.filtros"></div>
@@ -744,8 +744,8 @@ div.video:not([data-video]){cursor:default}
   <div class="container contato-grade">
     <div class="contato-texto">
       <p class="rotulo revelar"><span class="estrela" aria-hidden="true"></span> <span data-i18n="cont.rotulo">Contato</span></p>
-      <h2 class="titulo revelar" id="contato-titulo" data-i18n="cont.titulo">Bora criar <em>juntos</em>?</h2>
-      <p class="revelar" data-i18n="cont.texto">Me conta sobre a sua marca, o produto e o que você quer alcançar. Respondo em até 48h.</p>
+      <h2 class="titulo revelar" id="contato-titulo" data-i18n="cont.titulo">Vamos tirar sua ideia do <em>papel</em>?</h2>
+      <p class="revelar" data-i18n="cont.texto">Me fala da sua marca, do produto e do resultado que você busca. Eu te respondo em até 48h.</p>
       <ul class="canais revelar">
         <li>
           <a class="canal" href="https://wa.me/5541998669857?text=Oi%2C%20Alanna!%20Vim%20pelo%20seu%20portf%C3%B3lio." target="_blank" rel="noopener">
@@ -988,17 +988,17 @@ const NICHOS_EN = {
 
 // FRASES DOS NICHOS: aparecem em itálico embaixo do nome de cada carrossel.
 const FRASES_NICHOS = {
-  beleza: "Produtos que viram ritual",
+  beleza: "Beleza que vira autoestima",
   skincare: "Pele cuidada na vida real",
   comida: "Sabores que dão vontade",
-  tech: "Tecnologia sem complicação",
+  tech: "Tecnologia explicada de um jeito leve",
   casa: "Casa com a sua cara"
 };
 const FRASES_NICHOS_EN = {
-  beleza: "Products that become a ritual",
+  beleza: "Beauty that builds confidence",
   skincare: "Skincare in real life",
   comida: "Flavors you'll crave",
-  tech: "Tech made simple",
+  tech: "Tech explained the easy way",
   casa: "A home that feels like you"
 };
 
@@ -1105,7 +1105,7 @@ const INGLES = {
 
   "trab.rotulo": "Work",
   "trab.titulo": "Work by <em>niche</em>",
-  "trab.intro": "Pick a niche and see how I adapt the language, the setting and the pace to each type of product. Each row is a specialty. Hover over a video to watch a silent preview, and click to play it with sound. Swipe sideways to see more.",
+  "trab.intro": "Pick a niche and see how I adapt language, setting and pace to each product. Hover over a video to watch a silent preview, and click to play it with sound. On your phone, swipe sideways to see the others.",
   "trab.filtros": "Filter work by niche",
 
   "serv.rotulo": "Services",
@@ -1120,8 +1120,8 @@ const INGLES = {
   "dep.prox": "Next testimonial",
 
   "cont.rotulo": "Contact",
-  "cont.titulo": "Shall we create <em>together</em>?",
-  "cont.texto": "Tell me about your brand, your product and what you want to achieve. I reply within 48 hours.",
+  "cont.titulo": "Shall we bring your idea to <em>life</em>?",
+  "cont.texto": "Tell me about your brand, your product and the result you are looking for. I'll get back to you within 48 hours.",
   "cont.email": "Email",
   "aba.nova": "(opens in a new tab)",
   "form.titulo": "Send me a <em>message</em>",
