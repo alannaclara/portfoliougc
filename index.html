@@ -81,7 +81,23 @@ section{padding-block:var(--secao)}
    dentro do próprio bloco de cor.
    Se um dia eu tirar alguma parte do site, é esta regra que evita
    sobrar um buraco no lugar. */
-#sobre,#trabalhos,#depoimentos{padding-block:var(--entre)}
+#sobre,#trabalhos,#case,#depoimentos{padding-block:var(--entre)}
+
+/* ===== CASE (uma campanha contada do começo ao resultado) ===== */
+.case-grade{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(32px,5vw,72px);align-items:center}
+.case-desc{margin-top:20px;max-width:46ch;color:var(--tinta-2)}
+.case-resultado{margin-top:28px;padding-top:22px;border-top:1px solid var(--linha)}
+.case-resultado strong{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,5vw,3.6rem);line-height:1;letter-spacing:-.02em;color:var(--tinta)}
+.case-resultado span{display:block;margin-top:8px;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2)}
+.case-frase{margin:26px 0 0;padding-left:18px;border-left:3px solid var(--azul)}
+.case-frase p{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(1.05rem,1.6vw,1.25rem);line-height:1.45}
+.case-frase cite{display:block;margin-top:8px;font-style:normal;font-size:.88rem;font-weight:600}
+.case-frase cite a{text-decoration:none}
+.case-frase cite a:hover{text-decoration:underline}
+.case-videos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.6vw,20px)}
+.case-videos .video{width:100%}
+@media (max-width:960px){.case-grade{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.case-videos{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:64%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:8px}}
 
 /* ===== CABEÇALHO DE CADA SEÇÃO ===== */
 .cabeca{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:20px clamp(32px,6vw,96px);align-items:end;margin-bottom:clamp(44px,6vw,80px)}
@@ -702,6 +718,28 @@ div.video:not([data-video]){cursor:default}
     <div class="nichos" id="nichos"></div>
   </div>
 </section>
+
+<!-- ================= CASE: TOUR CURITIBA =================
+     Os vídeos e o papel de cada um ficam no objeto CASE, no script. -->
+<section class="case" id="case" aria-labelledby="case-titulo">
+  <div class="container case-grade">
+    <div class="case-texto">
+      <p class="rotulo revelar"><span class="estrela" aria-hidden="true"></span> <span data-i18n="case.rotulo">Case</span></p>
+      <h2 class="titulo revelar" id="case-titulo" data-i18n="case.titulo">Tour Curitiba em <em>três</em> vídeos</h2>
+      <p class="case-desc revelar" data-i18n="case.desc">Três vídeos para a mesma marca, cada um com um papel: mostrar a experiência, conversar com o público e apresentar os benefícios.</p>
+      <div class="case-resultado revelar">
+        <strong data-i18n="case.numero">+64 MIL</strong>
+        <span data-i18n="case.resultado">views em campanha</span>
+      </div>
+      <blockquote class="case-frase revelar">
+        <p data-i18n="case.frase">“Entregando sempre com consistência e com aquela estética só sua, que casa demais com o Tour em!! 😁”</p>
+        <cite><a href="https://www.instagram.com/tourcuritiba/" target="_blank" rel="noopener">@tourcuritiba</a></cite>
+      </blockquote>
+    </div>
+    <div class="case-videos revelar" id="case-videos"></div>
+  </div>
+</section>
+
 <!-- ================= 4. COMO EU TE AJUDO ================= -->
 <section class="servicos" id="servicos" aria-labelledby="servicos-titulo">
   <div class="container">
@@ -1031,6 +1069,14 @@ const TRABALHOS = [
   { nicho: "tech",     marca: "Marca 03", video: "", views: "" }
 ];
 
+// CASE: os vídeos da campanha da Tour Curitiba, na ordem em que aparecem.
+// papel = o que cada vídeo faz na campanha (aparece embaixo do vídeo)
+const CASE = [
+  { video: "https://youtube.com/shorts/1S3TMBjJFZM", papel: "Experiência na prática", papel_en: "The experience in action" },
+  { video: "https://youtube.com/shorts/ERf3iwJGRRw", papel: "Conversa com o público", papel_en: "Talking to the audience" },
+  { video: "https://youtube.com/shorts/x0oboCoIZU8", papel: "Os benefícios do Tour", papel_en: "What Tour offers" }
+];
+
 // SERVIÇOS: os seis cards da seção Como eu te ajudo.
 // objetivo = o que a marca ganha com o serviço (aparece em negrito, antes da descrição)
 const SERVICOS = [
@@ -1107,6 +1153,13 @@ const INGLES = {
   "trab.titulo": "Work by <em>niche</em>",
   "trab.intro": "Pick a niche and see how I adapt language, setting and pace to each product. Hover over a video to watch a silent preview, and click to play it with sound. On your phone, swipe sideways to see the others.",
   "trab.filtros": "Filter work by niche",
+
+  "case.rotulo": "Case",
+  "case.titulo": "Tour Curitiba in <em>three</em> videos",
+  "case.desc": "Three videos for the same brand, each with its own role: showing the experience, talking to the audience and presenting the benefits.",
+  "case.numero": "64K+",
+  "case.resultado": "campaign views",
+  "case.frase": "“Always delivering with consistency and that aesthetic that's all yours, which matches Tour so well!! 😁”",
 
   "serv.rotulo": "Services",
   "serv.titulo": "How I can <em>help</em>",
@@ -1771,6 +1824,25 @@ areaNichos.addEventListener("keydown", (e) => {
   if (card && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); abrirVideo(card); }
 });
 
+/* ---------- Case: os vídeos da campanha, cada um com o seu papel ---------- */
+const areaCase = $("#case-videos");
+function montarCase() {
+  areaCase.innerHTML = CASE.map((v, i) => cardVideo({
+    video: v.video,
+    titulo: doIdioma(v, "papel"),
+    nicho: tr(`Vídeo ${i + 1}`, `Video ${i + 1}`)
+  })).join("");
+}
+montarCase();
+areaCase.addEventListener("click", (e) => {
+  const card = e.target.closest(".video[data-video]");
+  if (card) abrirVideo(card);
+});
+areaCase.addEventListener("keydown", (e) => {
+  const card = e.target.closest(".video[data-video]");
+  if (card && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); abrirVideo(card); }
+});
+
 /* ---------- Animação de entrada ao rolar ---------- */
 const revelaveis = $$(".revelar");
 if (animar) {
@@ -2175,6 +2247,7 @@ function trocarIdioma(novo) {
   traduzirFixos();
   montarNumerosCapa(true);
   montarAviso();
+  montarCase();
   legendasRoda();
   montarServicos();
   montarDepoimentos(true);
