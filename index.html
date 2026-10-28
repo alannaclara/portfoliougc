@@ -24,7 +24,11 @@
   --creme:#f3eee9;
   --creme-2:#ebe3da;
   --papel:#fbf8f5;
-  --tinta:#173b43;
+  --tinta:#1f3f45;
+  /* Cor dos blocos coloridos (barra de cima escura, Serviços e rodapé). Antes era a mesma --tinta (#173b43). */
+  --bloco:#5aacba;
+  --bloco-2:#4f9dab;
+  --clara-no-bloco:#e6fbfd;
   --tinta-2:#554b41;
   /* Cor de destaque (água). É clara: use como fundo com texto escuro por cima, ou como texto só nos fundos escuros. */
   --azul:#a7ebf2;
@@ -542,6 +546,30 @@ div.video:not([data-video]){cursor:default}
   .seta{width:44px;height:44px}
   .video-info{padding:14px}
 }
+
+/* ===== PALETA DOS BLOCOS (#5aacba) =====
+   Barra de cima escura, Serviços, rodapé e o selo da barra de aviso usam a cor --bloco.
+   Em cima dela, as letras ficam brancas e os destaques num azul quase branco (--clara-no-bloco),
+   porque o #a7ebf2 some em cima do #5aacba. Para voltar ao azul-escuro, apague este bloco. */
+.topo.em-fundo-claro:not(.menu-aberto){background:rgba(90,172,186,.92);border-bottom-color:rgba(255,255,255,.2);color:#fff}
+.topo.em-fundo-claro:not(.menu-aberto) .logo em{color:var(--clara-no-bloco)}
+.topo.em-fundo-claro:not(.menu-aberto) .menu a::after{background:rgba(255,255,255,.4)}
+.topo.em-fundo-claro:not(.menu-aberto) .idioma button{color:rgba(255,255,255,.85)}
+.topo.em-fundo-claro:not(.menu-aberto) :focus-visible{outline-color:#fff}
+.aviso-selo,.aviso-selo::before,.aviso-selo::after,.aviso-selo i{background:var(--bloco)}
+.aviso-selo{color:#fff}
+.servicos,.servico{background:var(--bloco);color:#fff}
+.servico:hover{background:var(--bloco-2)}
+.servicos .rotulo,.servicos .intro{color:rgba(255,255,255,.9)}
+.servicos .titulo em{color:var(--clara-no-bloco)}
+.servicos :focus-visible,.rodape :focus-visible{outline-color:#fff}
+.servicos-grade{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.25)}
+.rodape{background:var(--bloco);color:#fff}
+.rodape-nome em{color:var(--clara-no-bloco)}
+.rodape-desc,.rodape-base{color:rgba(255,255,255,.9)}
+.rodape-grade{border-bottom-color:rgba(255,255,255,.3)}
+.redes a{border-color:rgba(255,255,255,.5)}
+.rodape-base a:hover{color:#fff}
 
 /* ===== MOVIMENTO REDUZIDO ===== */
 @media (prefers-reduced-motion:reduce){
