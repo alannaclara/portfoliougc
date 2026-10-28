@@ -235,11 +235,12 @@ section{padding-block:var(--secao)}
 .prova small{display:block;margin-top:2px;font-size:.78rem;color:var(--tinta-2)}
 .prova-icone{width:36px;height:36px;flex:none;display:grid;place-items:center;border-radius:50%;background:var(--bloco);color:#fff}
 .prova-icone .ico{width:18px;height:18px}
-.prova-1{top:18%;right:-4%}
-.prova-2{bottom:16%;left:-6%;animation-delay:-3s}
+/* Nos cantos livres: em cima à esquerda (antes do cabelo) e embaixo à direita (sobre o quadriculado) */
+.prova-1{top:-2%;left:-6%}
+.prova-2{bottom:6%;right:-6%;animation-delay:-3s}
 @keyframes flutuar{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@media (max-width:960px){.prova-1{right:0}.prova-2{left:0}}
-@media (max-width:480px){.prova{max-width:220px;padding:9px 12px 9px 9px;gap:9px}.prova strong{font-size:.8rem}.prova small{font-size:.7rem}.prova-icone{width:30px;height:30px}.prova-1{top:8%}.prova-2{bottom:6%}}
+@media (max-width:960px){.prova-1{left:0}.prova-2{right:0}}
+@media (max-width:480px){.prova{max-width:220px;padding:9px 12px 9px 9px;gap:9px}.prova strong{font-size:.8rem}.prova small{font-size:.7rem}.prova-icone{width:30px;height:30px}.prova-1{top:0}.prova-2{bottom:2%}}
 /* Rosto na capa: duas fotos com fundo transparente, uma em cima da outra.
    A cada 3,4 segundos a foto troca de repente para a piscadinha (como um piscar de verdade),
    com um leve tombo de cabeça, e volta. A sombra segue o contorno do rosto. */
