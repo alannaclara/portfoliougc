@@ -105,10 +105,7 @@ section{padding-block:var(--secao)}
 .case-frase cite{display:block;margin-top:8px;font-style:normal;font-size:.88rem;font-weight:600}
 .case-frase cite a{text-decoration:none}
 .case-frase cite a:hover{text-decoration:underline}
-.case-videos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.6vw,20px)}
-.case-videos .video{width:100%}
 @media (max-width:960px){.case-grade{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:560px){.case-videos{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:64%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:8px}}
 
 /* ===== CABEÇALHO DE CADA SEÇÃO ===== */
 .cabeca{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:20px clamp(32px,6vw,96px);align-items:end;margin-bottom:clamp(44px,6vw,80px)}
@@ -654,6 +651,32 @@ div.video:not([data-video]){cursor:default}
   .logo .vidro-texto.vidro-texto{background-image:linear-gradient(150deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 50%),linear-gradient(currentColor,currentColor);-webkit-text-stroke:.1px currentColor}
 }
 
+/* ===== CASE: LEQUE QUE VIRA CARROSSEL =====
+   Os 3 cards ficam um em cima do outro, no meio. Cada um ganha uma posição pelo script:
+   pos-esq, pos-centro ou pos-dir. Enquanto a área tem a classe "fechado", eles ficam
+   empilhados e tortos, como cartas na mão; quando ela sai, abrem em leque.
+   O do meio fica maior e na frente; os dos lados menores, inclinados e mais apagados. */
+.case-carrossel{--card:clamp(170px,15vw,210px);position:relative;width:100%;max-width:580px;margin-inline:auto;overflow-x:clip}
+#case-videos{position:relative;height:calc(var(--card) * 16 / 9 * 1.12 + 48px)}
+#case-videos .video{position:absolute;left:50%;top:50%;width:var(--card);margin:calc(var(--card) * -8 / 9) 0 0 calc(var(--card) / -2);transform:var(--pos);transition:transform .8s var(--ease),opacity .5s ease,box-shadow .5s var(--ease)}
+#case-videos .pos-centro{--pos:translateX(0) scale(1.12);z-index:3}
+#case-videos .pos-esq{--pos:translateX(-80%) rotate(-6deg) scale(.82);z-index:1;opacity:.6}
+#case-videos .pos-dir{--pos:translateX(80%) rotate(6deg) scale(.82);z-index:1;opacity:.6}
+#case-videos .pos-centro:hover{transform:var(--pos) translateY(-6px)}
+#case-videos .pos-esq:hover,#case-videos .pos-dir:hover{opacity:.85}
+#case-videos.fechado .pos-esq{--pos:rotate(-9deg) scale(.9)}
+#case-videos.fechado .pos-centro{--pos:rotate(1deg) scale(.95)}
+#case-videos.fechado .pos-dir{--pos:rotate(8deg) scale(.9)}
+/* Setas redondas de vidro, por cima dos cards dos lados */
+.case-seta{position:absolute;top:50%;z-index:4;width:48px;height:48px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.7);border-radius:50%;background:rgba(255,255,255,.62);color:var(--tinta);-webkit-backdrop-filter:blur(10px) saturate(1.4);backdrop-filter:blur(10px) saturate(1.4);box-shadow:inset 0 1px 1px rgba(255,255,255,.9),0 10px 22px -10px rgba(23,59,67,.45);cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transform:translateY(-50%);transition:background-color .25s,transform .25s var(--ease)}
+.case-seta:hover{background:#fff;transform:translateY(-50%) scale(1.08)}
+.case-ant{left:0}
+.case-prox{right:0}
+@media (max-width:560px){
+  .case-carrossel{--card:44vw}
+  .case-seta{width:42px;height:42px}
+}
+
 /* ===== ESTRELAS NO FUNDO =====
    Ficam presas nos cantos da tela e flutuam devagar. Estão atrás de tudo:
    aparecem nas partes cor creme e somem atrás dos blocos coloridos.
@@ -868,7 +891,13 @@ div.video:not([data-video]){cursor:default}
         <cite><a href="https://www.instagram.com/tourcuritiba/" target="_blank" rel="noopener">@tourcuritiba</a></cite>
       </blockquote>
     </div>
-    <div class="case-videos revelar" id="case-videos"></div>
+    <!-- Os 3 vídeos chegam empilhados, abrem em leque e o do meio fica maior.
+         As setas trocam qual vídeo fica no meio. -->
+    <div class="case-carrossel revelar">
+      <button class="case-seta case-ant" type="button" aria-controls="case-videos" aria-label="Vídeo anterior" data-i18n-attr="aria-label:case.ant"><svg class="ico" aria-hidden="true"><use href="#i-esq"/></svg></button>
+      <div class="case-videos" id="case-videos"></div>
+      <button class="case-seta case-prox" type="button" aria-controls="case-videos" aria-label="Próximo vídeo" data-i18n-attr="aria-label:case.prox"><svg class="ico" aria-hidden="true"><use href="#i-dir"/></svg></button>
+    </div>
   </div>
 </section>
 
@@ -1303,6 +1332,8 @@ const INGLES = {
   "case.numero": "64K+",
   "case.resultado": "campaign views",
   "case.frase": "“Always delivering with consistency and that aesthetic that's all yours, which matches Tour so well!! 😁”",
+  "case.ant": "Previous video",
+  "case.prox": "Next video",
 
   "serv.rotulo": "Services",
   "serv.titulo": "How I can <em>help</em>",
@@ -1866,7 +1897,7 @@ let esperaMedida;
 window.addEventListener("resize", () => {
   clearTimeout(esperaMedida);
   esperaMedida = setTimeout(() => {
-    $$(".video-previa", areaNichos).forEach((caixa) => {
+    $$(".video-previa").forEach((caixa) => {
       const quadro = $("iframe", caixa);
       if (quadro) encolherPara(caixa, quadro, ALTA_LARGURA, ALTA_ALTURA, 1.18);
     });
@@ -1882,7 +1913,8 @@ window.addEventListener("message", (e) => {
   if (!dados) return;
   const estado = dados.event === "onStateChange" ? dados.info : (dados.info && dados.info.playerState);
   if (estado !== 1) return;
-  $$(".video-previa iframe", areaNichos).forEach((quadro) => {
+  // Vale para as prévias dos Trabalhos e para o vídeo do meio do Case
+  $$(".video-previa iframe").forEach((quadro) => {
     if (quadro.contentWindow === e.source) {
       quadro.parentElement.classList.add("pronta");
       quadro.parentElement.parentElement.classList.add("tocando");
@@ -1978,6 +2010,24 @@ areaNichos.addEventListener("keydown", (e) => {
 
 /* ---------- Case: os vídeos da campanha, cada um com o seu papel ---------- */
 const areaCase = $("#case-videos");
+// Qual vídeo está no meio (começa no 2, o do meio)
+let caseAtivo = 1;
+// O vídeo do meio toca sem som, mas só enquanto o Case está na tela e o leque já abriu
+let caseNaTela = false;
+function tocarCentroCase() {
+  $$(".video[data-video]", areaCase).forEach((card) => {
+    const tocar = card.classList.contains("pos-centro") && caseNaTela && !areaCase.classList.contains("fechado") && !movimentoReduzido && !player.open;
+    if (tocar) iniciarPrevia(card); else pararPrevia(card);
+  });
+}
+function posicionarCase() {
+  $$(".video", areaCase).forEach((card, i) => {
+    const lugar = (i - caseAtivo + CASE.length) % CASE.length;
+    card.classList.remove("pos-centro", "pos-dir", "pos-esq");
+    card.classList.add(lugar === 0 ? "pos-centro" : lugar === 1 ? "pos-dir" : "pos-esq");
+  });
+  tocarCentroCase();
+}
 function montarCase() {
   areaCase.innerHTML = CASE.map((v, i) => cardVideo({
     video: v.video,
@@ -1985,17 +2035,50 @@ function montarCase() {
     nicho: tr(`Vídeo ${i + 1}`, `Video ${i + 1}`),
     linha: tr(`Vídeo ${i + 1}`, `Video ${i + 1}`)
   })).join("");
+  posicionarCase();
 }
 montarCase();
+const trocarCase = (passo) => { caseAtivo = (caseAtivo + passo + CASE.length) % CASE.length; posicionarCase(); };
+$(".case-ant").addEventListener("click", () => trocarCase(-1));
+$(".case-prox").addEventListener("click", () => trocarCase(1));
 
+// Clique no do meio abre o vídeo com som; clique num dos lados traz ele para o meio
 areaCase.addEventListener("click", (e) => {
   const card = e.target.closest(".video[data-video]");
-  if (card) abrirVideo(card);
+  if (!card) return;
+  if (card.classList.contains("pos-centro")) abrirVideo(card);
+  else { caseAtivo = $$(".video", areaCase).indexOf(card); posicionarCase(); }
 });
 areaCase.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); trocarCase(e.key === "ArrowLeft" ? -1 : 1); return; }
   const card = e.target.closest(".video[data-video]");
-  if (card && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); abrirVideo(card); }
+  if (card && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); card.click(); }
 });
+
+// No celular: arrastar o dedo para o lado também troca
+let toqueX = null;
+areaCase.addEventListener("touchstart", (e) => { toqueX = e.touches[0].clientX; }, { passive: true });
+areaCase.addEventListener("touchend", (e) => {
+  if (toqueX === null) return;
+  const dx = e.changedTouches[0].clientX - toqueX;
+  toqueX = null;
+  if (Math.abs(dx) > 40) trocarCase(dx < 0 ? 1 : -1);
+});
+
+// O leque abre quando o Case aparece na tela; depois disso o vídeo do meio começa a tocar
+if (animar) {
+  areaCase.classList.add("fechado");
+  const vigiaLeque = new IntersectionObserver(([en]) => {
+    if (!en.isIntersecting) return;
+    vigiaLeque.disconnect();
+    setTimeout(() => { areaCase.classList.remove("fechado"); setTimeout(tocarCentroCase, 700); }, 350);
+  }, { threshold: .45 });
+  vigiaLeque.observe(areaCase);
+  // Saiu da tela, para de tocar (economiza internet); voltou, toca de novo
+  new IntersectionObserver(([en]) => { caseNaTela = en.isIntersecting; tocarCentroCase(); }, { threshold: .3 }).observe(areaCase);
+}
+// Fechou o vídeo com som: o do meio volta a tocar sem som
+player.addEventListener("close", tocarCentroCase);
 
 /* ---------- Animação de entrada ao rolar ---------- */
 const revelaveis = $$(".revelar");
