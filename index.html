@@ -648,7 +648,10 @@ div.video:not([data-video]){cursor:default}
   }
   .capa h1 span.vidro-texto{width:fit-content}
   /* Letra pequena (barra de cima) ou fina e inclinada (Sobre e assinatura): sem o fio na borda, para não borrar */
-  .logo .vidro-texto,.titulo .vidro-texto,.assinatura .vidro-texto{-webkit-text-stroke:0}
+  .titulo .vidro-texto,.assinatura .vidro-texto{-webkit-text-stroke:0}
+  /* Na barra de cima a letra é pequena: a transparência do vidro deixava ela mais fina.
+     Aqui ela fica com a cor inteira e um contorno bem fino da própria cor, para manter a espessura de antes. */
+  .logo .vidro-texto.vidro-texto{background-image:linear-gradient(150deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 50%),linear-gradient(currentColor,currentColor);-webkit-text-stroke:.1px currentColor}
 }
 
 /* ===== ESTRELAS NO FUNDO =====
