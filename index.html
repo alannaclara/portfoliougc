@@ -612,6 +612,23 @@ div.video:not([data-video]){cursor:default}
 .redes a{border-color:rgba(255,255,255,.5)}
 .rodape-base a:hover{color:#fff}
 
+/* ===== ESTRELAS NO FUNDO =====
+   Ficam presas nos cantos da tela e flutuam devagar. Estão atrás de tudo:
+   aparecem nas partes cor creme e somem atrás dos blocos coloridos.
+   Posição, tamanho, tempo e atraso de cada uma ficam no HTML (--t, --d, --a). */
+.ceu{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.ceu span{position:absolute;width:var(--t,20px);aspect-ratio:1;background:url("fotos/estrela.png") center/contain no-repeat;opacity:var(--o,.75);animation:sobrevoar var(--d,9s) ease-in-out var(--a,0s) infinite}
+@keyframes sobrevoar{
+  0%,100%{transform:translate(0,0) rotate(0) scale(1)}
+  30%{transform:translate(10px,-16px) rotate(12deg) scale(1.1)}
+  60%{transform:translate(-8px,-26px) rotate(-8deg) scale(.9)}
+  80%{transform:translate(-12px,-8px) rotate(4deg) scale(1.04)}
+}
+@media (max-width:760px){
+  .ceu span{width:16px;opacity:.55}
+  .ceu .so-largo{display:none}
+}
+
 /* ===== MOVIMENTO REDUZIDO ===== */
 @media (prefers-reduced-motion:reduce){
   html,.trilho{scroll-behavior:auto}
@@ -628,6 +645,16 @@ div.video:not([data-video]){cursor:default}
 </head>
 <body>
 <a class="pular" href="#conteudo" data-i18n="pular">Pular para o conteúdo</a>
+
+<!-- Estrelas que flutuam nos cantos, atrás do conteúdo (só decoração) -->
+<div class="ceu" aria-hidden="true">
+  <span style="top:18%;left:2.5%;--t:28px;--d:10s"></span>
+  <span class="so-largo" style="top:27%;left:6.5%;--t:14px;--d:8s;--a:-3s;--o:.55"></span>
+  <span style="top:16%;right:3%;--t:20px;--d:11s;--a:-5s"></span>
+  <span style="bottom:10%;left:4%;--t:18px;--d:9s;--a:-2s;--o:.6"></span>
+  <span style="bottom:16%;right:2.5%;--t:30px;--d:12s;--a:-7s"></span>
+  <span class="so-largo" style="bottom:8%;right:7%;--t:13px;--d:7s;--a:-4s;--o:.5"></span>
+</div>
 
 <!-- Ícones usados no site (não precisa mexer) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
