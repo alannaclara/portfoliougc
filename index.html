@@ -612,6 +612,25 @@ div.video:not([data-video]){cursor:default}
 .redes a{border-color:rgba(255,255,255,.5)}
 .rodape-base a:hover{color:#fff}
 
+/* ===== BOTÕES DE VIDRO =====
+   Cada botão mantém a sua cor, só que um pouco transparente e desfocando o que está atrás.
+   Por cima vai um brilho branco (o ::before), um fio de luz no alto e uma sombrinha.
+   O brilho fica atrás do texto graças ao isolation:isolate. */
+.btn-azul,.btn-linha,.btn-claro,.selos li,.promessas .icone,.filtro,.canal,.redes a{position:relative;isolation:isolate;-webkit-backdrop-filter:blur(10px) saturate(1.4);backdrop-filter:blur(10px) saturate(1.4);box-shadow:inset 0 1px 1px rgba(255,255,255,.85),0 8px 20px -10px rgba(37,64,77,.38)}
+.btn-azul::before,.btn-linha::before,.btn-claro::before,.selos li::before,.promessas .icone::before,.filtro::before,.canal::before,.redes a::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(145deg,rgba(255,255,255,.55),rgba(255,255,255,0) 58%);pointer-events:none}
+.btn-azul{background-color:color-mix(in srgb,var(--azul) 82%,transparent)}
+.btn-linha{background-color:rgba(255,255,255,.3)}
+.btn-claro{background-color:color-mix(in srgb,var(--creme) 90%,transparent)}
+.selos li{background-color:color-mix(in srgb,var(--creme-2) 70%,transparent)}
+.selos .selo-destaque{background-color:color-mix(in srgb,var(--azul-claro) 70%,transparent)}
+.promessas .icone{background-color:color-mix(in srgb,var(--azul) 88%,transparent)}
+.filtro{background-color:rgba(255,255,255,.3)}
+.filtro[aria-pressed="true"]{background-color:color-mix(in srgb,var(--tinta) 94%,transparent)}
+.filtro[aria-pressed="true"]::before{background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,0) 58%)}
+.canal{background-color:rgba(255,255,255,.28)}
+.redes a{background-color:rgba(255,255,255,.12);box-shadow:inset 0 1px 1px rgba(255,255,255,.55),0 8px 20px -10px rgba(20,50,60,.45)}
+.redes a::before{background:linear-gradient(145deg,rgba(255,255,255,.3),rgba(255,255,255,0) 58%)}
+
 /* ===== ESTRELAS NO FUNDO =====
    Ficam presas nos cantos da tela e flutuam devagar. Estão atrás de tudo:
    aparecem nas partes cor creme e somem atrás dos blocos coloridos.
