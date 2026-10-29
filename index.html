@@ -631,6 +631,26 @@ div.video:not([data-video]){cursor:default}
 .redes a{background-color:rgba(255,255,255,.12);box-shadow:inset 0 1px 1px rgba(255,255,255,.55),0 8px 20px -10px rgba(20,50,60,.45)}
 .redes a::before{background:linear-gradient(145deg,rgba(255,255,255,.3),rgba(255,255,255,0) 58%)}
 
+/* ===== NOME DE VIDRO =====
+   Onde aparece "Alanna Clara": capa, barra de cima, Sobre, assinatura e rodapé.
+   A letra mantém a cor dela (currentColor), um pouco transparente, com o mesmo brilho
+   branco dos botões de vidro e um fio de luz na borda. Sem sombra.
+   O @supports garante que, num navegador antigo, o nome aparece normal.
+   A classe vem repetida (.vidro-texto.vidro-texto) para vencer o "background:none" do "Clara". */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .vidro-texto.vidro-texto{
+    background-image:linear-gradient(150deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,0) 50%),linear-gradient(currentColor,currentColor);
+    background-image:linear-gradient(150deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,0) 50%),linear-gradient(color-mix(in srgb,currentColor 90%,transparent),color-mix(in srgb,currentColor 90%,transparent));
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    -webkit-text-stroke:.5px rgba(255,255,255,.55);
+    -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  }
+  .capa h1 span.vidro-texto{width:fit-content}
+  /* Letra pequena (barra de cima) ou fina e inclinada (Sobre e assinatura): sem o fio na borda, para não borrar */
+  .logo .vidro-texto,.titulo .vidro-texto,.assinatura .vidro-texto{-webkit-text-stroke:0}
+}
+
 /* ===== ESTRELAS NO FUNDO =====
    Ficam presas nos cantos da tela e flutuam devagar. Estão atrás de tudo:
    aparecem nas partes cor creme e somem atrás dos blocos coloridos.
@@ -704,7 +724,7 @@ div.video:not([data-video]){cursor:default}
 
 <header class="topo" id="topo">
   <div class="container">
-    <a class="logo" href="#inicio" aria-label="Alanna Clara, voltar ao início" data-i18n-attr="aria-label:logo.aria"><span class="logo-estrela" aria-hidden="true"></span>Alanna <em>Clara</em></a>
+    <a class="logo" href="#inicio" aria-label="Alanna Clara, voltar ao início" data-i18n-attr="aria-label:logo.aria"><span class="logo-estrela" aria-hidden="true"></span><span class="vidro-texto">Alanna</span> <em class="vidro-texto">Clara</em></a>
     <nav class="menu" id="menu" aria-label="Menu principal" data-i18n-attr="aria-label:menu.aria">
       <ul>
         <li><a href="#sobre" data-i18n="menu.sobre">Sobre</a></li>
@@ -735,7 +755,7 @@ div.video:not([data-video]){cursor:default}
   <div class="container">
     <div class="capa-grade">
       <div class="capa-texto">
-        <h1 id="capa-titulo" class="entrada" style="--atraso:.2s"><span>Alanna</span> <em>Clara</em></h1>
+        <h1 id="capa-titulo" class="entrada" style="--atraso:.2s"><span class="vidro-texto">Alanna</span> <em class="vidro-texto">Clara</em></h1>
         <p class="capa-frase entrada" style="--atraso:.35s" data-i18n="capa.frase">Conteúdos criativos que <em>conectam</em>, despertam desejo e vendem.</p>
         <div class="botoes entrada" style="--atraso:.5s">
           <a class="btn btn-azul" href="#contato"><span data-i18n="capa.falar">Falar comigo</span> <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
@@ -793,7 +813,7 @@ div.video:not([data-video]){cursor:default}
 
     <div class="sobre-texto">
       <p class="rotulo revelar"><span class="estrela" aria-hidden="true"></span> <span data-i18n="sobre.rotulo">Sobre mim</span></p>
-      <h2 class="titulo revelar" id="sobre-titulo" data-i18n="sobre.titulo">Oii, sou a <em>Alanna Clara</em></h2>
+      <h2 class="titulo revelar" id="sobre-titulo" data-i18n="sobre.titulo">Oii, sou a <em><span class="vidro-texto">Alanna Clara</span></em></h2>
       <!-- TEXTO DO SOBRE MIM: o que estiver entre <strong> e </strong> aparece em negrito -->
       <div class="sobre-corpo revelar" data-i18n="sobre.corpo">
         <p>Tenho <strong>20 anos</strong> e sou <strong>UGC Creator, Universitária e Maquiadora Profissional</strong> em <strong>Curitiba (PR)</strong> há <strong>3 anos</strong>.</p>
@@ -822,7 +842,7 @@ div.video:not([data-video]){cursor:default}
 
       <div class="assinatura revelar">
         <p class="assinatura-pre" data-i18n="sobre.assinatura">Com carinho,</p>
-        <p class="assinatura-nome">Alanna Clara</p>
+        <p class="assinatura-nome"><span class="vidro-texto">Alanna Clara</span></p>
       </div>
     </div>
   </div>
@@ -1009,7 +1029,7 @@ div.video:not([data-video]){cursor:default}
   <div class="container">
     <div class="rodape-grade">
       <div>
-        <p class="rodape-nome">Alanna <em>Clara</em></p>
+        <p class="rodape-nome"><span class="vidro-texto">Alanna</span> <em class="vidro-texto">Clara</em></p>
         <p class="rodape-desc">UGC CREATOR</p>
       </div>
       <ul class="redes" aria-label="Minhas redes" data-i18n-attr="aria-label:rodape.redes">
@@ -1249,7 +1269,7 @@ const INGLES = {
 
   "sobre.fotos": "Photos of Alanna Clara",
   "sobre.rotulo": "About me",
-  "sobre.titulo": "Hi, I'm <em>Alanna Clara</em>",
+  "sobre.titulo": "Hi, I'm <em><span class='vidro-texto'>Alanna Clara</span></em>",
   "sobre.corpo":
     "<p>I'm <strong>20 years old</strong> and I've been a <strong>UGC Creator, college student and Professional Makeup Artist</strong> in <strong>Curitiba (PR)</strong> for <strong>3 years</strong>.</p>" +
     "<p>On my social media, I inspire <strong>confidence and self-esteem</strong> in a simple, effortless way. Creating <strong>real connections</strong> that spark desire and drive purchases.</p>" +
