@@ -656,7 +656,8 @@ div.video:not([data-video]){cursor:default}
    pos-esq, pos-centro ou pos-dir. Enquanto a área tem a classe "fechado", eles ficam
    empilhados e tortos, como cartas na mão; quando ela sai, abrem em leque.
    O do meio fica maior e na frente; os dos lados menores, inclinados e mais apagados. */
-.case-carrossel{--card:clamp(170px,15vw,210px);position:relative;width:100%;max-width:580px;margin-inline:auto;overflow-x:clip}
+/* Sem corte nas laterais no computador: o corte deixava uma risca reta na sombra do card do lado */
+.case-carrossel{--card:clamp(190px,17vw,250px);position:relative;width:100%;max-width:640px;margin-inline:auto}
 #case-videos{position:relative;height:calc(var(--card) * 16 / 9 * 1.12 + 48px)}
 #case-videos .video{position:absolute;left:50%;top:50%;width:var(--card);margin:calc(var(--card) * -8 / 9) 0 0 calc(var(--card) / -2);transform:var(--pos);transition:transform .8s var(--ease),opacity .5s ease,box-shadow .5s var(--ease)}
 #case-videos .pos-centro{--pos:translateX(0) scale(1.12);z-index:3}
@@ -672,9 +673,13 @@ div.video:not([data-video]){cursor:default}
 .case-seta:hover{background:#fff;transform:translateY(-50%) scale(1.08)}
 .case-ant{left:0}
 .case-prox{right:0}
+/* No celular os cards dos lados passam da tela: a área vai de ponta a ponta da tela
+   e o corte acontece na borda do celular, onde não aparece risca nenhuma */
 @media (max-width:560px){
-  .case-carrossel{--card:44vw}
+  .case-carrossel{--card:50vw;width:100vw;max-width:none;margin-inline:calc(50% - 50vw);overflow-x:clip}
   .case-seta{width:42px;height:42px}
+  .case-ant{left:10px}
+  .case-prox{right:10px}
 }
 
 /* ===== ESTRELAS NO FUNDO =====
