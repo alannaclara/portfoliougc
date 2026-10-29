@@ -303,7 +303,9 @@ section{padding-block:var(--secao)}
 .ph::after{content:"";position:absolute;inset:auto 0 0;height:45%;background:linear-gradient(transparent,rgba(23,59,67,.35));pointer-events:none}
 .ph .legenda{position:relative;z-index:1}
 .play{position:absolute;top:50%;left:50%;z-index:2;width:76px;height:76px;margin:-38px 0 0 -38px;display:grid;place-items:center;border-radius:50%;background:rgba(251,248,245,.94);color:var(--tinta);box-shadow:0 14px 30px -12px rgba(23,59,67,.55);transition:transform .4s var(--ease),background-color .3s,color .3s}
-.play svg{width:26px;height:26px;margin-left:4px;fill:currentColor}
+/* O desenho do play já fica um pouquinho à direita no próprio ícone, o que deixa o
+   triângulo visualmente no meio do círculo. Por isso sem margem extra. */
+.play svg{width:26px;height:26px;fill:currentColor}
 
 /* Degradês dos espaços reservados, um por nicho */
 .ph-beleza{background:radial-gradient(90% 55% at 30% 15%,rgba(255,255,255,.55),transparent 60%),linear-gradient(165deg,#fbe8e1 0%,#f4b8a8 58%,#e9a08e 100%)}
@@ -349,8 +351,8 @@ section{padding-block:var(--secao)}
 .etiquetas{position:absolute;top:14px;left:14px;right:14px;z-index:3;display:flex;flex-wrap:wrap;gap:6px}
 .etiqueta{padding:6px 11px;border-radius:999px;background:var(--papel);color:var(--tinta);font-size:.66rem;font-weight:700;line-height:1.2;letter-spacing:.12em;text-transform:uppercase}
 .etiqueta-views{background:var(--tinta);color:var(--azul)}
-.video .play{z-index:3;width:64px;height:64px;margin:-32px 0 0 -32px;background:rgba(23,59,67,.9);color:#fff;transition:transform .4s var(--ease),opacity .4s}
-.video .play svg{width:24px;height:24px}
+.video .play{z-index:3;width:48px;height:48px;margin:-24px 0 0 -24px;background:rgba(23,59,67,.9);color:#fff;transition:transform .4s var(--ease),opacity .4s}
+.video .play svg{width:20px;height:20px}
 .video:hover .play{transform:scale(1.08)}
 .video.tocando .play{opacity:0;transform:scale(.8)}
 .video-info{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:18px}
