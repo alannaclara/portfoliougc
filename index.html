@@ -90,7 +90,7 @@ section{padding-block:var(--secao)}
    dentro do próprio bloco de cor.
    Se um dia eu tirar alguma parte do site, é esta regra que evita
    sobrar um buraco no lugar. */
-#sobre,#trabalhos,#case,#depoimentos{padding-block:var(--entre)}
+#sobre,#trabalhos,#case,#depoimentos,#perguntas{padding-block:var(--entre)}
 
 
 
@@ -118,7 +118,7 @@ section{padding-block:var(--secao)}
 .rotulo b{padding:3px 7px;border-radius:5px;background:var(--azul);color:var(--tinta);font-weight:700;letter-spacing:.08em}
 .titulo{font-size:clamp(2.5rem,5.8vw,4.6rem);line-height:1}
 /* Palavras em itálico: marca-texto na cor de destaque por trás */
-.titulo em,.capa h1 em,.logo em,.capa-frase em,.form-titulo em,.confirmacao h3 em,.modal h2 em{font-style:italic;font-weight:300;color:var(--tinta);padding:0 .08em;background:linear-gradient(transparent 56%,var(--azul) 56%,var(--azul) 90%,transparent 90%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.titulo em,.capa h1 em,.logo em,.capa-frase em,.form-titulo em,.confirmacao h3 em{font-style:italic;font-weight:300;color:var(--tinta);padding:0 .08em;background:linear-gradient(transparent 56%,var(--azul) 56%,var(--azul) 90%,transparent 90%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .intro{max-width:44ch;color:var(--tinta-2)}
 
 /* ===== BOTÕES ===== */
@@ -360,7 +360,6 @@ section{padding-block:var(--secao)}
 .video .ph{align-items:center;justify-content:center}
 div.video:not([data-video]){cursor:default}
 .video-nicho{display:block;margin-top:6px;font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85)}
-.video-tipo{color:var(--azul)}
 @keyframes surgir{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
 /* Player que abre o vídeo com som no próprio site */
@@ -464,7 +463,7 @@ div.video:not([data-video]){cursor:default}
 .campo [aria-invalid="true"]{border-color:#b3261e}
 .erro{font-size:.82rem;font-weight:500;color:#b3261e}
 .erro:empty{display:none}
-.formulario .btn,.modal .btn{width:100%;margin-top:6px}
+.formulario .btn{width:100%;margin-top:6px}
 .form-nota{margin-top:14px;font-size:.84rem;text-align:center;color:var(--tinta-2)}
 .confirmacao{padding:32px 8px;text-align:center}
 .confirmacao:focus{outline:none}
@@ -492,27 +491,27 @@ div.video:not([data-video]){cursor:default}
 .rodape-base a{text-decoration:none}
 .rodape-base a:hover{color:var(--creme);text-decoration:underline}
 
-/* ===== CARD DE CAPTURA (MÍDIA KIT) ===== */
-.modal{width:calc(100% - 32px);max-width:460px;max-height:calc(100dvh - 32px);padding:0;border:0;background:transparent;color:var(--tinta);overflow:auto}
-.modal::backdrop{background:rgba(23,59,67,.62);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-.modal[open]{animation:modal-entra .5s var(--ease)}
-.modal[open]::backdrop{animation:esmaecer .4s ease}
-.modal-card{position:relative;overflow:hidden;padding:clamp(30px,5vw,44px);border-radius:var(--raio);background:var(--papel);box-shadow:var(--sombra-forte)}
-.modal-card:focus{outline:none}
-/* Formulário do mídia kit: rótulos pequenos em maiúsculas e campos brancos com contorno */
-#kit-corpo h2{margin-bottom:22px}
-.modal .campo{gap:6px;margin-bottom:14px}
-.modal .campo label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-2)}
-.modal .campo input,.modal .campo textarea{padding:12px 16px;border-color:rgba(23,59,67,.45);background:#fff}
-.modal .campo textarea{min-height:96px}
-.modal .campo input::placeholder,.modal .campo textarea::placeholder{color:rgba(85,75,65,.7)}
-.modal form .btn{width:100%;margin-top:8px}
+/* ===== PERGUNTAS FREQUENTES =====
+   Todas abertas; o + / × deixa a marca fechar a que já leu. */
+.faq-lista{max-width:880px;border-bottom:1px solid var(--linha)}
+.faq-item{border-top:1px solid var(--linha)}
+.faq-item summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 0;font-size:clamp(1rem,1.3vw,1.12rem);font-weight:600;list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:"+";flex:none;font-family:var(--serif);font-size:1.6rem;font-weight:300;line-height:1;color:var(--tinta-2);transition:transform .3s var(--ease)}
+.faq-item[open] summary::after{transform:rotate(45deg)}
+.faq-item p{max-width:640px;padding-bottom:22px;color:var(--tinta-2)}
+
+/* ===== CARTÃO NO CANTO =====
+   Pequeno, no canto de baixo. Não cobre os vídeos e o botão leva ao formulário do Contato. */
+.cartao-canto{position:fixed;right:clamp(16px,2.5vw,28px);bottom:clamp(16px,2.5vw,28px);z-index:90;width:min(300px,calc(100% - 32px));padding:20px 22px 22px;border-radius:var(--raio);background:var(--papel);color:var(--tinta);box-shadow:var(--sombra-forte);animation:modal-entra .5s var(--ease)}
+.cartao-canto[hidden]{display:none}
+.cartao-canto .cartao-titulo{margin-bottom:4px;padding-right:36px;font-family:var(--serif);font-size:1.25rem;font-weight:500;line-height:1.2}
+.cartao-canto p{font-size:.92rem;line-height:1.45;color:var(--tinta-2)}
+.cartao-canto .btn{width:100%;min-height:46px;margin-top:14px;padding-block:10px}
+.cartao-canto .fechar{top:10px;right:10px;width:34px;height:34px;border:0}
+.cartao-canto .fechar .ico{width:16px;height:16px}
 .fechar{position:absolute;top:16px;right:16px;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:transparent;color:var(--tinta);cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transition:background-color .25s}
 .fechar:hover{background:var(--creme-2)}
-.modal h2{margin-bottom:12px;padding-right:36px;font-size:clamp(1.9rem,6vw,2.5rem);line-height:1.05}
-.modal-desc{margin-bottom:24px;font-size:.98rem;color:var(--tinta-2)}
-.modal .rotulo{margin-bottom:16px}
-.modal .confirmacao{padding:12px 0 0}
 @keyframes modal-entra{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes esmaecer{from{opacity:0}to{opacity:1}}
 
@@ -860,6 +859,27 @@ div.video:not([data-video]){cursor:default}
   </div>
 </section>
 
+<!-- ================= PERGUNTAS FREQUENTES =================
+     Para mudar uma resposta, troque o texto aqui e a versão em inglês (faq.r1, faq.r2...) no script. -->
+<section id="perguntas" aria-labelledby="perguntas-titulo">
+  <div class="container">
+    <header class="cabeca">
+      <div>
+        <p class="rotulo revelar"><span class="estrela" aria-hidden="true"></span> <span data-i18n="faq.rotulo">Perguntas frequentes</span></p>
+        <h2 class="titulo revelar" id="perguntas-titulo" data-i18n="faq.titulo">Antes de você <em>perguntar</em></h2>
+      </div>
+    </header>
+    <div class="faq-lista revelar">
+      <details class="faq-item" open><summary data-i18n="faq.q1">Em quanto tempo você entrega?</summary><p data-i18n="faq.r1">Em até 72 horas úteis.</p></details>
+      <details class="faq-item" open><summary data-i18n="faq.q2">E se eu quiser mudar alguma coisa?</summary><p data-i18n="faq.r2">Uma rodada de ajuste já está inclusa, sem custo extra.</p></details>
+      <details class="faq-item" open><summary data-i18n="faq.q3">Quem escreve o roteiro?</summary><p data-i18n="faq.r3">Eu escrevo, e você aprova a ideia e a fala antes de eu gravar.</p></details>
+      <details class="faq-item" open><summary data-i18n="faq.q4">Posso usar o vídeo em anúncio? Por quanto tempo?</summary><p data-i18n="faq.r4">Pode, por 3 meses.</p></details>
+      <details class="faq-item" open><summary data-i18n="faq.q5">O vídeo vai com legenda e música?</summary><p data-i18n="faq.r5">Vai sim, com legenda e com música.</p></details>
+      <details class="faq-item" open><summary data-i18n="faq.q6">Como funciona a aprovação?</summary><p data-i18n="faq.r6">O vídeo para aprovação vai com a minha logo. Ela só sai depois que você aprova.</p></details>
+    </div>
+  </div>
+</section>
+
 <!-- ================= 6. BORA CRIAR JUNTOS ================= -->
 <section class="contato" id="contato" aria-labelledby="contato-titulo">
   <div class="container contato-grade">
@@ -969,49 +989,15 @@ div.video:not([data-video]){cursor:default}
   <div class="player-caixa" id="player-caixa"></div>
 </dialog>
 
-<!-- ================= CARD DE CAPTURA: MÍDIA KIT =================
-     Aparece sozinho depois de 7 segundos, uma vez por visita.
-     Para mudar o tempo, altere TEMPO_MIDIA_KIT no começo do script. -->
-<dialog class="modal" id="midia-kit" aria-labelledby="kit-titulo" aria-describedby="kit-desc">
-  <div class="modal-card" tabindex="-1">
-    <button class="fechar" type="button" id="fechar-kit" aria-label="Fechar" data-i18n-attr="aria-label:kit.fechar"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
-    <div id="kit-corpo">
-      <h2 id="kit-titulo" data-i18n="kit.titulo">No que eu posso te <em>ajudar</em>?</h2>
-      <p class="sr" id="kit-desc" data-i18n="kit.desc">Deixe seus dados e me conte o que você precisa.</p>
-      <form id="form-kit" novalidate>
-        <div class="campo">
-          <label for="k-nome" data-i18n="kit.nome">Nome</label>
-          <input id="k-nome" name="nome" type="text" autocomplete="name" required placeholder="seu nome" data-i18n-attr="placeholder:kit.nome.ph" aria-describedby="k-nome-erro">
-          <span class="erro" id="k-nome-erro"></span>
-        </div>
-        <div class="campo">
-          <label for="k-empresa" data-i18n="kit.empresa">Empresa</label>
-          <input id="k-empresa" name="empresa" type="text" autocomplete="organization" placeholder="nome da marca" data-i18n-attr="placeholder:kit.empresa.ph">
-        </div>
-        <div class="campo">
-          <label for="k-email" data-i18n="kit.email">E-mail</label>
-          <input id="k-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="email@empresa.com" data-i18n-attr="placeholder:kit.email.ph" aria-describedby="k-email-erro">
-          <span class="erro" id="k-email-erro"></span>
-        </div>
-        <div class="campo">
-          <label for="k-whats">WhatsApp</label>
-          <input id="k-whats" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="(00) 00000-0000">
-        </div>
-        <div class="campo">
-          <label for="k-mensagem" data-i18n="kit.mensagem">Mensagem</label>
-          <textarea id="k-mensagem" name="mensagem" rows="3" placeholder="objetivo da campanha, prazo, referências" data-i18n-attr="placeholder:kit.mensagem.ph"></textarea>
-        </div>
-        <button class="btn btn-azul" type="submit" data-i18n="kit.botao">Enviar</button>
-      </form>
-    </div>
-    <div class="confirmacao" id="ok-kit" role="status" tabindex="-1" hidden>
-      <div class="check" aria-hidden="true"><svg class="ico"><use href="#i-check"/></svg></div>
-      <h3 data-i18n="kit.ok">Mensagem <em>recebida</em>!</h3>
-      <p id="ok-kit-texto">Te respondo em até 48h.</p>
-      <button class="btn btn-linha" type="button" id="fechar-kit-ok" data-i18n="kit.fechar">Fechar</button>
-    </div>
-  </div>
-</dialog>
+<!-- ================= CARTÃO NO CANTO =================
+     Aparece uma vez por visita, depois que a pessoa passa do Case.
+     O botão leva ao formulário do Contato. -->
+<aside class="cartao-canto" id="cartao-canto" aria-labelledby="cartao-titulo" hidden>
+  <button class="fechar" type="button" id="fechar-cartao" aria-label="Fechar" data-i18n-attr="aria-label:cartao.fechar"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
+  <p class="cartao-titulo" id="cartao-titulo" data-i18n="cartao.titulo">Gostou do que viu?</p>
+  <p data-i18n="cartao.texto">Me conta da sua marca e do produto.</p>
+  <a class="btn btn-azul" href="#contato" id="cartao-ir"><span data-i18n="cartao.botao">Falar comigo</span> <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
+</aside>
 
 <!-- Conexão com o painel (Supabase). O endereço e a chave pública ficam em js/banco.js -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
@@ -1022,9 +1008,6 @@ div.video:not([data-video]){cursor:default}
    Edite só esta parte para trocar textos, números e links.
    Não precisa mexer no HTML.
    ========================================================= */
-
-// Tempo (em milissegundos) até o card do mídia kit aparecer. 7000 = 7 segundos.
-const TEMPO_MIDIA_KIT = 7000;
 
 // AVISO: a barra fixa no topo do site. Ela conta sozinha os dias que faltam até a data
 // e some sozinha quando a data passa. Para desligar antes, troque ligado: true por false.
@@ -1291,19 +1274,24 @@ const INGLES = {
   "rodape.topo": "Back to top",
   "player.fechar": "Close video",
 
-  "kit.fechar": "Close",
-  "kit.titulo": "How can I <em>help</em> you?",
-  "kit.desc": "Leave your details and tell me what you need.",
-  "kit.mensagem": "Message",
-  "kit.mensagem.ph": "campaign goal, deadline, references",
-  "kit.nome": "Name",
-  "kit.nome.ph": "your name",
-  "kit.empresa": "Company",
-  "kit.empresa.ph": "brand name",
-  "kit.email": "Email",
-  "kit.email.ph": "email@company.com",
-  "kit.botao": "Send",
-  "kit.ok": "Message <em>received</em>!"
+  "cartao.fechar": "Close",
+  "cartao.titulo": "Liked what you saw?",
+  "cartao.texto": "Tell me about your brand and your product.",
+  "cartao.botao": "Talk to me",
+  "faq.rotulo": "FAQ",
+  "faq.titulo": "Before you <em>ask</em>",
+  "faq.q1": "How fast do you deliver?",
+  "faq.r1": "Within 72 business hours.",
+  "faq.q2": "What if I want to change something?",
+  "faq.r2": "One round of revisions is included, at no extra cost.",
+  "faq.q3": "Who writes the script?",
+  "faq.r3": "I do, and you approve the idea and the lines before I film.",
+  "faq.q4": "Can I use the video in ads? For how long?",
+  "faq.r4": "Yes, for 3 months.",
+  "faq.q5": "Does the video come with captions and music?",
+  "faq.r5": "Yes, with captions and music.",
+  "faq.q6": "How does approval work?",
+  "faq.r6": "The video for approval has my logo on it. The logo only comes off after you approve it."
 };
 
 /* =========================================================
@@ -1578,10 +1566,12 @@ const nomeTipo = (f) => {
 function cardVideo(t) {
   const id = idYoutube(t.video);
   const nicho = nomeNicho(t.nicho);
-  const titulo = t.titulo || t.marca || nicho;
-  const etiquetas = `<span class="etiquetas">${t.marca ? `<span class="etiqueta">${esc(t.marca)}</span>` : ""}${t.views ? `<span class="etiqueta etiqueta-views">${esc(t.views)}</span>` : ""}</span>`;
-  const tipo = nomeTipo(t.formato);
-  const info = `<span class="video-info"><span class="video-titulo">${esc(titulo)}</span><span class="video-nicho">${esc(nicho)}${tipo ? ` · <span class="video-tipo">${esc(tipo)}</span>` : ""}</span></span>`;
+  // No card aparecem só a marca e o tipo de vídeo. O nicho já está no título de cada bloco.
+  // O Case não tem marca: mostra o papel do vídeo e "Vídeo 1, 2, 3" (vem em t.linha).
+  const titulo = t.marca || t.titulo || nicho;
+  const etiquetas = t.views ? `<span class="etiquetas"><span class="etiqueta etiqueta-views">${esc(t.views)}</span></span>` : "";
+  const linha = t.linha || nomeTipo(t.formato);
+  const info = `<span class="video-info"><span class="video-titulo">${esc(titulo)}</span>${linha ? `<span class="video-nicho">${esc(linha)}</span>` : ""}</span>`;
   const linkSeguro = /^https?:\/\//i.test(String(t.video || "")) ? t.video : "";
   if (!id && linkSeguro) {
     // Link que não é do YouTube (Instagram, TikTok, Drive): abre numa aba nova
@@ -1923,7 +1913,8 @@ function montarCase() {
   areaCase.innerHTML = CASE.map((v, i) => cardVideo({
     video: v.video,
     titulo: doIdioma(v, "papel"),
-    nicho: tr(`Vídeo ${i + 1}`, `Video ${i + 1}`)
+    nicho: tr(`Vídeo ${i + 1}`, `Video ${i + 1}`),
+    linha: tr(`Vídeo ${i + 1}`, `Video ${i + 1}`)
   })).join("");
 }
 montarCase();
@@ -2153,71 +2144,36 @@ $("#nova-mensagem").addEventListener("click", () => {
   $("#c-nome").focus();
 });
 
-/* ---------- Card de captura do mídia kit ---------- */
-const modal = $("#midia-kit");
-const CHAVE_KIT = "midiaKitMostrado";
-const temDialog = typeof modal.showModal === "function";
-let focoAntes = null;
+/* ---------- Cartão no canto ----------
+   Aparece uma vez por visita, quando a pessoa passa do Case (o Case sai da tela por cima).
+   Some sozinho quando ela chega no Contato. */
+const cartao = $("#cartao-canto");
+const CHAVE_CARTAO = "cartaoMostrado";
+const cartaoJaMostrado = () => { try { return sessionStorage.getItem(CHAVE_CARTAO) === "1"; } catch (e) { return false; } };
+const marcarCartao = () => { try { sessionStorage.setItem(CHAVE_CARTAO, "1"); } catch (e) { /* navegação privada */ } };
+const contatoNaTela = () => $("#contato").getBoundingClientRect().top < innerHeight;
 
-const kitJaMostrado = () => { try { return sessionStorage.getItem(CHAVE_KIT) === "1"; } catch (e) { return false; } };
-const marcarKit = () => { try { sessionStorage.setItem(CHAVE_KIT, "1"); } catch (e) { /* navegação privada */ } };
-
-function abrirKit() {
-  if (kitJaMostrado() || modal.open) return;
-  const ativo = document.activeElement;
-  // Se a pessoa estiver digitando em algum campo, espera mais um pouco para não atrapalhar
-  // Também espera se um vídeo estiver aberto no player
-  if ((ativo && /^(INPUT|TEXTAREA)$/.test(ativo.tagName)) || $("#player").open) { setTimeout(abrirKit, 5000); return; }
-  marcarKit();
-  focoAntes = ativo;
-  fecharMenu();
-  if (temDialog) modal.showModal(); else modal.setAttribute("open", "");
-  $(".modal-card", modal).focus();
+function mostrarCartao() {
+  if (cartaoJaMostrado() || !cartao.hidden || contatoNaTela()) return;
+  // Com um vídeo aberto no player, espera ele fechar
+  if ($("#player").open) { setTimeout(mostrarCartao, 4000); return; }
+  marcarCartao();
+  cartao.hidden = false;
 }
-function fecharKit() {
-  if (!modal.open) return;
-  if (temDialog) modal.close();
-  else { modal.removeAttribute("open"); aoFecharKit(); }
-}
-function aoFecharKit() {
-  if (focoAntes && focoAntes !== document.body && typeof focoAntes.focus === "function") focoAntes.focus();
-}
-modal.addEventListener("close", aoFecharKit);
-$("#fechar-kit").addEventListener("click", fecharKit);
-$("#fechar-kit-ok").addEventListener("click", fecharKit);
-modal.addEventListener("click", (e) => { if (e.target === modal) fecharKit(); }); // clique no fundo escuro
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && modal.open) { e.preventDefault(); fecharKit(); }
-});
+const fecharCartao = () => { cartao.hidden = true; };
+$("#fechar-cartao").addEventListener("click", fecharCartao);
+$("#cartao-ir").addEventListener("click", fecharCartao);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !cartao.hidden) fecharCartao(); });
 
-const formKit = $("#form-kit");
-formKit.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (!validar(formKit)) return;
-  const dados = new FormData(formKit);
-  // Quem pede o mídia kit também entra na sua base de marcas como Lead
-  // Com empresa preenchida, o recado aparece no painel com o nome da marca (igual ao formulário de contato)
-  const nomeKit = String(dados.get("nome") || "").trim();
-  const empresaKit = String(dados.get("empresa") || "").trim();
-  const whatsKit = String(dados.get("whatsapp") || "").trim();
-  const mensagemKit = String(dados.get("mensagem") || "").trim();
-  await salvarLead(empresaKit || nomeKit, dados.get("email"), [
-    idioma === "en" ? "Escreveu pelo pop-up do site, em inglês." : "Escreveu pelo pop-up do site.",
-    `Contato: ${nomeKit}`,
-    empresaKit ? `Empresa: ${empresaKit}` : "",
-    whatsKit ? `WhatsApp: ${whatsKit}` : "",
-    mensagemKit ? `Mensagem: ${mensagemKit}` : ""
-  ].filter(Boolean).join("\n"));
-  $("#ok-kit-texto").textContent = tr(
-    `Obrigada, ${primeiroNome(dados.get("nome"))}! Vou ler com carinho e te respondo em até 48h.`,
-    `Thank you, ${primeiroNome(dados.get("nome"))}! I'll read it carefully and reply within 48 hours.`);
-  $("#kit-corpo").hidden = true;
-  const ok = $("#ok-kit");
-  ok.hidden = false;
-  ok.focus();
-});
-
-if (!kitJaMostrado()) setTimeout(abrirKit, TEMPO_MIDIA_KIT);
+if ("IntersectionObserver" in window) {
+  if (!cartaoJaMostrado()) {
+    const vigiaCase = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting && e.boundingClientRect.top < 0) { vigiaCase.disconnect(); mostrarCartao(); }
+    });
+    vigiaCase.observe($("#case"));
+  }
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) fecharCartao(); }).observe($("#contato"));
+}
 
 /* ---------- Vídeos: vêm do painel (tabela videos) ----------
    O site pergunta ao banco quais vídeos estão visíveis, na ordem do painel.
