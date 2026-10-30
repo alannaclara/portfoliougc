@@ -5,33 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alanna Clara | Links e cupons</title>
 <meta name="description" content="Meus cupons de desconto, portfólio e contato, tudo num lugar só.">
-<meta name="theme-color" content="#f3eee9">
+<meta name="theme-color" content="#5aacba">
 <meta property="og:title" content="Alanna Clara | Links e cupons">
 <meta property="og:description" content="Meus cupons de desconto, portfólio e contato, tudo num lugar só.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a7ebf2'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='40' fill='%23173b43'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="../fotos/estrela.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* =========================================================
    LINKS DA BIO
-   Mesmas cores e fontes do portfólio. Feito para celular:
-   uma coluna só, botões grandes, cupom que copia num toque.
+   Mesmo visual do portfólio: as mesmas cores, a estrela, o fundo
+   com estrela e rostinhos, os botões de vidro e o nome de vidro.
+   Feito para celular: uma coluna só, botões grandes, cupom que
+   copia num toque.
    ========================================================= */
 :root{
   --creme:#f3eee9;
   --creme-2:#ebe3da;
   --papel:#fbf8f5;
-  --tinta:#173b43;
+  --tinta:#25404d;
   --tinta-2:#554b41;
+  --bloco:#5aacba;
+  --clara-no-bloco:#e6fbfd;
   --azul:#a7ebf2;
+  --azul-2:#86dde7;
   --azul-claro:#dcf6f9;
-  --pessego:#f4b8a8;
   --linha:rgba(23,59,67,.14);
   --linha-forte:rgba(23,59,67,.24);
-  --sombra:0 1px 2px rgba(23,59,67,.05),0 18px 40px -22px rgba(23,59,67,.30);
+  --sombra-vidro:inset 0 1px 1px rgba(255,255,255,.85),0 8px 20px -10px rgba(37,64,77,.38);
+  --brilho:linear-gradient(145deg,rgba(255,255,255,.55),rgba(255,255,255,0) 58%);
   --raio:14px;
+  --raio-sm:10px;
   --serif:"Fraunces",Georgia,"Times New Roman",serif;
   --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --ease:cubic-bezier(.22,.61,.36,1);
@@ -45,87 +51,112 @@ body{
   font-family:var(--sans);
   font-size:1rem;
   line-height:1.6;
+  overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
 }
-h1,h2{font-family:var(--serif);font-weight:400;line-height:1.1;margin:0;letter-spacing:-.015em}
+/* O cursor de estrela do portfólio */
+html,body,*{cursor:url("../fotos/cursor-estrela.png") 16 16,auto}
+a,button{cursor:url("../fotos/cursor-estrela.png") 16 16,pointer}
+h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.1;margin:0;letter-spacing:-.015em}
 p{margin:0}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--tinta);outline-offset:3px;border-radius:8px}
 .sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 .ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
-/* ---------- O quadriculado do topo, igual ao da capa do portfólio ---------- */
-.fundo{
-  position:absolute;inset:0 0 auto;height:172px;z-index:0;
-  background:
-    repeating-linear-gradient(to right,rgba(255,255,255,.55) 0 1px,transparent 1px 12.5%),
-    repeating-linear-gradient(to bottom,rgba(255,255,255,.55) 0 1px,transparent 1px 34px),
-    var(--azul);
+/* ---------- Estrelas que flutuam nos cantos (iguais às do portfólio) ---------- */
+.ceu{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.ceu span{position:absolute;width:var(--t,18px);aspect-ratio:1;background:url("../fotos/estrela.png") center/contain no-repeat;opacity:var(--o,.7);animation:sobrevoar var(--d,9s) ease-in-out var(--a,0s) infinite}
+@keyframes sobrevoar{
+  0%,100%{transform:translate(0,0) rotate(0) scale(1)}
+  30%{transform:translate(10px,-16px) rotate(12deg) scale(1.1)}
+  60%{transform:translate(-8px,-26px) rotate(-8deg) scale(.9)}
+  80%{transform:translate(-12px,-8px) rotate(4deg) scale(1.04)}
 }
-/* Some antes do nome começar, para o "Clara" cair sobre o creme e não sobre o azul */
-.fundo::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--creme) 92%)}
+
+/* ---------- Faixa do topo: a cor dos blocos com a estrela e os rostinhos,
+   que vai sumindo no creme (sem corte reto) ---------- */
+/* O azul termina antes do nome, para o "Clara" ficar em cima do creme, como na capa */
+.fundo{position:absolute;inset:0 0 auto;height:200px;z-index:0;overflow:hidden;background:var(--bloco)}
+.fundo::before{content:"";position:absolute;inset:0;background:url("../fotos/padrao-servicos.png") 0 0/176px 88px repeat;opacity:.22}
+.fundo::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(243,238,233,0) 30%,var(--creme) 84%)}
 
 /* ---------- Estrutura ---------- */
-.folha{position:relative;z-index:1;max-width:460px;margin:0 auto;padding:36px 20px 40px}
+.folha{position:relative;z-index:1;max-width:460px;margin:0 auto;padding:44px 20px 96px}
 
 /* ---------- Cabeçalho ---------- */
-.topo{text-align:center;margin-bottom:28px}
+.topo{text-align:center;margin-bottom:30px}
+.retrato-moldura{position:relative;width:120px;height:120px;margin:0 auto 18px}
 .retrato{
-  width:112px;height:112px;margin:0 auto 16px;display:block;
+  width:100%;height:100%;display:block;
   border-radius:50%;object-fit:cover;
-  border:3px solid var(--papel);
-  box-shadow:var(--sombra);
+  border:4px solid rgba(255,255,255,.75);
+  box-shadow:0 18px 34px -16px rgba(23,59,67,.55);
 }
-h1{font-size:2rem;margin-bottom:6px}
-h1 em{font-style:normal;font-weight:400;color:var(--azul)}
+/* A estrela da logo, encostada na foto */
+.retrato-moldura::after{content:"";position:absolute;right:-6px;bottom:4px;width:34px;height:34px;background:url("../fotos/estrela.png") center/contain no-repeat;filter:drop-shadow(0 2px 3px rgba(23,59,67,.3))}
+h1{font-size:2.6rem;line-height:1;margin-bottom:10px;letter-spacing:-.03em}
+h1 em{font-style:normal;color:var(--azul)}
 .descricao{color:var(--tinta-2);font-size:.95rem;max-width:30ch;margin:0 auto}
 
+/* Nome de vidro: mantém a cor, com o brilho branco no alto (igual ao portfólio) */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .vidro-texto.vidro-texto{
+    background-image:linear-gradient(150deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,0) 50%),linear-gradient(currentColor,currentColor);
+    background-image:linear-gradient(150deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,0) 50%),linear-gradient(color-mix(in srgb,currentColor 90%,transparent),color-mix(in srgb,currentColor 90%,transparent));
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    -webkit-text-stroke:.5px rgba(255,255,255,.55);
+  }
+}
+
+/* ---------- Vidro: a mesma receita dos botões do portfólio ---------- */
+.vidro{position:relative;isolation:isolate;-webkit-backdrop-filter:blur(10px) saturate(1.4);backdrop-filter:blur(10px) saturate(1.4);box-shadow:var(--sombra-vidro)}
+.vidro::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--brilho);pointer-events:none}
+
 /* ---------- Redes ---------- */
-.redes{display:flex;justify-content:center;gap:10px;margin-top:18px}
+.redes{display:flex;justify-content:center;gap:10px;margin-top:20px}
 .rede{
-  width:44px;height:44px;display:grid;place-items:center;
+  width:46px;height:46px;display:grid;place-items:center;
   border:1px solid var(--linha-forte);border-radius:50%;
-  background:var(--papel);color:var(--tinta);
+  background-color:rgba(255,255,255,.35);color:var(--tinta);
   transition:transform .25s var(--ease),background-color .25s,color .25s;
 }
-.rede:hover{transform:translateY(-3px);background:var(--tinta);color:var(--azul)}
+.rede:hover{transform:translateY(-3px);background-color:var(--tinta);color:var(--azul)}
 
 /* ---------- Botões grandes ---------- */
-.botoes{display:grid;gap:10px;margin-bottom:34px}
+.botoes{display:grid;gap:12px;margin-bottom:40px}
 .botao{
   display:flex;align-items:center;gap:12px;
-  min-height:56px;padding:12px 18px;
-  border:1px solid var(--tinta);border-radius:var(--raio);
-  background:var(--papel);
+  min-height:58px;padding:12px 18px;
+  border:1.5px solid var(--tinta);border-radius:var(--raio-sm);
+  background-color:rgba(255,255,255,.3);
   font-weight:600;font-size:.98rem;
-  box-shadow:var(--sombra);
   transition:transform .25s var(--ease),background-color .25s,color .25s;
 }
-.botao:hover{transform:translateY(-2px);background:var(--tinta);color:var(--creme)}
-.botao-principal{background:var(--azul)}
-.botao-principal:hover{background:var(--tinta);color:var(--azul)}
-.botao .seta{margin-left:auto;opacity:.5;transition:opacity .25s,transform .25s var(--ease)}
+.botao:hover{transform:translateY(-2px);background-color:var(--tinta);color:var(--creme)}
+.botao-principal{background-color:color-mix(in srgb,var(--azul) 82%,transparent)}
+.botao-principal:hover{color:var(--azul)}
+.botao .seta{margin-left:auto;opacity:.55;transition:opacity .25s,transform .25s var(--ease)}
 .botao:hover .seta{opacity:1;transform:translateX(3px)}
 
 /* ---------- Cupons ---------- */
-.secao-titulo{
-  display:flex;align-items:center;gap:14px;
-  margin-bottom:16px;
-  font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-2);
-}
-.secao-titulo::after{content:"";flex:1;height:1px;background:var(--linha)}
+.rotulo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-2)}
+.rotulo .estrela{width:26px;height:26px;margin-right:-6px;flex:none;background:url("../fotos/estrela.png") center/contain no-repeat}
+.secao-titulo{text-align:center;font-size:2.1rem;line-height:1.05;margin-bottom:22px}
+.secao-titulo em{font-style:italic;font-weight:300;padding:0 .08em;background:linear-gradient(transparent 56%,var(--azul) 56%,var(--azul) 90%,transparent 90%)}
 /* minmax(0,1fr) e os min-width:0 abaixo impedem um código comprido
    de esticar o cartão e criar rolagem lateral no celular */
-.cupons{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.cupons{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
 .cupom{
   min-width:0;
   padding:16px 18px;
-  border:1px solid var(--linha);border-radius:var(--raio);
-  background:var(--papel);
+  border:1px solid rgba(255,255,255,.75);border-radius:var(--raio);
+  background-color:color-mix(in srgb,var(--papel) 70%,transparent);
 }
 .cupom-topo{display:flex;align-items:baseline;gap:10px;min-width:0;margin-bottom:12px}
-.cupom-marca{min-width:0;font-family:var(--serif);font-size:1.18rem;line-height:1.2;overflow-wrap:anywhere}
-.cupom-desconto{flex:none;padding:2px 9px;border-radius:999px;background:var(--pessego);color:#8a3a24;font-size:.72rem;font-weight:700;letter-spacing:.02em}
+.cupom-marca{min-width:0;font-size:1.22rem;line-height:1.2;overflow-wrap:anywhere}
+.cupom-desconto{flex:none;padding:2px 10px;border-radius:999px;background:var(--bloco);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.02em}
 .cupom-loja{
   margin-left:auto;flex:none;
   font-size:.78rem;font-weight:600;color:var(--tinta-2);
@@ -135,28 +166,33 @@ h1 em{font-style:normal;font-weight:400;color:var(--azul)}
 .cupom-loja:hover{color:var(--tinta);text-decoration-color:var(--tinta)}
 .copiar{
   width:100%;min-width:0;display:flex;align-items:center;gap:10px;
-  min-height:48px;padding:10px 14px;
-  border:1.5px dashed var(--linha-forte);border-radius:10px;
-  background:var(--azul-claro);
+  min-height:50px;padding:10px 14px;
+  border:1.5px dashed var(--azul-2);border-radius:var(--raio-sm);
+  background-color:color-mix(in srgb,var(--azul-claro) 80%,transparent);
   font:inherit;font-weight:700;letter-spacing:.04em;color:var(--tinta);
-  cursor:pointer;text-align:left;
+  text-align:left;
   transition:background-color .2s,border-color .2s;
 }
-.copiar:hover{background:var(--azul);border-color:var(--tinta)}
+.copiar:hover{background-color:var(--azul);border-color:var(--tinta)}
 /* O código nunca é cortado: se faltar espaço, ele quebra a linha */
 .copiar .codigo{min-width:0;overflow-wrap:anywhere}
-.copiar .rotulo{margin-left:auto;flex:none;font-size:.74rem;font-weight:600;letter-spacing:normal;color:var(--tinta-2);white-space:nowrap}
-.copiar.copiado{background:var(--azul);border-style:solid;border-color:var(--tinta)}
-.copiar.copiado .rotulo{color:var(--tinta)}
+.copiar .rotulo-copiar{margin-left:auto;flex:none;font-size:.74rem;font-weight:600;letter-spacing:normal;color:var(--tinta-2);white-space:nowrap}
+.copiar.copiado{background-color:var(--azul);border-style:solid;border-color:var(--tinta)}
+.copiar.copiado .rotulo-copiar{color:var(--tinta)}
 
-/* ---------- Rodapé ---------- */
-.rodape{margin-top:36px;padding-top:20px;border-top:1px solid var(--linha);text-align:center;font-size:.84rem;color:var(--tinta-2)}
-.rodape a{text-decoration:underline;text-decoration-color:var(--linha);text-underline-offset:3px}
-.rodape a:hover{text-decoration-color:var(--tinta)}
+/* ---------- Rodapé: o bloco azul do portfólio ---------- */
+.rodape{position:relative;z-index:1;background:var(--bloco);color:#fff;text-align:center;padding:40px 20px 34px}
+.rodape::before{content:"";position:absolute;inset:-60px 0 100%;background:linear-gradient(to bottom,rgba(90,172,186,0),var(--bloco));pointer-events:none}
+.rodape-nome{font-family:var(--serif);font-size:2.4rem;line-height:1;letter-spacing:-.03em}
+.rodape-nome em{font-style:normal;color:var(--clara-no-bloco)}
+.rodape-desc{margin-top:6px;font-size:.78rem;font-weight:600;letter-spacing:.16em;color:rgba(255,255,255,.9)}
+.rodape-base{margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,.3);font-size:.84rem;color:rgba(255,255,255,.9)}
+.rodape-base a{text-decoration:underline;text-decoration-color:rgba(255,255,255,.5);text-underline-offset:3px}
+.rodape-base a:hover{color:#fff;text-decoration-color:#fff}
 
 /* Celular estreito: o aviso de copiar sai e sobra espaço para o código */
 @media (max-width:359px){
-  .copiar .rotulo{display:none}
+  .copiar .rotulo-copiar{display:none}
   .folha{padding-left:14px;padding-right:14px}
 }
 
@@ -167,6 +203,14 @@ h1 em{font-style:normal;font-weight:400;color:var(--azul)}
 </head>
 <body>
 
+<!-- Estrelas que flutuam nos cantos, atrás de tudo (só decoração) -->
+<div class="ceu" aria-hidden="true">
+  <span style="top:30%;left:3%;--t:20px;--d:10s"></span>
+  <span style="top:44%;right:4%;--t:16px;--d:11s;--a:-5s;--o:.55"></span>
+  <span style="bottom:22%;left:5%;--t:14px;--d:9s;--a:-2s;--o:.55"></span>
+  <span style="bottom:12%;right:3%;--t:22px;--d:12s;--a:-7s"></span>
+</div>
+
 <div class="fundo" aria-hidden="true"></div>
 
 <!-- Ícones -->
@@ -176,7 +220,6 @@ h1 em{font-style:normal;font-weight:400;color:var(--azul)}
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3 7l9 6 9-6"/></symbol>
   <symbol id="i-whats" viewBox="0 0 24 24"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1.3-4.4A8.5 8.5 0 1 1 20.5 11.6z"/><path d="M9 9c0 3 3 6 6 6"/></symbol>
   <symbol id="i-portfolio" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 4v5"/></symbol>
-  <symbol id="i-kit" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></symbol>
   <symbol id="i-seta" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></symbol>
   <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12.5V4h8.5L21 13.5 13.5 21z"/><circle cx="7.5" cy="7.5" r="1.4"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
@@ -186,55 +229,56 @@ h1 em{font-style:normal;font-weight:400;color:var(--azul)}
 <main class="folha">
 
   <header class="topo">
-    <img class="retrato" src="foto.jpg" alt="Alanna Clara" width="112" height="112">
-    <h1>Alanna <em>Clara</em></h1>
+    <div class="retrato-moldura">
+      <img class="retrato" src="foto.jpg" alt="Alanna Clara" width="120" height="120">
+    </div>
+    <h1><span class="vidro-texto">Alanna</span> <em class="vidro-texto">Clara</em></h1>
     <p class="descricao">UGC Creator em Curitiba · beleza, skincare, comida e tech</p>
 
     <nav class="redes" aria-label="Minhas redes">
-      <a class="rede" href="https://www.instagram.com/_alannaclara/" target="_blank" rel="noopener">
+      <a class="rede vidro" href="https://www.instagram.com/_alannaclara/" target="_blank" rel="noopener">
         <svg class="ico" aria-hidden="true"><use href="#i-insta"/></svg><span class="sr">Instagram</span>
       </a>
-      <a class="rede" href="https://www.tiktok.com/@_alannaclara" target="_blank" rel="noopener">
+      <a class="rede vidro" href="https://www.tiktok.com/@_alannaclara" target="_blank" rel="noopener">
         <svg class="ico" aria-hidden="true"><use href="#i-tiktok"/></svg><span class="sr">TikTok</span>
       </a>
-      <a class="rede" href="mailto:contatoalannaclara@gmail.com">
+      <a class="rede vidro" href="mailto:contatoalannaclara@gmail.com">
         <svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg><span class="sr">E-mail</span>
       </a>
-      <a class="rede" href="https://wa.me/5541998669857" target="_blank" rel="noopener">
+      <a class="rede vidro" href="https://wa.me/5541998669857" target="_blank" rel="noopener">
         <svg class="ico" aria-hidden="true"><use href="#i-whats"/></svg><span class="sr">WhatsApp</span>
       </a>
     </nav>
   </header>
 
   <nav class="botoes" aria-label="Links principais">
-    <a class="botao botao-principal" href="../" target="_blank" rel="noopener">
+    <a class="botao botao-principal vidro" href="../" target="_blank" rel="noopener">
       <svg class="ico" aria-hidden="true"><use href="#i-portfolio"/></svg>
       Ver meu portfólio
       <svg class="ico seta" aria-hidden="true"><use href="#i-seta"/></svg>
     </a>
-    <a class="botao" href="../#contato" target="_blank" rel="noopener">
-      <svg class="ico" aria-hidden="true"><use href="#i-kit"/></svg>
-      Pedir meu mídia kit
-      <svg class="ico seta" aria-hidden="true"><use href="#i-seta"/></svg>
-    </a>
-    <a class="botao" href="https://wa.me/5541998669857" target="_blank" rel="noopener">
-      <svg class="ico" aria-hidden="true"><use href="#i-whats"/></svg>
-      Falar comigo no WhatsApp
+    <a class="botao vidro" href="mailto:contatoalannaclara@gmail.com">
+      <svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg>
+      Falar comigo por e-mail
       <svg class="ico seta" aria-hidden="true"><use href="#i-seta"/></svg>
     </a>
   </nav>
 
   <section aria-labelledby="titulo-cupons">
-    <h2 class="secao-titulo" id="titulo-cupons">Meus cupons</h2>
+    <p class="rotulo"><span class="estrela" aria-hidden="true"></span> Cupons</p>
+    <h2 class="secao-titulo" id="titulo-cupons">Meus <em>cupons</em></h2>
     <div class="cupons" id="cupons"></div>
   </section>
 
-  <footer class="rodape">
-    <p>© <span id="ano">2026</span> Alanna Clara</p>
-    <p style="margin-top:6px"><a href="../privacidade.html">Política de privacidade</a></p>
-  </footer>
-
 </main>
+
+<footer class="rodape">
+  <p class="rodape-nome"><span class="vidro-texto">Alanna</span> <em class="vidro-texto">Clara</em></p>
+  <p class="rodape-desc">UGC CREATOR</p>
+  <div class="rodape-base">
+    <p>© <span id="ano">2026</span> Alanna Clara · <a href="../privacidade.html">Política de privacidade</a></p>
+  </div>
+</footer>
 
 <script>
 /* =========================================================
@@ -274,15 +318,15 @@ async function buscarCupons() {
 
 function desenharCupons(lista) {
   document.getElementById("cupons").innerHTML = lista.map((c) => `
-    <article class="cupom">
+    <article class="cupom vidro">
       <div class="cupom-topo">
         <h3 class="cupom-marca">${esc(c.marca)}</h3>
         ${c.descricao ? `<span class="cupom-desconto">${esc(c.descricao)}</span>` : ""}
         <a class="cupom-loja" href="${esc(c.link)}" target="_blank" rel="noopener">Ir à loja${icone("link")}</a>
       </div>
-      <button class="copiar" type="button" data-codigo="${esc(c.codigo)}">
+      <button class="copiar vidro" type="button" data-codigo="${esc(c.codigo)}">
         ${icone("tag")}<span class="codigo">${esc(c.codigo)}</span>
-        <span class="rotulo">copiar</span>
+        <span class="rotulo-copiar">copiar</span>
       </button>
     </article>`).join("");
 }
@@ -323,7 +367,7 @@ async function copiarTexto(texto) {
 document.getElementById("cupons").addEventListener("click", async (e) => {
   const botao = e.target.closest(".copiar");
   if (!botao) return;
-  const rotulo = botao.querySelector(".rotulo");
+  const rotulo = botao.querySelector(".rotulo-copiar");
   const deuCerto = await copiarTexto(botao.dataset.codigo);
 
   if (!deuCerto) {
