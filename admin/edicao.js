@@ -2326,7 +2326,7 @@
     if (!carregarEditorVideo.promessa) {
       carregarEditorVideo.promessa = new Promise((ok, falha) => {
         const s = document.createElement("script");
-        s.src = "editor-video.js?v=7";
+        s.src = "editor-video.js?v=8";
         s.onload = () => (window.EditorVideo ? ok(window.EditorVideo) : falha(new Error("player não carregou")));
         s.onerror = () => { carregarEditorVideo.promessa = null; falha(new Error("não consegui baixar o player")); };
         document.head.appendChild(s);
