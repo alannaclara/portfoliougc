@@ -165,6 +165,8 @@
         if (campoAnim === "texto" || campoAnim === "extra") { mudarAnimacao(Number(ev.target.dataset.i), campoAnim, ev.target.value, true); return; }
         const txt = ev.target.id && P.$(`#${ev.target.id}-txt`, s);
         if (txt) txt.textContent = ev.target.value + "%";
+        // "Ajustes finos": a prévia muda enquanto você digita, arrasta ou escolhe a cor
+        if (ev.target.closest(".ed-ajustes") && ev.target.type !== "file") ajusteNaPrevia(ev.target, false);
       });
       // duplo clique numa palavra da aba Cortar: corrige a grafia da legenda
       s.addEventListener("dblclick", (ev) => {
@@ -876,7 +878,7 @@
       atual.config.legendas.push({ inicio: ult ? ult.fim : 0, fim: ult ? ult.fim + 2 : 2, falada: "", ingles: "" });
       return desenharEditor();
     }
-    if (acao === "tirar-legenda") { botao.closest("tr").remove(); return; }
+    if (acao === "tirar-legenda") { botao.closest("tr").remove(); absorver(); atualizarPrevia(); salvarDepois(); return; }
     if (acao === "enviar-pedido") return enviarPedido(botao);
     if (acao === "tirar-musica") return tirarMusica();
     if (acao === "tirar-elemento") { botao.closest("tr").remove(); absorver(); return desenharEditor(); }
@@ -926,11 +928,107 @@
       absorver();
       desenharEditor();
     }
-    // qualquer campo dos "Ajustes finos" (tempos, textos, cor...) aparece na prévia ao vivo
-    if (atual && ev.target.closest(".ed-ajustes") && ev.target.type !== "file") {
+    // qualquer campo dos "Ajustes finos" (tempos, textos, cor...) aparece na prévia e salva sozinho
+    if (atual && ev.target.closest(".ed-ajustes") && ev.target.type !== "file") ajusteNaPrevia(ev.target, true);
+  }
+
+  /* ---------- "Ajustes finos" na prévia ao vivo ---------- */
+  const limpaTexto = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w%]/g, "");
+
+  // terminou = saiu do campo (change): além de mostrar, salva e acerta a linha do tempo
+  function ajusteNaPrevia(alvo, terminou) {
+    if (!atual || travado()) return;
+    clearTimeout(viva.ajusteT);
+    const aplicar = () => {
+      if (!atual) return;
       absorver();
       atualizarPrevia();
+      // a primeira mexida num campo leva a prévia até onde ele aparece (as seguintes só atualizam)
+      const qual = campoDoAjuste(alvo);
+      if (qual && qual !== viva.ajusteVisto) {
+        viva.ajusteVisto = qual;
+        const t = tempoDoAjuste(alvo);
+        if (t != null) irNaPrevia(t);
+      }
+      if (terminou) {
+        viva.ajusteVisto = null; // voltando a mexer nesse campo depois, a prévia vai até ele de novo
+        redesenharLinha();
+        if (viva.aba === "animacoes" || viva.aba === "finalizar") desenharAbaViva();
+        salvarDepois();
+        avisoDoAjuste(alvo);
+      }
+    };
+    if (terminou) aplicar(); else viva.ajusteT = setTimeout(aplicar, 120);
+  }
+
+  function campoDoAjuste(alvo) {
+    if (alvo.id) return alvo.id;
+    const tr = alvo.closest("#ed-elementos tr");
+    if (tr) return "el:" + tr.sectionRowIndex;
+    const li = alvo.closest("[data-clip]");
+    if (li) return "clip:" + li.dataset.clip;
+    if (alvo.dataset.palavra != null) return "palavra:" + alvo.dataset.palavra;
+    const leg = alvo.closest("#ed-legendas tr");
+    if (leg) return "leg:" + leg.sectionRowIndex;
+    return null;
+  }
+
+  // Em que segundo o ajuste aparece no vídeo (null = não muda de lugar, ex.: volume)
+  function tempoDoAjuste(alvo) {
+    const c = atual.config;
+    const id = alvo.id || "";
+    if (id === "ed-cor") return tempoDaCorDaMarca();
+    if (id === "ed-hook") return 1;
+    if (id === "ed-por-vez" || id === "ed-na-cor") {
+      const chaves = id === "ed-na-cor" ? new Set((c.palavrasNaCor || []).map(limpaTexto)) : null;
+      const w = (c.palavras || []).find((p) => !chaves || chaves.has(limpaTexto(p.texto)));
+      return w ? n(w.inicio) + 0.05 : null;
     }
+    const tr = alvo.closest("#ed-elementos tr");
+    if (tr) return tempoParaMostrar({ tipo: "el", i: tr.sectionRowIndex }, alvo.dataset.x === "fim" ? "d" : null);
+    const li = alvo.closest("[data-clip]");
+    if (li) {
+      const i = atual.clips.findIndex((x) => x.id === li.dataset.clip);
+      return i >= 0 ? tempoParaMostrar({ tipo: "clip", i }, alvo.dataset.tempo === "fim" ? "d" : null) : null;
+    }
+    if (alvo.dataset.palavra != null) {
+      const p = (c.palavras || [])[Number(alvo.dataset.palavra)];
+      return p ? n(p.inicio) + 0.05 : null;
+    }
+    const leg = alvo.closest("#ed-legendas tr");
+    if (leg) return tempoParaMostrar({ tipo: "leg", i: leg.sectionRowIndex });
+    return null;
+  }
+
+  // Primeiro texto na tela que usa a cor da marca (número, checklist, etiqueta, CTA, título de duas linhas…)
+  function tempoDaCorDaMarca() {
+    const c = atual.config;
+    const editorial = !!(c.estilo && c.estilo.tituloItalico); // títulos em itálico usam a cor do título, não a da marca
+    const linhas = (t) => String(t || "").split(/\s\/\s/).filter((s) => s.trim()).length;
+    const usa = (x) => ({
+      hook: !editorial && linhas(x.texto) > 1, titulo: !editorial && linhas(x.texto) > 1, destaque: x.extra === "cor",
+      lista: linhas(x.texto) > 1, numero: true, preco: true, checklist: true, etiqueta: true, cta: true, rotulo: true
+    })[x.tipo];
+    const x = (c.elementos || []).filter(usa).sort((a, b) => n(a.inicio) - n(b.inicio))[0];
+    if (x) return n(x.inicio) + Math.min(0.9, Math.max(0, (n(x.fim) - n(x.inicio)) / 2));
+    const jeito = (c.estilo || {}).legendaEstilo;
+    if ((jeito === "palavraCor" || jeito === "karaoke") && (c.palavras || []).length) return n(c.palavras[0].inicio) + 0.05;
+    return null;
+  }
+
+  // Quando o ajuste não tem onde aparecer, explica o porquê (uma vez só)
+  function avisoDoAjuste(alvo) {
+    viva.avisos = viva.avisos || new Set();
+    const c = atual.config;
+    const jeito = (c.estilo || {}).legendaEstilo;
+    const colorida = jeito === "palavraCor" || jeito === "karaoke";
+    let aviso = "";
+    if (alvo.id === "ed-cor" && tempoDaCorDaMarca() == null) {
+      aviso = "A cor da marca aparece em números, checklist, etiqueta, CTA e títulos de duas linhas. Este vídeo ainda não tem nenhum desses.";
+    } else if (alvo.id === "ed-na-cor" && !colorida) {
+      aviso = "A legenda está numa cor só. Para essas palavras ficarem coloridas, escolha “Palavra + cor” em Este vídeo → Jeito da legenda.";
+    }
+    if (aviso && !viva.avisos.has(alvo.id)) { viva.avisos.add(alvo.id); P.toast(aviso); }
   }
 
   function criar() {
@@ -1536,7 +1634,10 @@
   // Depois de cada mudança na linha do tempo, a prévia para no ponto mexido (assim a mudança aparece)
   function mostrarNaPrevia(sel, ponta) {
     const t = tempoParaMostrar(sel, ponta);
-    if (t == null) return;
+    if (t != null) irNaPrevia(t);
+  }
+
+  function irNaPrevia(t) {
     lt.cursor = Math.max(0, t);
     posicionarCursor();
     if (viva.ctrl) { viva.ctrl.pausar(); viva.ctrl.irPara(lt.cursor); }
