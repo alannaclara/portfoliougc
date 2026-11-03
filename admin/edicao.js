@@ -1702,6 +1702,7 @@
   };
   const ANIMACOES = { quique: ["Pop com quique", "o padrão"], adesivo: ["Adesivo", "cai girando"], flash: ["Flash", "revela da luz"], subir: ["Subir", "sobe devagar"], seco: ["Corte seco", "só aparece"] };
   const JEITOS_LEGENDA = { "": ["Do nicho", "como já está"], palavra: ["Uma palavra", "uma grande por vez"], palavraCor: ["Palavra + cor", "palavras-chave na cor"], karaoke: ["Karaokê", "a palavra falada acende"], linhas: ["Frases calmas", "poucas palavras pequenas"] };
+  const CAIXAS_LEGENDA = { minusculas: ["minúsculas", "o padrão"], normal: ["Como falado", "maiúscula só no começo"], maiusculas: ["MAIÚSCULAS", "tudo grande"] };
   const POSICOES_LEGENDA = { "": ["Do nicho", "como já está"], peito: ["Altura do peito", "o normal"], rosto: ["Perto do rosto", "acompanha você"], baixo: ["Mais embaixo", "longe do rosto"] };
   const SONS_FOTO = [["cliqueDuplo", "Clique duplo"], ["clique", "Clique"], ["cliqueSuave", "Clique suave"], ["popSuave", "Pop suave"], ["pop", "Pop"], ["adesivo", "Tapa de adesivo"], ["obturador", "Obturador de câmera"], ["nenhum", "Sem som"]];
   const CORES_TITULO = ["#3A3A3C", "#C9A27E", "#FFFFFF", "#F3EBD3", "#F2B8C6", "#E0263A", "#2B2D42", "#5B8DB8"];
@@ -1726,7 +1727,7 @@
     if (!carregarEditorVideo.promessa) {
       carregarEditorVideo.promessa = new Promise((ok, falha) => {
         const s = document.createElement("script");
-        s.src = "editor-video.js?v=1";
+        s.src = "editor-video.js?v=2";
         s.onload = () => (window.EditorVideo ? ok(window.EditorVideo) : falha(new Error("player não carregou")));
         s.onerror = () => { carregarEditorVideo.promessa = null; falha(new Error("não consegui baixar o player")); };
         document.head.appendChild(s);
@@ -2007,6 +2008,8 @@
       <section class="ev-secao"><h3>Legenda</h3>
         <p class="ev-rot">Jeito da legenda</p>
         <div class="ev-opcoes">${Object.entries(JEITOS_LEGENDA).map(([k, [t, d]]) => opcao("legendaEstilo", k, est.legendaEstilo || "", t, d, "", ocupado)).join("")}</div>
+        <p class="ev-rot">Letras da legenda</p>
+        <div class="ev-opcoes">${Object.entries(CAIXAS_LEGENDA).map(([k, [t, d]]) => opcao("legendaCaixa", k, est.legendaCaixa || "minusculas", t, d, "", ocupado)).join("")}</div>
         <p class="ev-rot">Posição da legenda</p>
         <div class="ev-opcoes">${Object.entries(POSICOES_LEGENDA).map(([k, [t, d]]) => opcao("legendaPosicao", k, est.legendaPosicao || "", t, d, "", ocupado)).join("")}</div>
         <p class="ev-rot">Tamanho da legenda: <b id="ev-tam-txt">${n(est.legendaTamanho || 100)}%</b></p>
