@@ -611,7 +611,7 @@
       ${c.elementos.length ? `<div class="tabela-rolagem"><table class="tabela ed-tabela ed-elementos">
         <thead><tr><th>Tipo</th><th>Texto</th><th>De</th><th>Até</th><th>Extra</th><th></th></tr></thead>
         <tbody id="ed-elementos">${c.elementos.map((x) => `
-          <tr><td><select data-x="tipo">${opcoes(x.tipo)}</select></td>
+          <tr data-pos="${P.esc(x.pos || "")}"><td><select data-x="tipo">${opcoes(x.tipo)}</select></td>
           <td><input data-x="texto" value="${P.esc(x.texto)}" placeholder="texto" aria-label="Texto"></td>
           <td><input type="text" inputmode="decimal" data-x="inicio" value="${x.inicio}" placeholder="de (s)" aria-label="De (segundos)"></td>
           <td><input type="text" inputmode="decimal" data-x="fim" value="${x.fim}" placeholder="até (s)" aria-label="Até (segundos)"></td>
@@ -660,7 +660,9 @@
         c.elementos = P.$$("#ed-elementos tr", secao).map((tr) => {
           const x = (k) => P.$(`[data-x=${k}]`, tr).value;
           const inicio = n(x("inicio"));
-          return { tipo: x("tipo"), texto: x("texto").trim().replace(/^["“]|["”]$/g, ""), inicio, fim: vazio(x("fim")) ? inicio + 2 : n(x("fim")), extra: x("extra").trim() };
+          // a posição só se escolhe na linha do tempo: a linha da tabela guarda a que já estava
+          return { tipo: x("tipo"), texto: x("texto").trim().replace(/^["“]|["”]$/g, ""), inicio, fim: vazio(x("fim")) ? inicio + 2 : n(x("fim")), extra: x("extra").trim(),
+            ...(tr.dataset.pos ? { pos: tr.dataset.pos } : {}) };
         });
       }
     }
@@ -1208,6 +1210,8 @@
         campo("Tipo", `<select data-campo="tipo">${Object.entries(TIPOS).map(([v, [t]]) => `<option value="${v}"${v === x.tipo ? " selected" : ""}>${t}</option>`).join("")}</select>`)
         + campo("Texto", txt("texto", x.texto, "use “ / ” para quebrar a linha"), true)
         + campo("Extra", txt("extra", x.extra, (TIPOS[x.tipo] || ["", ""])[1]))
+        + campo("Posição", `<select data-campo="pos">${[["", "Padrão do tipo"], ["topo", "Em cima (acima da cabeça)"], ["meio", "No meio (peito)"], ["baixo", "Embaixo"]]
+          .map(([v, t]) => `<option value="${v}"${(x.pos || "") === v ? " selected" : ""}>${t}</option>`).join("")}</select>`)
         + campo("De (s)", num("inicio", x.inicio)) + campo("Até (s)", num("fim", x.fim)),
         `<button class="botao" type="button" data-lt-acao="duplicar">${P.icone("copiar", "ico-p")}Duplicar</button>${apagar}`);
     }
