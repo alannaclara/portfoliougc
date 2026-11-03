@@ -158,8 +158,17 @@
       s.addEventListener("pointerdown", aoApertarLinha);
       // Mostra a porcentagem enquanto arrasta o volume
       s.addEventListener("input", (ev) => {
+        // faixas da edição ao vivo: a prévia muda enquanto arrasta
+        if (ev.target.closest("#ev") && ev.target.type === "range" && faixaViva(ev.target)) return;
         const txt = ev.target.id && P.$(`#${ev.target.id}-txt`, s);
         if (txt) txt.textContent = ev.target.value + "%";
+      });
+      // duplo clique numa palavra da aba Cortar: corrige a grafia da legenda
+      s.addEventListener("dblclick", (ev) => {
+        const p = ev.target.closest("[data-ev-p]");
+        if (!p) return;
+        clearTimeout(viva.cliqueP);
+        corrigirPalavra(p.dataset.evP);
       });
       await carregar();
     },
@@ -325,6 +334,8 @@
 
       ${blocoEstagiario(e, ocupado)}
 
+      ${blocoEdicaoViva(e, ocupado)}
+
       ${blocoLinhaDoTempo(e, ocupado)}
 
       <details class="ed-ajustes"${abrirAjustes ? " open" : ""}>
@@ -376,6 +387,7 @@
     if (player && novoPlayer) novoPlayer.appendChild(player);
     const novaRolagem = P.$("#lt-rolagem", secao);
     if (novaRolagem) novaRolagem.scrollLeft = rolagemX;
+    encaixarPlayer();
     tela.style.minHeight = "";
     pagina.scrollTop = rolagemPagina;
     posicionarCursor();
@@ -589,13 +601,13 @@
               <button class="botao botao-icone botao-perigo" type="button" data-acao="tirar-musica" aria-label="Tirar música">${P.icone("lixo", "ico-p")}</button></div>
             <span class="campo-ajuda">Ela toca o vídeo todo (repete se for curta) e entra e sai suave.</span></div>
           <div class="campo"><label for="ed-vol-musica">Volume da música: <span id="ed-vol-musica-txt">${P.num(m.volume)}%</span></label>
-            <input id="ed-vol-musica" type="range" min="0" max="100" step="5" value="${P.num(m.volume)}"></div>
+            <input id="ed-vol-musica" type="range" min="0" max="100" step="1" value="${P.num(m.volume)}"></div>
           <div class="campo"><label for="ed-musica-inicio">Começar a música em (segundos)</label>
             <input id="ed-musica-inicio" type="text" inputmode="decimal" value="${P.num(m.inicio)}">
             <span class="campo-ajuda">Para pular a introdução e cair direto no refrão.</span></div>`
         : `<p class="mudo pequeno largo">Sem música. Envie um MP3 ou M4A, de preferência sem direitos autorais (ou poste sem música e escolha um áudio do próprio Instagram).</p>`}
         <div class="campo"><label for="ed-vol-clipes">Som original dos clipes: <span id="ed-vol-clipes-txt">${P.num(c.somClipes)}%</span></label>
-          <input id="ed-vol-clipes" type="range" min="0" max="100" step="5" value="${P.num(c.somClipes)}">
+          <input id="ed-vol-clipes" type="range" min="0" max="100" step="1" value="${P.num(c.somClipes)}">
           <span class="campo-ajuda">0% = mudo. Em vídeo sem fala, deixe baixinho para ouvir só o secador ao fundo.</span></div>
       </div></div>`;
   }
@@ -831,6 +843,8 @@
     }
     // botões comuns (data-acao, como "Gerar 4K") que moram dentro da linha do tempo seguem para baixo
     if (ev.target.closest("#lt") && !ev.target.closest("[data-acao]")) return cliqueNaLinha(ev);
+    // edição ao vivo (os botões comuns dela, como "Gerar 4K", seguem para baixo)
+    if (ev.target.closest("#ev") && !ev.target.closest("[data-acao]") && cliqueVivo(ev)) return;
 
     const mover = ev.target.closest("[data-mover]");
     if (mover) return moverClipe(mover.closest("[data-clip]").dataset.clip, Number(mover.dataset.mover));
@@ -878,6 +892,7 @@
   }
 
   function aoMudar(ev) {
+    if (ev.target.closest("#ev") && mudancaViva(ev)) return;
     if (ev.target.id === "ed-fotos") {
       const arquivos = Array.from(ev.target.files || []);
       ev.target.value = "";
@@ -983,6 +998,9 @@
     if (atual.final) caminhos.push(...caminhosDe(atual.final));
     if (atual.config.musica && atual.config.musica.caminho) caminhos.push(...caminhosDe(atual.config.musica));
     atual.conversa.forEach((m) => (m.imagens || []).forEach((f) => caminhos.push(f.caminho)));
+    // prévia ao vivo que o estagiário preparou (as fotos da biblioteca ficam: servem para outros vídeos)
+    const previa = await banco.storage.from(BALDE).list(`${atual.id}/previa`, { limit: 1000 });
+    (previa.data || []).forEach((f) => caminhos.push(`${atual.id}/previa/${f.name}`));
     const erroArq = await apagarArquivos(caminhos);
     if (erroArq) return P.toast(erroArq, "erro");
     const erro = await P.gravar(TABELA, "apagar", null, atual.id);
@@ -1007,6 +1025,7 @@
   // Ao abrir outro vídeo ou voltar para a lista, nada do vídeo anterior fica pendurado
   function trocarDeVideo() {
     soltarVideo();
+    soltarPlayer();
     limparAnexos();
     ajustesAbertos = null;
     lt.sel = null;
@@ -1072,7 +1091,10 @@
      clique para editar. Mexer num clipe leva junto a legenda, os textos e os efeitos
      que estão em cima dele (como o "vincular" do CapCut).
      ========================================================= */
-  const EFEITOS = { whoosh: "Whoosh (transição)", pop: "Pop (texto que salta)", ding: "Ding (número, conquista)", click: "Click (toque na tela)" };
+  const EFEITOS = {
+    whoosh: "Whoosh (transição)", pop: "Pop (texto que salta)", ding: "Ding (número, conquista)", click: "Click (toque na tela)",
+    cliqueDuplo: "Clique duplo", cliqueSuave: "Clique suave", popSuave: "Pop suave", adesivo: "Tapa de adesivo", obturador: "Obturador de câmera"
+  };
   const LT_NOME = 96; // largura da coluna com o nome de cada camada (igual ao admin.css)
   const lt = { sel: null, historico: [], pps: 0, arrasto: null, cursor: 0, salvarDepois: null, ignorarClique: false };
   const fix = (v) => Math.round(v * 100) / 100;
@@ -1168,6 +1190,8 @@
         : `<span class="lt-vazio">sem música (envie em Ajustes finos ou ponha na pasta do Drive)</span>`);
       trilhas += trilha("Efeitos", (c.efeitos || []).map((x, i) => bloco("efeito", i, n(x.inicio), n(x.inicio) + 0.5,
         (EFEITOS[x.tipo] || x.tipo).split(" (")[0], "lt-efeito", { semPontas: true })).join(""));
+      trilhas += trilha("Fotos", (c.fotos || []).map((f, i) => bloco("foto", i, n(f.inicio), n(f.fim),
+        (LUGARES[f.lugar] || [f.lugar])[0], "lt-foto")).join("") || `<span class="lt-vazio">sem fotos (aba Fotos da edição ao vivo)</span>`);
     }
 
     return `<div class="cartao bloco lt-cartao" id="lt">
@@ -1249,6 +1273,16 @@
         + campo("Começar a música em (s)", num("inicio", c.musica.inicio)),
         `<button class="botao botao-perigo" type="button" data-lt-acao="apagar">${P.icone("lixo", "ico-p")}Tirar música</button>`);
     }
+    if (s.tipo === "foto") {
+      const f = (c.fotos || [])[s.i];
+      if (!f) return "";
+      const url = viva.urls.get(f.caminho);
+      return caixa("Foto no vídeo",
+        (url ? `<img class="lt-miniatura" src="${P.esc(url.url)}" alt="">` : "")
+        + campo("Onde aparece", `<select data-campo="lugar">${Object.entries(LUGARES).map(([v, [t]]) => `<option value="${v}"${v === f.lugar ? " selected" : ""}>${t}</option>`).join("")}</select>`)
+        + campo("De (s)", num("inicio", f.inicio)) + campo("Até (s)", num("fim", f.fim))
+        + `<p class="mudo pequeno lt-largo">Fotos no mesmo lugar e no mesmo segundo entram juntas, uma depois da outra (com som).</p>`, apagar);
+    }
     if (s.tipo === "efeito") {
       const x = (c.efeitos || [])[s.i];
       if (!x) return "";
@@ -1280,10 +1314,7 @@
 
   function mudou() {
     desenharEditor();
-    clearTimeout(lt.salvarDepois);
-    lt.salvarDepois = setTimeout(async () => {
-      if (atual && !travado()) await salvar({ config: atual.config, clips: atual.clips });
-    }, 800);
+    salvarDepois();
   }
 
   /* ---------- Mexer num clipe leva junto o que está em cima dele ---------- */
@@ -1294,27 +1325,36 @@
     const marcar = (obj, colado) => {
       const k = achar(n(obj.inicio));
       const x = atual.clips[k];
-      return x ? { obj, colado, clipe: x, src: n(obj.inicio) - inis[k] + n(x.inicio), dur: obj.fim != null ? n(obj.fim) - n(obj.inicio) : 0 } : null;
+      return x ? { obj, colado, clipe: x, chave: chavePrevia(x), src: n(obj.inicio) - inis[k] + n(x.inicio), dur: obj.fim != null ? n(obj.fim) - n(obj.inicio) : 0 } : null;
     };
-    // palavras e frases da Airlearn somem junto com o clipe; textos e efeitos ficam onde estão
+    // palavras e frases da Airlearn somem junto com o clipe; textos, efeitos e fotos ficam onde estão
     return [...(c.palavras || []).map((o) => marcar(o, true)), ...(c.legendas || []).map((o) => marcar(o, true)),
-      ...(c.elementos || []).map((o) => marcar(o, false)), ...(c.efeitos || []).map((o) => marcar(o, false))].filter(Boolean);
+      ...(c.elementos || []).map((o) => marcar(o, false)), ...(c.efeitos || []).map((o) => marcar(o, false)),
+      ...(c.fotos || []).map((o) => marcar(o, false))].filter(Boolean);
   }
 
   function reaplicar(ancoras) {
     const inis = iniciosDosClipes(atual.clips);
     const total = totalVideo(atual.clips);
     const fora = new Set();
+    const contem = (x, src) => src >= n(x.inicio) - 0.05 && src < n(x.inicio) + durClipe(x);
     ancoras.forEach((a) => {
-      const k = atual.clips.indexOf(a.clipe);
+      // o mesmo pedaço; se ele não tem mais esse segundo do vídeo (cortou uma palavra no meio, dividiu),
+      // o outro pedaço do mesmo vídeo que tem
+      let k = atual.clips.indexOf(a.clipe);
+      if (k < 0 || !contem(atual.clips[k], a.src)) {
+        const outro = atual.clips.findIndex((x) => !x.apagado && chavePrevia(x) === a.chave && contem(x, a.src));
+        if (outro >= 0) k = outro;
+      }
       if (k < 0) {
         if (a.colado) fora.add(a.obj);
         return;
       }
-      const ini = n(a.clipe.inicio);
-      const fim = ini + durClipe(a.clipe);
+      const x = atual.clips[k];
+      const ini = n(x.inicio);
+      const fim = ini + durClipe(x);
       let src = a.src;
-      if (src < ini - 0.05 || src >= fim) {
+      if (!contem(x, src)) {
         if (a.colado) { fora.add(a.obj); return; }
         src = Math.min(Math.max(src, ini), fim - 0.1);
       }
@@ -1392,6 +1432,7 @@
       const x = c.elementos[a.i];
       if (x.tipo === "flash") { x.inicio = fix(Math.max(0, n(x.inicio) + dt)); x.fim = x.inicio; } else mexer(x);
     } else if (a.tipo === "leg" && c.legendas[a.i]) mexer(c.legendas[a.i]);
+    else if (a.tipo === "foto" && c.fotos && c.fotos[a.i]) mexer(c.fotos[a.i], 0.4);
     else if (a.tipo === "efeito" && c.efeitos && c.efeitos[a.i]) c.efeitos[a.i].inicio = fix(Math.max(0, n(c.efeitos[a.i].inicio) + dt));
     else if (a.tipo === "frase") {
       const f = frasesDe(c.palavras)[a.i];
@@ -1452,6 +1493,7 @@
       posicionarCursor();
       const v = P.$("#ed-player video", secao);
       if (v && Number.isFinite(v.duration)) v.currentTime = Math.min(lt.cursor, v.duration);
+      if (viva.ctrl) viva.ctrl.irPara(lt.cursor); // a prévia ao vivo pula junto
     };
     mover(ev.clientX);
     const aoMover = (e2) => mover(e2.clientX);
@@ -1565,6 +1607,7 @@
     const c = atual.config;
     if (s.tipo === "el") c.elementos.splice(s.i, 1);
     else if (s.tipo === "efeito") (c.efeitos || []).splice(s.i, 1);
+    else if (s.tipo === "foto") (c.fotos || []).splice(s.i, 1);
     else if (s.tipo === "leg") c.legendas.splice(s.i, 1);
     else if (s.tipo === "frase") {
       const f = frasesDe(c.palavras)[s.i];
@@ -1607,6 +1650,9 @@
     } else if (s.tipo === "leg" && c.legendas[s.i]) {
       const l = c.legendas[s.i];
       if (k === "inicio" || k === "fim") tempos(l); else l[k] = v.trim();
+    } else if (s.tipo === "foto" && c.fotos && c.fotos[s.i]) {
+      const f = c.fotos[s.i];
+      if (k === "lugar") f.lugar = v; else tempos(f);
     } else if (s.tipo === "efeito" && c.efeitos && c.efeitos[s.i]) {
       c.efeitos[s.i][k] = k === "tipo" ? v : fix(k === "volume" ? Math.min(100, num) : num);
     } else if (s.tipo === "hook") c.hook = v.trim();
@@ -1642,6 +1688,715 @@
     mudou();
   }
 
+  /* =========================================================
+     EDIÇÃO AO VIVO (como o editor da referência)
+     O player usa o mesmo motor do 4K (admin/editor-video.js, gerado pelo meu-video/tools/construir-editor.mjs):
+     cada escolha aparece no vídeo na hora, sem renderizar. O vídeo da prévia é uma cópia leve que o
+     estagiário sobe para <id>/previa/ no Supabase, junto com o rosto acompanhado e a transcrição.
+     ========================================================= */
+  const LUGARES = {
+    acimaCabeca: ["Acima da cabeça", "uma foto em cima de você"],
+    grupo: ["Grupo ao redor", "várias fotos em volta do rosto"],
+    cartoes: ["Cartões", "empilham do lado direito"],
+    telaCheia: ["Tela cheia", "a foto toma a tela toda"]
+  };
+  const ANIMACOES = { quique: ["Pop com quique", "o padrão"], adesivo: ["Adesivo", "cai girando"], flash: ["Flash", "revela da luz"], subir: ["Subir", "sobe devagar"], seco: ["Corte seco", "só aparece"] };
+  const JEITOS_LEGENDA = { "": ["Do nicho", "como já está"], palavra: ["Uma palavra", "uma grande por vez"], palavraCor: ["Palavra + cor", "palavras-chave na cor"], karaoke: ["Karaokê", "a palavra falada acende"], linhas: ["Frases calmas", "poucas palavras pequenas"] };
+  const POSICOES_LEGENDA = { "": ["Do nicho", "como já está"], peito: ["Altura do peito", "o normal"], rosto: ["Perto do rosto", "acompanha você"], baixo: ["Mais embaixo", "longe do rosto"] };
+  const SONS_FOTO = [["cliqueDuplo", "Clique duplo"], ["clique", "Clique"], ["cliqueSuave", "Clique suave"], ["popSuave", "Pop suave"], ["pop", "Pop"], ["adesivo", "Tapa de adesivo"], ["obturador", "Obturador de câmera"], ["nenhum", "Sem som"]];
+  const CORES_TITULO = ["#3A3A3C", "#C9A27E", "#FFFFFF", "#F3EBD3", "#F2B8C6", "#E0263A", "#2B2D42", "#5B8DB8"];
+  const CHAVES = [["efeitosLigados", "efeitos sonoros", true], ["musicaLigada", "música", true], ["zoomCortes", "zoom nos cortes", true], ["brilho", "brilho acima da cabeça", false]];
+  const BIBLIOTECA = "_biblioteca";
+  const FONTE_BOOTZY = "_fontes/BootzyTM.ttf";
+
+  const viva = {
+    aba: "estilo", host: null, ctrl: null, idVideo: null, arquivos: null, urls: new Map(), rostos: {}, transcricao: null,
+    biblioteca: null, bootzy: null, lugarNovo: "grupo", duracaoFoto: 2.5, salvo: "salvo", espera: null, carregando: false
+  };
+
+  // Mesmo nome que o estagiário dá às prévias (meu-video/tools/renderizar.mjs: chavePrevia e chaveMusica)
+  const slug = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w.-]+/g, "_").slice(0, 80);
+  const chavePrevia = (c) => (c.origem === "drive" ? "drive-" + slug(c.nome) : "clip-" + slug(String(c.caminho || c.id || "").split("/").pop()));
+  const chaveMusica = (m) => `musica-${slug((m && m.nome) || "musica")}.mp3`;
+  const estiloAtual = () => (atual && atual.config.estilo) || {};
+  const ligado = (k, padrao) => (estiloAtual()[k] == null ? padrao : !!estiloAtual()[k]);
+
+  function carregarEditorVideo() {
+    if (window.EditorVideo) return Promise.resolve(window.EditorVideo);
+    if (!carregarEditorVideo.promessa) {
+      carregarEditorVideo.promessa = new Promise((ok, falha) => {
+        const s = document.createElement("script");
+        s.src = "editor-video.js?v=1";
+        s.onload = () => (window.EditorVideo ? ok(window.EditorVideo) : falha(new Error("player não carregou")));
+        s.onerror = () => { carregarEditorVideo.promessa = null; falha(new Error("não consegui baixar o player")); };
+        document.head.appendChild(s);
+      });
+    }
+    return carregarEditorVideo.promessa;
+  }
+
+  // Links temporários do Supabase (valem 1 h; renova quando faltar pouco)
+  async function assinar(caminhos) {
+    const agora = Date.now();
+    const faltam = [...new Set(caminhos.filter(Boolean))].filter((c) => !viva.urls.has(c) || viva.urls.get(c).ate < agora + 5 * 60000);
+    for (let i = 0; i < faltam.length; i += 100) {
+      const { data } = await banco.storage.from(BALDE).createSignedUrls(faltam.slice(i, i + 100), 3600);
+      (data || []).forEach((d) => { if (d.signedUrl) viva.urls.set(d.path, { url: d.signedUrl, ate: agora + 3600 * 1000 }); });
+    }
+  }
+  const urlDe = (caminho) => (viva.urls.get(caminho) || {}).url || "";
+
+  // Lista o que o estagiário já preparou para este vídeo e baixa rosto e transcrição
+  async function prepararPrevia(forcar) {
+    if (!atual || viva.carregando) return;
+    const id = atual.id;
+    if (viva.idVideo === id && viva.arquivos && !forcar) return;
+    viva.carregando = true;
+    try {
+      const { data } = await banco.storage.from(BALDE).list(`${id}/previa`, { limit: 1000 });
+      const nomes = new Set((data || []).map((f) => f.name));
+      if (!atual || atual.id !== id) return;
+      if (viva.idVideo !== id) { viva.rostos = {}; viva.transcricao = null; }
+      for (const nome of nomes) {
+        if (!nome.endsWith(".rosto.json") || viva.rostos[nome]) continue;
+        const r = await banco.storage.from(BALDE).download(`${id}/previa/${nome}`);
+        if (r.data) { try { viva.rostos[nome] = JSON.parse(await r.data.text()).amostras || []; } catch { /* rosto ruim: ignora */ } }
+      }
+      if (nomes.has("transcricao.json") && (!viva.transcricao || forcar)) {
+        const r = await banco.storage.from(BALDE).download(`${id}/previa/transcricao.json`);
+        if (r.data) { try { viva.transcricao = JSON.parse(await r.data.text()); } catch { viva.transcricao = null; } }
+      }
+      await assinar([...[...nomes].filter((n) => /\.(mp4|mp3)$/.test(n)).map((n) => `${id}/previa/${n}`),
+        ...(atual.config.fotos || []).map((f) => f.caminho), FONTE_BOOTZY]);
+      viva.bootzy = urlDe(FONTE_BOOTZY) || null;
+      if (viva.bootzy && !document.fonts.check("16px BootzyPainel")) {
+        new FontFace("BootzyPainel", `url("${viva.bootzy}")`).load().then((f) => document.fonts.add(f)).catch(() => {});
+      }
+      // só agora (com os links prontos) a prévia pode desenhar
+      if (atual && atual.id === id) { viva.idVideo = id; viva.arquivos = nomes; }
+    } finally {
+      viva.carregando = false;
+    }
+    if (atual && atual.id === id) {
+      atualizarPrevia();
+      desenharAbaViva();
+      // ainda falta prévia de algum trecho: confere de novo daqui a pouco (o estagiário prepara sozinho)
+      clearTimeout(viva.espera);
+      const faltam = atual.clips.some((x) => !x.apagado && !temPrevia(x)) || (!viva.transcricao && atual.clips.some((x) => x.origem === "drive"));
+      viva.tentativas = faltam ? (viva.tentativas || 0) + 1 : 0;
+      if (faltam && viva.tentativas <= 30) { // por uns 10 minutos
+        viva.espera = setTimeout(async () => {
+          if (!atual || atual.id !== id || !P.$("#ev", secao)) return;
+          const assinatura = () => [...(viva.arquivos || [])].sort().join("|") + (viva.transcricao ? "|T" : "");
+          const antes = assinatura();
+          await prepararPrevia(true);
+          // só redesenha se chegou prévia nova (e guarda antes o que estiver digitado)
+          if (atual && atual.id === id && assinatura() !== antes) { absorver(); desenharEditor(); }
+        }, 20000);
+      }
+    }
+  }
+
+  const temPrevia = (c) => viva.arquivos && viva.arquivos.has(`${chavePrevia(c)}.mp4`);
+
+  // Rosto de cada vídeo de origem levado para a linha do tempo, com o zoom de cada trecho (igual ao renderizar.mjs)
+  function rostoNaLinha(clips) {
+    const saida = [];
+    let t0 = 0;
+    const zoomLigado = ligado("zoomCortes", true);
+    clips.forEach((x) => {
+      const dur = durClipe(x);
+      const ini = n(x.inicio);
+      const z = zoomLigado ? n(x.zoom) || 1 : 1;
+      (viva.rostos[`${chavePrevia(x)}.rosto.json`] || []).forEach(([t, cx, cy, w, h]) => {
+        if (t < ini || t > ini + dur) return;
+        saida.push([t0 + t - ini, 0.5 + (cx - 0.5) * z, 0.5 + (cy - 0.5) * z, w * z, h * z]);
+      });
+      t0 += dur;
+    });
+    return saida;
+  }
+
+  function propsDaPrevia() {
+    const e = atual;
+    const c = e.config;
+    const vivos = e.clips.filter((x) => !x.apagado);
+    const clips = vivos.map((x) => ({
+      arquivo: temPrevia(x) ? urlDe(`${e.id}/previa/${chavePrevia(x)}.mp4`) : "",
+      inicio: n(x.inicio), fim: n(x.inicio) + durClipe(x), zoom: n(x.zoom) || 1
+    }));
+    const _frames = vivos.map((x) => Math.max(1, Math.round(durClipe(x) * 30)));
+    const frames = _frames.reduce((s, f) => s + f, 0) || 150;
+    if (e.modelo === "airlearn") {
+      return { modelo: "airlearn", frames, props: { clips, _frames, hook: c.hook || "", legendas: (c.legendas || []).filter((l) => (l.falada || "").trim() || (l.ingles || "").trim()) } };
+    }
+    const m = c.musica;
+    const urlMusica = m && viva.arquivos && viva.arquivos.has(chaveMusica(m)) ? urlDe(`${e.id}/previa/${chaveMusica(m)}`) : "";
+    return {
+      modelo: "nicho", frames, props: {
+        clips, _frames, nicho: e.modelo, corMarca: c.corMarca || undefined,
+        palavras: c.palavras || [], palavrasPorVez: n(c.palavrasPorVez) || undefined, palavrasNaCor: c.palavrasNaCor || [],
+        elementos: (c.elementos || []).filter((x) => x.tipo && ((x.texto || "").trim() || x.tipo === "flash")),
+        somClipes: c.somClipes == null ? 1 : n(c.somClipes) / 100,
+        musica: urlMusica ? { arquivo: urlMusica, volume: n(m.volume ?? 60) / 100, inicio: n(m.inicio) } : undefined,
+        fonteLegenda: viva.bootzy || undefined,
+        estilo: c.estilo || undefined,
+        fotos: (c.fotos || []).map((f) => ({ src: urlDe(f.caminho), inicio: n(f.inicio), fim: n(f.fim), lugar: f.lugar || "grupo" })).filter((f) => f.src),
+        rosto: rostoNaLinha(vivos),
+        sons: { base: "sons/", lista: c.efeitos || [] }
+      }
+    };
+  }
+
+  function atualizarPrevia() {
+    // espera saber o que já está pronto (senão o player tentaria a fonte e os vídeos antes de ter os links)
+    if (!viva.ctrl || !atual || !viva.arquivos || viva.idVideo !== atual.id) return;
+    try { viva.ctrl.atualizar(propsDaPrevia()); } catch (e) { console.error("prévia", e); }
+  }
+
+  // O player fica vivo entre os redesenhos da tela: só muda de lugar
+  async function encaixarPlayer() {
+    const vaga = P.$("#ev-player", secao);
+    if (!vaga || !atual) return;
+    if (!viva.host) {
+      viva.host = document.createElement("div");
+      viva.host.className = "ev-host";
+    }
+    if (viva.host.parentNode !== vaga) vaga.appendChild(viva.host);
+    if (!viva.ctrl) {
+      try {
+        const EV = await carregarEditorVideo();
+        if (!atual || viva.ctrl) return;
+        viva.ctrl = EV.montar(viva.host);
+        desenharAbaViva(); // agora os botões de fonte já aparecem escritos na própria fonte
+        viva.ctrl.aoTempo((s) => {
+          lt.cursor = s;
+          posicionarCursor();
+          const rol = P.$("#lt-rolagem", secao);
+          const x = LT_NOME + s * lt.pps;
+          if (rol && viva.ctrl.tocando() && (x < rol.scrollLeft + LT_NOME || x > rol.scrollLeft + rol.clientWidth - 40)) rol.scrollLeft = x - LT_NOME - 40;
+        });
+      } catch (e) {
+        vaga.innerHTML = `<div class="ev-sem-player">Não consegui abrir o player. Recarregue a página (Ctrl+Shift+R).</div>`;
+        return;
+      }
+    }
+    atualizarPrevia();
+    prepararPrevia(false);
+  }
+
+  function soltarPlayer() {
+    if (viva.ctrl) viva.ctrl.destruir();
+    if (viva.host) viva.host.remove();
+    clearTimeout(viva.espera);
+    Object.assign(viva, { host: null, ctrl: null, idVideo: null, arquivos: null, rostos: {}, transcricao: null, salvo: "salvo", tentativas: 0 });
+  }
+
+  // Mudou alguma escolha: aparece na prévia na hora, salva sozinho logo depois
+  function salvarDepois() {
+    viva.salvo = "salvando";
+    marcarSalvo();
+    clearTimeout(lt.salvarDepois);
+    lt.salvarDepois = setTimeout(async () => {
+      if (atual && !travado()) {
+        const ok = await salvar({ config: atual.config, clips: atual.clips });
+        viva.salvo = ok ? "salvo" : "erro";
+        marcarSalvo();
+      }
+    }, 800);
+  }
+  function marcarSalvo() {
+    const el = P.$("#ev-salvo", secao);
+    if (el) el.textContent = viva.salvo === "salvando" ? "Salvando…" : viva.salvo === "erro" ? "Não salvou: tente de novo" : "Tudo salvo";
+  }
+
+  function mudarEstilo(k, v, { redesenhar = "aba" } = {}) {
+    if (!atual || travado()) return;
+    guardar();
+    atual.config.estilo = Object.assign({}, atual.config.estilo, { [k]: v });
+    atualizarPrevia();
+    if (redesenhar === "tudo") desenharEditor(); else desenharAbaViva();
+    salvarDepois();
+  }
+
+  /* ---------- Desenho ---------- */
+  function blocoEdicaoViva(e, ocupado) {
+    if (!e.clips.length) return "";
+    const est = estiloAtual();
+    const abas = [["cortar", "Cortar"], ["estilo", "Este vídeo"], ["fotos", "Fotos"], ["som", "Som"], ["finalizar", "Finalizar"]];
+    const qtdPrevias = viva.arquivos ? e.clips.filter((x) => !x.apagado && temPrevia(x)).length : 0;
+    const vivos = e.clips.filter((x) => !x.apagado).length;
+    return `<div class="cartao bloco ev" id="ev">
+      <div class="ev-topo">
+        <h2>${P.icone("play", "ico-p")} Edição ao vivo</h2>
+        <nav class="ev-abas" aria-label="Partes da edição">${abas.map(([k, t]) =>
+          `<button type="button" class="ev-aba${viva.aba === k ? " ev-aba-ativa" : ""}" data-ev-aba="${k}">${t}</button>`).join("")}</nav>
+        <span class="ev-salvo mudo pequeno" id="ev-salvo">${viva.salvo === "salvando" ? "Salvando…" : "Tudo salvo"}</span>
+      </div>
+      <div class="ev-grade">
+        <div class="ev-esquerda">
+          <div class="ev-player" id="ev-player"></div>
+          ${viva.arquivos && qtdPrevias < vivos ? `<p class="ev-aviso mudo pequeno">${qtdPrevias ? "Parte" : "Nenhuma parte"} da prévia está pronta (${qtdPrevias} de ${vivos} trechos). O estagiário prepara sozinho com o computador ligado; os textos já aparecem.</p>` : ""}
+          ${e.modelo === "airlearn" ? "" : `<div class="ev-chaves">${CHAVES.map(([k, t, padrao]) =>
+            `<label><input type="checkbox" data-ev-chave="${k}"${(est[k] == null ? padrao : est[k]) ? " checked" : ""}${ocupado ? " disabled" : ""}> ${t}</label>`).join("")}</div>`}
+        </div>
+        <div class="ev-direita" id="ev-aba">${abaViva(e, ocupado)}</div>
+      </div>
+    </div>`;
+  }
+
+  function desenharAbaViva() {
+    const caixa = P.$("#ev-aba", secao);
+    if (!caixa || !atual) return;
+    const rolagem = caixa.scrollTop;
+    caixa.innerHTML = abaViva(atual, travado());
+    caixa.scrollTop = rolagem;
+    P.$$(".ev-aba", secao).forEach((b) => b.classList.toggle("ev-aba-ativa", b.dataset.evAba === viva.aba));
+  }
+
+  function abaViva(e, ocupado) {
+    if (viva.aba === "cortar") return abaCortar(e, ocupado);
+    if (viva.aba === "fotos") return abaFotos(e, ocupado);
+    if (viva.aba === "som") return abaSom(e, ocupado);
+    if (viva.aba === "finalizar") return abaFinalizar(e, ocupado);
+    return abaEstilo(e, ocupado);
+  }
+
+  const opcao = (grupo, valor, atualValor, titulo, desc, estiloTexto, ocupado) => `<button type="button" class="ev-opcao${atualValor === valor ? " ev-opcao-sel" : ""}"
+    data-ev-estilo="${grupo}" data-valor="${P.esc(valor)}"${ocupado ? " disabled" : ""}>
+    <span class="ev-opcao-nome"${estiloTexto ? ` style="${estiloTexto}"` : ""}>${titulo}</span>${desc ? `<small>${P.esc(desc)}</small>` : ""}</button>`;
+
+  function familiaNoPainel(lista, chave) {
+    try { return window.EditorVideo ? window.EditorVideo.carregarFonte(lista, chave) : null; } catch { return null; }
+  }
+
+  function abaEstilo(e, ocupado) {
+    if (e.modelo === "airlearn") return `<p class="mudo">O formato Airlearn é fixo (hook do Snapchat e legenda dupla). Os estilos desta aba valem para os nichos.</p>`;
+    const est = estiloAtual();
+    const c = e.config;
+    const fontes = window.EditorVideo ? window.EditorVideo.fontes : null;
+    const palavras = (c.palavras || []).length;
+    const eventos = (c.elementos || []).length + (c.fotos || []).length + (c.efeitos || []).length;
+    const fonteBotao = (lista, f, italico) => {
+      const fam = familiaNoPainel(lista, f.chave);
+      return fam ? `font-family:'${fam}';${italico ? "font-style:italic;" : ""}font-weight:${f.peso}` : "";
+    };
+    return `
+      <div class="ev-passos">
+        <div class="ev-passo"><b>1</b>Você grava. As pausas são cortadas sozinhas e seu rosto é acompanhado quadro a quadro.</div>
+        <div class="ev-passo"><b>2</b>Sua fala é transcrita palavra por palavra (Whisper): ${P.plural(palavras, "palavra", "palavras")}, ${seg(totalVideo(e.clips.filter((x) => !x.apagado)))}.</div>
+        <div class="ev-passo"><b>3</b>Palavras-chave ganham eventos: foto da sua biblioteca, texto, efeito. ${eventos} neste vídeo.</div>
+        <div class="ev-passo"><b>4</b>Cada evento ganha um som. O motor desenha os quadros e junta vídeo, voz e música em 4K.</div>
+      </div>
+      <section class="ev-secao"><h3>Fontes</h3>
+        ${fontes ? `
+        <p class="ev-rot">Título · parte grande em itálico</p>
+        <div class="ev-opcoes">${opcao("tituloItalico", "", est.tituloItalico || "", "Do nicho", "Anton, caixa alta", "font-family:Anton,Impact,sans-serif;text-transform:uppercase", ocupado)}
+          ${fontes.italico.map((f) => opcao("tituloItalico", f.chave, est.tituloItalico || "", f.nome, f.desc, fonteBotao("italico", f, true), ocupado)).join("")}</div>
+        <p class="ev-rot">Título · primeira parte</p>
+        <div class="ev-opcoes">${fontes.primeira.map((f) => opcao("tituloPrimeira", f.chave, est.tituloPrimeira || "interTight", f.nome, f.desc, fonteBotao("primeira", f), ocupado)).join("")}</div>
+        <p class="ev-rot">Cor do título</p>
+        <div class="ev-cores">${CORES_TITULO.map((cor) => `<button type="button" class="ev-cor${(est.corTitulo || "#C9A27E").toUpperCase() === cor ? " ev-cor-sel" : ""}" data-ev-estilo="corTitulo" data-valor="${cor}" style="background:${cor}" aria-label="Cor ${cor}"${ocupado ? " disabled" : ""}></button>`).join("")}
+          <label class="ev-cor-livre" title="Outra cor"><input type="color" data-ev-cor="corTitulo" value="${P.esc(est.corTitulo || "#C9A27E")}"${ocupado ? " disabled" : ""}></label></div>
+        ${est.tituloItalico ? "" : `<p class="mudo pequeno">As fontes do título valem quando a parte em itálico não é “Do nicho”.</p>`}
+        <p class="ev-rot">Legenda</p>
+        <div class="ev-opcoes">${opcao("legendaFonte", "bootzy", est.legendaFonte || "bootzy", "Bootzy", "a sua fonte", "font-family:BootzyPainel,sans-serif", ocupado)}
+          ${fontes.legenda.map((f) => opcao("legendaFonte", f.chave, est.legendaFonte || "bootzy", f.nome, f.desc, fonteBotao("legenda", f), ocupado)).join("")}</div>`
+        : `<p class="mudo pequeno">Carregando as fontes…</p>`}
+      </section>
+      <section class="ev-secao"><h3>Legenda</h3>
+        <p class="ev-rot">Jeito da legenda</p>
+        <div class="ev-opcoes">${Object.entries(JEITOS_LEGENDA).map(([k, [t, d]]) => opcao("legendaEstilo", k, est.legendaEstilo || "", t, d, "", ocupado)).join("")}</div>
+        <p class="ev-rot">Posição da legenda</p>
+        <div class="ev-opcoes">${Object.entries(POSICOES_LEGENDA).map(([k, [t, d]]) => opcao("legendaPosicao", k, est.legendaPosicao || "", t, d, "", ocupado)).join("")}</div>
+        <p class="ev-rot">Tamanho da legenda: <b id="ev-tam-txt">${n(est.legendaTamanho || 100)}%</b></p>
+        <input type="range" class="ev-faixa" min="60" max="150" step="5" value="${n(est.legendaTamanho || 100)}" data-ev-num="legendaTamanho" data-txt="ev-tam-txt" data-sufixo="%"${ocupado ? " disabled" : ""}>
+        <p class="mudo pequeno">A legenda nunca entra nos 20% de baixo da tela, onde o Instagram mostra seu nome e a legenda do post.</p>
+      </section>
+      <section class="ev-secao"><h3>Animação das fotos</h3>
+        <div class="ev-opcoes">${Object.entries(ANIMACOES).map(([k, [t, d]]) => opcao("fotoAnimacao", k, est.fotoAnimacao || "quique", t, d, "", ocupado)).join("")}</div>
+      </section>
+      <div class="ev-rodape"><button class="botao botao-principal" type="button" data-ev-aba="fotos">Próximo: fotos ›</button></div>`;
+  }
+
+  function abaSom(e, ocupado) {
+    if (e.modelo === "airlearn") return `<p class="mudo">No formato Airlearn o som é o dos clipes. Música e efeitos ficam nos nichos.</p>`;
+    const est = estiloAtual();
+    const c = e.config;
+    const m = c.musica;
+    const bloqueio = ocupado ? " disabled" : "";
+    return `
+      <section class="ev-secao"><h3>Efeitos sonoros</h3>
+        <p class="ev-rot">Som quando uma foto aparece <span class="mudo">(clique para ouvir)</span></p>
+        <div class="ev-opcoes">${SONS_FOTO.map(([k, t]) => opcao("fotoSom", k, est.fotoSom || "popSuave", t, "", "", ocupado)).join("")}</div>
+        <p class="ev-rot">Volume dos efeitos: <b id="ev-vol-sfx">${n(est.efeitosVolume ?? 100)}%</b></p>
+        <input type="range" class="ev-faixa" min="0" max="150" step="5" value="${n(est.efeitosVolume ?? 100)}" data-ev-num="efeitosVolume" data-txt="ev-vol-sfx" data-sufixo="%"${bloqueio}>
+        <p class="mudo pequeno">Os efeitos dos textos (whoosh, pop, ding) ficam na faixa “Efeitos” da linha do tempo: arraste, troque o som ou apague.</p>
+      </section>
+      <section class="ev-secao"><h3>Música</h3>
+        ${m ? `<p><b>${P.esc(m.nome || "música")}</b> ${viva.arquivos && viva.arquivos.has(chaveMusica(m)) ? "" : `<span class="mudo pequeno">· a prévia da música fica pronta com o estagiário</span>`}</p>
+          <p class="ev-rot">Volume da música: <b id="ev-vol-mus">${n(m.volume ?? 60)}%</b></p>
+          <input type="range" class="ev-faixa" min="0" max="100" step="1" value="${n(m.volume ?? 60)}" data-ev-musica="volume" data-txt="ev-vol-mus" data-sufixo="%"${bloqueio}>
+          <label class="ev-marcar"><input type="checkbox" data-ev-chave="musicaAbaixa"${est.musicaAbaixa ? " checked" : ""}${bloqueio}> abaixa sozinha quando você fala</label>
+          <p class="ev-rot">Entrada e saída suave: <b id="ev-fade">${String(n(est.musicaFade ?? 0.5)).replace(".", ",")} s</b></p>
+          <input type="range" class="ev-faixa" min="0" max="4" step="0.5" value="${n(est.musicaFade ?? 0.5)}" data-ev-num="musicaFade" data-txt="ev-fade" data-sufixo=" s"${bloqueio}>
+          <p class="ev-rot">Começar a música em: <b id="ev-mus-ini">${String(n(m.inicio)).replace(".", ",")} s</b></p>
+          <input type="range" class="ev-faixa" min="0" max="120" step="0.5" value="${n(m.inicio)}" data-ev-musica="inicio" data-txt="ev-mus-ini" data-sufixo=" s"${bloqueio}>`
+        : `<p class="mudo pequeno">Sem música. Ponha um MP3 na pasta do Drive e peça ao estagiário, ou envie aqui.</p>`}
+        <label class="botao${enviando || ocupado ? " ed-desligado" : ""}" style="margin-top:8px">${P.icone("subir", "ico-p")}${m ? "Trocar música" : "Enviar música"}
+          <input type="file" id="ev-musica" accept="audio/*,.mp3,.m4a,.wav,.aac" hidden${enviando || ocupado ? " disabled" : ""}></label>
+      </section>
+      <section class="ev-secao"><h3>Som original dos clipes</h3>
+        <p class="ev-rot">Volume da sua voz e do ambiente: <b id="ev-vol-clip">${n(c.somClipes ?? 100)}%</b></p>
+        <input type="range" class="ev-faixa" min="0" max="100" step="5" value="${n(c.somClipes ?? 100)}" data-ev-clipes="1" data-txt="ev-vol-clip" data-sufixo="%"${bloqueio}>
+      </section>
+      <div class="ev-rodape"><button class="botao botao-principal" type="button" data-ev-aba="finalizar">Próximo: finalizar ›</button></div>`;
+  }
+
+  function abaFotos(e, ocupado) {
+    if (e.modelo === "airlearn") return `<p class="mudo">Fotos no vídeo ficam nos nichos (o formato Airlearn é fixo).</p>`;
+    const c = e.config;
+    const usadasAqui = new Set((c.fotos || []).map((f) => f.caminho));
+    const usadasEmOutros = new Set();
+    lista.forEach((x) => { if (x.id !== e.id) ((x.config || {}).fotos || []).forEach((f) => usadasEmOutros.add(f.caminho)); });
+    const bib = viva.biblioteca;
+    const perto = (t) => {
+      const ws = (c.palavras || []).filter((w) => w.inicio >= t - 0.6 && w.inicio <= t + 1.2).slice(0, 4).map((w) => w.texto);
+      return ws.length ? ` · “${P.esc(ws.join(" "))}”` : "";
+    };
+    return `
+      <section class="ev-secao"><h3>Fotos no vídeo</h3>
+        <p class="ev-rot">Onde a próxima foto aparece</p>
+        <div class="ev-opcoes">${Object.entries(LUGARES).map(([k, [t, d]]) => `<button type="button" class="ev-opcao${viva.lugarNovo === k ? " ev-opcao-sel" : ""}" data-ev-lugar="${k}"${ocupado ? " disabled" : ""}><span class="ev-opcao-nome">${t}</span><small>${d}</small></button>`).join("")}</div>
+        <p class="ev-rot">Quanto tempo fica: <b id="ev-dur-foto">${String(viva.duracaoFoto).replace(".", ",")} s</b></p>
+        <input type="range" class="ev-faixa" min="1" max="6" step="0.5" value="${viva.duracaoFoto}" data-ev-dur="1" data-txt="ev-dur-foto" data-sufixo=" s"${ocupado ? " disabled" : ""}>
+        <p class="mudo pequeno">Pare o vídeo no momento da fala (ou clique na régua da linha do tempo) e toque numa foto da biblioteca: ela entra ali, com som e animação. Várias fotos no mesmo segundo formam um grupo.</p>
+        ${(c.fotos || []).length ? `<ul class="ev-fotos-usadas">${c.fotos.map((f, i) => `<li>
+            ${urlDe(f.caminho) ? `<img src="${P.esc(urlDe(f.caminho))}" alt="">` : `<span class="ev-sem-img"></span>`}
+            <div class="cresce"><b>${(LUGARES[f.lugar] || [f.lugar])[0]}</b><div class="mudo pequeno">${seg(f.inicio)} a ${seg(f.fim)}${perto(n(f.inicio))}</div></div>
+            <button class="botao botao-icone" type="button" data-ev-ir="${n(f.inicio)}" aria-label="Ver no vídeo">${P.icone("play", "ico-p")}</button>
+            <button class="botao botao-icone botao-perigo" type="button" data-ev-tirar-foto="${i}" aria-label="Tirar do vídeo"${ocupado ? " disabled" : ""}>${P.icone("x", "ico-p")}</button></li>`).join("")}</ul>`
+          : `<p class="mudo pequeno">Nenhuma foto neste vídeo ainda.</p>`}
+      </section>
+      <section class="ev-secao"><h3>Sua biblioteca</h3>
+        <p class="mudo pequeno">As fotos ficam guardadas para todos os vídeos. As marcadas “usada” já estão em outro vídeo.</p>
+        <label class="botao${ocupado ? " ed-desligado" : ""}">${P.icone("subir", "ico-p")}Enviar fotos
+          <input type="file" id="ev-fotos-up" accept="image/*" multiple hidden${ocupado ? " disabled" : ""}></label>
+        <div id="ev-envio-fotos"></div>
+        ${bib == null ? `<p class="mudo pequeno">Carregando a biblioteca…</p>`
+          : bib.length ? `<div class="ev-biblioteca">${bib.map((b) => `<div class="ev-foto-bib${usadasAqui.has(b.caminho) ? " ev-foto-aqui" : ""}">
+              <button type="button" data-ev-add-foto="${P.esc(b.caminho)}" aria-label="Pôr esta foto no cursor"${ocupado ? " disabled" : ""}>${urlDe(b.caminho) ? `<img src="${P.esc(urlDe(b.caminho))}" alt="" loading="lazy">` : ""}</button>
+              ${usadasEmOutros.has(b.caminho) ? `<span class="ev-usada">usada</span>` : ""}
+              ${usadasAqui.has(b.caminho) || usadasEmOutros.has(b.caminho) ? "" : `<button type="button" class="ev-foto-apagar" data-ev-apagar-bib="${P.esc(b.caminho)}" aria-label="Apagar da biblioteca">${P.icone("x", "ico-p")}</button>`}
+            </div>`).join("")}</div>`
+          : `<p class="mudo pequeno">Sua biblioteca está vazia. Envie fotos (de produto, prints, fotos suas).</p>`}
+      </section>
+      <div class="ev-rodape"><button class="botao botao-principal" type="button" data-ev-aba="som">Próximo: som ›</button></div>`;
+  }
+
+  // Aba Cortar: a fala inteira; clicar numa palavra corta (fica riscada) e clicar de novo traz de volta
+  function abaCortar(e, ocupado) {
+    if (e.modelo === "airlearn") return `<p class="mudo">No formato Airlearn, corte pela linha do tempo (pontas dos clipes).</p>`;
+    if (!viva.transcricao) {
+      return `<p class="mudo">A transcrição palavra por palavra aparece aqui quando o estagiário preparar a prévia deste vídeo (deixe o computador ligado).
+        Enquanto isso, dá para cortar pela linha do tempo: puxe as pontas dos clipes ou use “Dividir no cursor”.</p>`;
+    }
+    const vivos = e.clips.filter((x) => !x.apagado);
+    const correcoes = e.config.correcoes || {};
+    const fontes = [...new Set(vivos.map(chavePrevia))].filter((ch) => viva.transcricao[ch]);
+    if (!fontes.length) return `<p class="mudo">Não tenho a transcrição destes clipes (só dos vídeos que vieram da pasta do Drive).</p>`;
+    let cortadas = 0;
+    const blocos = fontes.map((ch) => {
+      const palavras = viva.transcricao[ch];
+      const pedacos = vivos.filter((x) => chavePrevia(x) === ch);
+      const dentro = (w) => pedacos.some((x) => w.inicio >= n(x.inicio) - 0.02 && w.inicio < n(x.inicio) + durClipe(x));
+      return `<p class="ev-fala">${palavras.map((w, i) => {
+        const fica = dentro(w);
+        if (!fica) cortadas++;
+        const texto = correcoes[`${ch}|${i}`] ?? w.texto;
+        return `<span class="ev-p${fica ? "" : " ev-p-cortada"}" data-ev-p="${P.esc(ch)}|${i}" title="${seg(w.inicio)} · clique para ${fica ? "cortar" : "trazer de volta"}, duplo clique para corrigir">${P.esc(texto)}</span>`;
+      }).join(" ")}</p>`;
+    }).join("");
+    const pausas = Math.max(0, vivos.length - fontes.length);
+    return `
+      <p class="mudo pequeno">Clique numa palavra para cortar (ou várias, uma por uma). Clique numa riscada para trazer de volta. Duplo clique corrige a grafia da legenda.${ocupado ? " <b>O computador está mexendo neste vídeo agora.</b>" : ""}</p>
+      <div class="ev-fala-caixa${ocupado ? " ev-travado" : ""}">${blocos}</div>
+      <p class="mudo pequeno">${P.plural(pausas, "trecho cortado", "trechos cortados")} entre as falas · ${P.plural(cortadas, "palavra fora", "palavras fora")} do vídeo.</p>
+      <div class="ev-rodape"><button class="botao botao-principal" type="button" data-ev-aba="estilo">Próximo: este vídeo ›</button></div>`;
+  }
+
+  function abaFinalizar(e, ocupado) {
+    const c = e.config;
+    const vivos = e.clips.filter((x) => !x.apagado);
+    const f = e.final;
+    return `
+      <section class="ev-secao"><h3>Resumo</h3>
+        <ul class="ev-resumo">
+          <li><b>${seg(totalVideo(vivos))}</b> de vídeo em ${P.plural(vivos.length, "trecho", "trechos")}</li>
+          <li><b>${(c.elementos || []).length}</b> textos na tela · <b>${(c.fotos || []).length}</b> fotos · <b>${(c.efeitos || []).length}</b> efeitos</li>
+          <li>Legenda: ${(c.palavras || []).length} palavras${c.musica ? ` · música: ${P.esc(c.musica.nome || "")}` : " · sem música"}</li>
+        </ul>
+        <p class="mudo pequeno">A prévia é leve para ser rápida. O vídeo final sai em 4K (2160×3840), com o mesmo visual da prévia.</p>
+        <button class="botao botao-principal" type="button" data-acao="pedir-render"${!vivos.length || ocupado ? " disabled" : ""}>${P.icone("play", "ico-p")}Gerar 4K com estas escolhas</button>
+        ${f ? `<p style="margin-top:12px"><b>Último 4K:</b> <span class="mudo pequeno">${new Date(f.gerado_em).toLocaleString("pt-BR")} · ${tamanho(f.tamanho)}</span></p>
+          <div class="grupo-botoes"><button class="botao" type="button" data-acao="assistir">${P.icone("play", "ico-p")}Assistir</button>
+          <button class="botao" type="button" data-acao="baixar">${P.icone("baixar", "ico-p")}Baixar MP4</button></div>` : ""}
+      </section>`;
+  }
+
+  /* ---------- Cliques e mudanças da edição ao vivo ---------- */
+  function cliqueVivo(ev) {
+    const aba = ev.target.closest("[data-ev-aba]");
+    if (aba) {
+      viva.aba = aba.dataset.evAba;
+      if (viva.aba === "fotos" && viva.biblioteca == null) carregarBiblioteca();
+      desenharAbaViva();
+      const caixa = P.$("#ev-aba", secao);
+      if (caixa) caixa.scrollTop = 0;
+      return true;
+    }
+    const opc = ev.target.closest("[data-ev-estilo]");
+    if (opc) {
+      const k = opc.dataset.evEstilo;
+      const v = opc.dataset.valor;
+      if (k === "fotoSom" && v !== "nenhum") tocarAmostra(v);
+      mudarEstilo(k, v);
+      return true;
+    }
+    const lugar = ev.target.closest("[data-ev-lugar]");
+    if (lugar) { viva.lugarNovo = lugar.dataset.evLugar; desenharAbaViva(); return true; }
+    const add = ev.target.closest("[data-ev-add-foto]");
+    if (add) { adicionarFoto(add.dataset.evAddFoto); return true; }
+    const apagarBib = ev.target.closest("[data-ev-apagar-bib]");
+    if (apagarBib) { apagarDaBiblioteca(apagarBib.dataset.evApagarBib); return true; }
+    const tirar = ev.target.closest("[data-ev-tirar-foto]");
+    if (tirar) {
+      if (travado()) return true;
+      guardar();
+      atual.config.fotos.splice(Number(tirar.dataset.evTirarFoto), 1);
+      mudou();
+      return true;
+    }
+    const ir = ev.target.closest("[data-ev-ir]");
+    if (ir) { if (viva.ctrl) viva.ctrl.irPara(n(ir.dataset.evIr)); return true; }
+    const p = ev.target.closest("[data-ev-p]");
+    if (p) {
+      // espera um instante: se for duplo clique, é correção (não corte)
+      clearTimeout(viva.cliqueP);
+      viva.cliqueP = setTimeout(() => alternarPalavra(p.dataset.evP), 230);
+      return true;
+    }
+    return false;
+  }
+
+  function tocarAmostra(tipo) {
+    try { const a = new Audio(`sons/${tipo}.mp3`); a.volume = 0.8; a.play().catch(() => {}); } catch { /* sem som no navegador */ }
+  }
+
+  function mudancaViva(ev) {
+    const t = ev.target;
+    if (t.dataset.evChave) { mudarEstilo(t.dataset.evChave, t.checked); return true; }
+    if (t.dataset.evCor) { mudarEstilo(t.dataset.evCor, t.value.toUpperCase()); return true; }
+    if (t.id === "ev-fotos-up") { const arqs = Array.from(t.files || []); t.value = ""; enviarFotosBiblioteca(arqs); return true; }
+    if (t.id === "ev-musica") { const arq = (t.files || [])[0]; t.value = ""; enviarMusica(arq); return true; }
+    // faixas: o "input" já mexeu na prévia; aqui, ao soltar, guarda e salva
+    if (t.dataset.evNum || t.dataset.evMusica || t.dataset.evClipes) { salvarDepois(); return true; }
+    if (t.dataset.evDur) { viva.duracaoFoto = n(t.value); return true; }
+    return false;
+  }
+
+  // Enquanto arrasta uma faixa (volume, tamanho...), a prévia muda junto
+  function faixaViva(t) {
+    if (!atual || travado()) return false;
+    const valor = n(t.value);
+    const txt = t.dataset.txt && P.$("#" + t.dataset.txt, secao);
+    if (txt) txt.textContent = String(valor).replace(".", ",") + (t.dataset.sufixo || "");
+    if (t.dataset.evDur) { viva.duracaoFoto = valor; return true; }
+    if (!t.dataset.evGuardou) { guardar(); t.dataset.evGuardou = "1"; }
+    if (t.dataset.evNum) atual.config.estilo = Object.assign({}, atual.config.estilo, { [t.dataset.evNum]: valor });
+    else if (t.dataset.evMusica && atual.config.musica) atual.config.musica = Object.assign({}, atual.config.musica, { [t.dataset.evMusica]: valor });
+    else if (t.dataset.evClipes) atual.config.somClipes = valor;
+    else return false;
+    sincronizarAjustes();
+    atualizarPrevia();
+    return true;
+  }
+
+  // Os "Ajustes finos" têm cópia de alguns valores: ficam iguais aos da edição ao vivo
+  // (senão, na próxima mudança, a cópia antiga voltaria por cima)
+  function sincronizarAjustes() {
+    const c = atual.config;
+    const por = (id, valor, sufixo) => {
+      const el = P.$("#" + id, secao);
+      if (!el) return;
+      el.value = valor;
+      const txt = P.$(`#${id}-txt`, secao);
+      if (txt) txt.textContent = valor + (sufixo || "");
+    };
+    if (c.musica) {
+      por("ed-vol-musica", n(c.musica.volume ?? 60), "%");
+      por("ed-musica-inicio", n(c.musica.inicio));
+    }
+    por("ed-vol-clipes", n(c.somClipes ?? 100), "%");
+  }
+
+  /* ---------- Fotos: biblioteca e fotos no vídeo ---------- */
+  async function carregarBiblioteca() {
+    const { data, error } = await banco.storage.from(BALDE).list(BIBLIOTECA, { limit: 1000, sortBy: { column: "created_at", order: "desc" } });
+    if (error) { viva.biblioteca = []; P.toast("Não consegui abrir a biblioteca de fotos: " + P.explicarErro(error, "balde edicao"), "erro"); return desenharAbaViva(); }
+    viva.biblioteca = (data || []).filter((f) => f.id && /\.(jpe?g|png|webp)$/i.test(f.name)).map((f) => ({ caminho: `${BIBLIOTECA}/${f.name}`, nome: f.name }));
+    await assinar(viva.biblioteca.map((b) => b.caminho));
+    desenharAbaViva();
+  }
+
+  // Foto do celular é enorme: reduz para no máximo 1600 px antes de guardar (fica leve e nítida no 4K)
+  function reduzirImagem(arquivo) {
+    return new Promise((ok) => {
+      const url = URL.createObjectURL(arquivo);
+      const img = new Image();
+      img.onload = () => {
+        const escala = Math.min(1, 1600 / Math.max(img.width, img.height));
+        const cv = document.createElement("canvas");
+        cv.width = Math.round(img.width * escala);
+        cv.height = Math.round(img.height * escala);
+        cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+        URL.revokeObjectURL(url);
+        cv.toBlob((b) => ok(b || arquivo), "image/jpeg", 0.88);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); ok(arquivo); };
+      img.src = url;
+    });
+  }
+
+  async function enviarFotosBiblioteca(arquivos) {
+    const fotos = arquivos.filter((a) => a.type.startsWith("image/"));
+    if (!fotos.length) return;
+    const caixa = () => P.$("#ev-envio-fotos", secao);
+    let feitas = 0;
+    for (const a of fotos) {
+      if (caixa()) caixa().innerHTML = `<div class="ed-envio">Enviando ${feitas + 1} de ${fotos.length}…</div>`;
+      const blob = await reduzirImagem(a);
+      const caminho = `${BIBLIOTECA}/${novoId()}.jpg`;
+      const { error } = await banco.storage.from(BALDE).upload(caminho, blob, { contentType: "image/jpeg", cacheControl: "3600" });
+      if (error) { P.toast(`Não consegui enviar ${a.name}: ${P.explicarErro(error, "balde edicao")}`, "erro"); break; }
+      feitas++;
+    }
+    if (feitas) P.toast(feitas === 1 ? "Foto guardada na biblioteca." : `${feitas} fotos guardadas na biblioteca.`);
+    await carregarBiblioteca();
+  }
+
+  async function apagarDaBiblioteca(caminho) {
+    if (!confirm("Apagar esta foto da biblioteca?")) return;
+    const erro = await apagarArquivos([caminho]);
+    if (erro) return P.toast(erro, "erro");
+    viva.biblioteca = (viva.biblioteca || []).filter((b) => b.caminho !== caminho);
+    desenharAbaViva();
+  }
+
+  async function adicionarFoto(caminho) {
+    if (!atual || travado()) return;
+    guardar();
+    const inicio = fix(Math.max(0, viva.ctrl ? viva.ctrl.tempo() : lt.cursor));
+    atual.config.fotos = [...(atual.config.fotos || []), { id: novoId(), caminho, inicio, fim: fix(inicio + viva.duracaoFoto), lugar: viva.lugarNovo }];
+    await assinar([caminho]);
+    lt.sel = { tipo: "foto", i: atual.config.fotos.length - 1 };
+    mudou();
+    P.toast(`Foto em ${seg(inicio)} (${LUGARES[viva.lugarNovo][0].toLowerCase()}).`);
+  }
+
+  /* ---------- Cortar pela fala ---------- */
+  // Legenda refeita a partir da transcrição: segue os cortes e as correções de grafia
+  function palavrasDaTranscricao() {
+    const correcoes = atual.config.correcoes || {};
+    const saida = [];
+    let t = 0;
+    atual.clips.filter((x) => !x.apagado).forEach((x) => {
+      const ch = chavePrevia(x);
+      const ini = n(x.inicio);
+      const dur = durClipe(x);
+      (viva.transcricao[ch] || []).forEach((w, i) => {
+        if (w.inicio < ini - 0.02 || w.inicio >= ini + dur) return;
+        const texto = String(correcoes[`${ch}|${i}`] ?? w.texto).replace(/[.,!?;:…]+$/, "").trim();
+        if (!texto) return;
+        saida.push({ texto, inicio: fix(t + Math.max(0, w.inicio - ini)), fim: fix(t + Math.min(ini + dur, w.fim) - ini) });
+      });
+      t += dur;
+    });
+    return saida;
+  }
+
+  function alternarPalavra(ref) {
+    if (!atual || travado() || !viva.transcricao) return;
+    const [ch, si] = ref.split("|");
+    const i = Number(si);
+    const palavras = viva.transcricao[ch] || [];
+    const w = palavras[i];
+    if (!w) return;
+    const ant = palavras[i - 1];
+    const prox = palavras[i + 1];
+    guardar();
+    const ancoras = ancorar();
+    const clips = atual.clips;
+    const k = clips.findIndex((x) => !x.apagado && chavePrevia(x) === ch && w.inicio >= n(x.inicio) - 0.02 && w.inicio < n(x.inicio) + durClipe(x));
+    // o pedaço cortado vai do fim da palavra anterior até o começo da próxima (leva junto a pausa depois dela)
+    const a = Math.max(ant ? ant.fim : 0, w.inicio - 0.06);
+    const b = prox ? Math.max(w.fim, prox.inicio - 0.04) : w.fim + 0.12;
+    if (k >= 0) {
+      const x = clips[k];
+      const ini = n(x.inicio);
+      const fim = ini + durClipe(x);
+      const pedacos = [];
+      if (Math.max(ini, a) - ini >= 0.12) pedacos.push(Object.assign({}, x, { fim: fix(Math.max(ini, a)) }));
+      if (fim - Math.min(fim, b) >= 0.12) pedacos.push(Object.assign({}, x, { id: pedacos.length ? novoId() : x.id, inicio: fix(Math.min(fim, b)), fim: fix(fim) }));
+      clips.splice(k, 1, ...pedacos);
+    } else {
+      // trazer de volta: estica o pedaço do mesmo vídeo que termina logo antes (e junta com o seguinte, se encostar)
+      let antes = -1;
+      let fimAntes = -Infinity;
+      clips.forEach((x, j) => {
+        if (x.apagado || chavePrevia(x) !== ch) return;
+        const f = n(x.inicio) + durClipe(x);
+        if (f <= w.inicio + 0.01 && f > fimAntes) { fimAntes = f; antes = j; }
+      });
+      const modelo = clips.find((x) => chavePrevia(x) === ch);
+      if (antes >= 0 && a - fimAntes < 0.08) {
+        const x = clips[antes];
+        x.fim = fix(Math.max(n(x.fim ?? fimAntes), b));
+        const seguinte = clips[antes + 1];
+        if (seguinte && chavePrevia(seguinte) === ch && n(seguinte.inicio) <= x.fim + 0.08 && n(seguinte.inicio) >= n(x.inicio)) {
+          x.fim = fix(Math.max(x.fim, n(seguinte.inicio) + durClipe(seguinte)));
+          clips.splice(antes + 1, 1);
+        }
+      } else {
+        const seguinte = clips[antes + 1];
+        if (seguinte && chavePrevia(seguinte) === ch && n(seguinte.inicio) - b < 0.08 && n(seguinte.inicio) > w.inicio) {
+          if (seguinte.fim == null || seguinte.fim === "") seguinte.fim = fix(n(seguinte.inicio) + durClipe(seguinte));
+          seguinte.inicio = fix(a);
+        } else if (modelo) {
+          clips.splice(antes + 1, 0, Object.assign({}, modelo, { id: novoId(), inicio: fix(a), fim: fix(b), zoom: 1 }));
+        }
+      }
+    }
+    reaplicar(ancoras);
+    atual.config.palavras = palavrasDaTranscricao();
+    mudou();
+  }
+
+  function corrigirPalavra(ref) {
+    if (!atual || travado() || !viva.transcricao) return;
+    const [ch, si] = ref.split("|");
+    const w = (viva.transcricao[ch] || [])[Number(si)];
+    if (!w) return;
+    const correcoes = atual.config.correcoes || {};
+    const atualTexto = correcoes[ref] ?? w.texto;
+    const novo = prompt("Como essa palavra deve aparecer na legenda?", atualTexto);
+    if (novo == null || novo.trim() === atualTexto) return;
+    guardar();
+    atual.config.correcoes = Object.assign({}, correcoes, { [ref]: novo.trim() });
+    atual.config.palavras = palavrasDaTranscricao();
+    mudou();
+  }
+
   /* ---------- Acompanhar o computador trabalhando ---------- */
   function ligarRelogio() {
     pararRelogio();
@@ -1658,6 +2413,7 @@
         const rascunho = (P.$("#ed-texto", secao) || {}).value || "";
         atual = normalizar(novo);
         desenharEditor();
+        prepararPrevia(true); // o estagiário pode ter subido prévias novas
         const caixa = P.$("#ed-texto", secao);
         if (caixa && rascunho) caixa.value = rascunho;
         if (terminou) {
