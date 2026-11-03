@@ -154,6 +154,11 @@
           ev.preventDefault();
           apagarSelecionado();
         }
+        // Ctrl+B divide no cursor (o mesmo atalho do CapCut)
+        if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "b") {
+          ev.preventDefault();
+          dividirNoCursor();
+        }
       });
       s.addEventListener("pointerdown", aoApertarLinha);
       // Mostra a porcentagem enquanto arrasta o volume
@@ -1448,9 +1453,11 @@
     const px = (t) => (Math.max(0, t) * pps).toFixed(1);
     const sel = lt.sel;
     const bloco = (tipo, i, ini, fim, rotulo, classe, opc = {}) => {
-      const pontas = !(opc.fixo || opc.semPontas);
+      const largura = Math.max(8, (fim - ini) * pps);
+      // bloco pequeno arrasta inteiro (as pontas de esticar tomariam ele todo); para esticar, aumente o zoom
+      const pontas = !(opc.fixo || opc.semPontas) && largura >= 44;
       return `<div class="lt-bloco ${classe}${sel && sel.tipo === tipo && sel.i === i ? " lt-sel" : ""}${opc.fixo ? " lt-fixo" : ""}"
-        data-lt="${tipo}" data-i="${i}" style="left:${px(ini)}px;width:${Math.max(8, (fim - ini) * pps).toFixed(1)}px" title="${P.esc(rotulo)}">
+        data-lt="${tipo}" data-i="${i}" style="left:${px(ini)}px;width:${largura.toFixed(1)}px" title="${P.esc(rotulo)}">
         ${pontas ? `<span class="lt-ponta lt-ponta-e" data-ponta="e"></span>` : ""}<span class="lt-rotulo">${P.esc(rotulo)}</span>${pontas ? `<span class="lt-ponta lt-ponta-d" data-ponta="d"></span>` : ""}</div>`;
     };
     const trilha = (nome, conteudo, classe) => `<div class="lt-trilha ${classe || ""}"><div class="lt-nome">${nome}</div>
@@ -1491,7 +1498,10 @@
     } else {
       trilhas += trilha("Legenda", frasesDe(c.palavras).map((f, i) => bloco("frase", i, f.inicio, f.fim, f.texto, "lt-legenda")).join("")
         || `<span class="lt-vazio">sem legenda</span>`);
-      trilhas += trilha("Música", c.musica ? bloco("musica", 0, 0, Math.max(total, 1), `♪ ${c.musica.nome} · ${n(c.musica.volume)}%`, "lt-musica", { fixo: true })
+      // a música é um bloco como os outros: arrasta (entra mais cedo ou mais tarde) e as pontas cortam o começo e o fim
+      const mIni = c.musica ? Math.min(Math.max(0, n(c.musica.comeca)), Math.max(0, total - 0.5)) : 0;
+      const mFim = c.musica && c.musica.termina != null ? Math.min(total, n(c.musica.termina)) : total;
+      trilhas += trilha("Música", c.musica ? bloco("musica", 0, mIni, Math.max(mIni + 0.5, mFim), `♪ ${c.musica.nome} · ${n(c.musica.volume)}%`, "lt-musica")
         : `<span class="lt-vazio">sem música (envie em Ajustes finos ou ponha na pasta do Drive)</span>`);
       trilhas += trilha("Efeitos", (c.efeitos || []).map((x, i) => bloco("efeito", i, n(x.inicio), n(x.inicio) + 0.5,
         (EFEITOS[x.tipo] || x.tipo).split(" (")[0], "lt-efeito", { semPontas: true })).join(""));
@@ -1503,6 +1513,8 @@
       <div class="cartao-topo"><h2>${P.icone("cortar", "ico-p")} Linha do tempo <span class="mudo pequeno">${seg(total)}</span></h2>
         <div class="grupo-botoes">
           <button class="botao" type="button" data-lt-acao="desfazer"${lt.historico.length && !ocupado ? "" : " disabled"} title="Ctrl+Z">${P.icone("desfazer", "ico-p")}Desfazer</button>
+          <button class="botao" type="button" data-lt-acao="dividir-cursor"${ocupado ? " disabled" : ""} title="Corta no cursor (linha vermelha) o que estiver selecionado, ou o vídeo (Ctrl+B)">${P.icone("cortar", "ico-p")}Dividir</button>
+          <button class="botao botao-perigo" type="button" data-lt-acao="apagar"${lt.sel && !ocupado && lt.sel.tipo !== "hook" ? "" : " disabled"} title="Apaga o que estiver selecionado (tecla Delete)">${P.icone("lixo", "ico-p")}Excluir</button>
           ${airlearn ? `<button class="botao" type="button" data-lt-acao="mais-leg"${ocupado ? " disabled" : ""}>${P.icone("mais", "ico-p")}Frase</button>`
             : `<button class="botao" type="button" data-lt-acao="mais-texto"${ocupado ? " disabled" : ""}>${P.icone("mais", "ico-p")}Texto</button>
                <button class="botao" type="button" data-lt-acao="mais-efeito"${ocupado ? " disabled" : ""}>${P.icone("mais", "ico-p")}Efeito sonoro</button>`}
@@ -1576,7 +1588,10 @@
     if (s.tipo === "musica" && c.musica) {
       return caixa(`Música: ${P.esc(c.musica.nome)}`,
         campo(`Volume`, `<input type="range" data-campo="volume" min="0" max="100" step="5" value="${n(c.musica.volume)}">`)
-        + campo("Começar a música em (s)", num("inicio", c.musica.inicio)),
+        + campo("Entra no vídeo em (s)", num("comeca", c.musica.comeca || 0))
+        + campo("Sai do vídeo em (s)", num("termina", c.musica.termina != null ? c.musica.termina : totalVideo(e.clips)))
+        + campo("Pula o começo da música (s)", num("inicio", c.musica.inicio))
+        + `<p class="mudo pequeno lt-largo">Arraste o bloco verde para a música entrar mais cedo ou mais tarde; puxe as pontas para cortar o começo ou o fim.</p>`,
         `<button class="botao botao-perigo" type="button" data-lt-acao="apagar">${P.icone("lixo", "ico-p")}Tirar música</button>`);
     }
     if (s.tipo === "foto") {
@@ -1750,6 +1765,28 @@
     } else if (a.tipo === "leg" && c.legendas[a.i]) mexer(c.legendas[a.i]);
     else if (a.tipo === "foto" && c.fotos && c.fotos[a.i]) mexer(c.fotos[a.i], 0.4);
     else if (a.tipo === "efeito" && c.efeitos && c.efeitos[a.i]) c.efeitos[a.i].inicio = fix(Math.max(0, n(c.efeitos[a.i].inicio) + dt));
+    else if (a.tipo === "musica" && c.musica) {
+      // comeca/termina = quando a música entra e sai no vídeo (termina vazio = até o fim do vídeo)
+      const total = totalVideo(atual.clips);
+      const m = Object.assign({}, c.musica);
+      let com = n(m.comeca);
+      let ter = m.termina != null ? n(m.termina) : total;
+      if (!a.ponta) {
+        const d = Math.max(-com, Math.min(dt, total - 0.5 - com));
+        com += d;
+        if (m.termina != null) ter = Math.min(total, ter + d);
+      } else if (a.ponta === "e") {
+        // cortar o começo: entra mais tarde e pula o mesmo tanto do começo da música (fica sincronizada)
+        const d = Math.max(-Math.min(com, n(m.inicio)), Math.min(dt, ter - 0.5 - com));
+        com += d;
+        m.inicio = fix(Math.max(0, n(m.inicio) + d));
+      } else {
+        ter = Math.min(total, Math.max(com + 0.5, ter + dt));
+      }
+      m.comeca = fix(com);
+      m.termina = ter >= total - 0.05 ? null : fix(ter);
+      c.musica = m;
+    }
     else if (a.tipo === "frase") {
       const f = frasesDe(c.palavras)[a.i];
       if (f) {
@@ -1821,6 +1858,11 @@
     if (sel.tipo === "frase") { const f = frasesDe(c.palavras || [])[sel.i]; return f ? (fim ? f.fim - 0.05 : f.inicio + 0.05) : null; }
     if (sel.tipo === "foto") { const f = (c.fotos || [])[sel.i]; return f ? (fim ? n(f.fim) - 0.05 : n(f.inicio) + 0.5) : null; }
     if (sel.tipo === "efeito") { const x = (c.efeitos || [])[sel.i]; return x ? n(x.inicio) : null; }
+    if (sel.tipo === "musica") {
+      if (!c.musica) return null;
+      const ter = c.musica.termina != null ? n(c.musica.termina) : totalVideo(atual.clips);
+      return fim ? ter - 0.05 : n(c.musica.comeca) + 0.3;
+    }
     if (sel.tipo === "clip") {
       const x = atual.clips[sel.i];
       if (!x) return null;
@@ -1962,22 +2004,59 @@
       lt.sel = { tipo: "clip", i: j };
       return mudou();
     }
-    if (acao === "dividir" && lt.sel) {
-      const k = lt.sel.i;
-      const inis = iniciosDosClipes(atual.clips);
-      const dentro = lt.cursor - inis[k];
-      if (!atual.clips[k] || dentro <= 0.15 || dentro >= durClipe(atual.clips[k]) - 0.15) {
-        return P.toast("Ponha o cursor (linha vermelha) no meio deste clipe para dividir: clique na régua.", "erro");
-      }
-      guardar();
-      const x = atual.clips[k];
-      const corte = fix(n(x.inicio) + dentro);
-      const fimOriginal = x.fim != null && x.fim !== "" ? x.fim : (x.duracao || null);
-      atual.clips.splice(k + 1, 0, Object.assign({}, x, { id: novoId(), inicio: corte, fim: fimOriginal }));
-      x.fim = corte;
-      lt.sel = { tipo: "clip", i: k + 1 };
-      return mudou();
+    if (acao === "dividir" && lt.sel) return dividirClipe(lt.sel.i, lt.cursor - iniciosDosClipes(atual.clips)[lt.sel.i]);
+    if (acao === "dividir-cursor") return dividirNoCursor();
+  }
+
+  // Corta um trecho de vídeo em dois, "dentro" segundos depois do começo dele
+  function dividirClipe(k, dentro) {
+    if (!atual.clips[k] || dentro <= 0.15 || dentro >= durClipe(atual.clips[k]) - 0.15) {
+      return P.toast("Ponha o cursor (linha vermelha) no meio do trecho para dividir: clique na régua ou pare o vídeo ali.", "erro");
     }
+    guardar();
+    const x = atual.clips[k];
+    const corte = fix(n(x.inicio) + dentro);
+    const fimOriginal = x.fim != null && x.fim !== "" ? x.fim : (x.duracao || null);
+    atual.clips.splice(k + 1, 0, Object.assign({}, x, { id: novoId(), inicio: corte, fim: fimOriginal }));
+    x.fim = corte;
+    lt.sel = { tipo: "clip", i: k + 1 };
+    mudou();
+  }
+
+  // Botão "Dividir" (e Ctrl+B, como no CapCut): corta no cursor o texto ou a foto selecionados;
+  // sem nada disso selecionado, corta o trecho de vídeo que está embaixo do cursor
+  function dividirNoCursor() {
+    if (!atual || travado()) return;
+    const t = lt.cursor;
+    const c = atual.config;
+    const s = lt.sel;
+    const corta = (ini, fim) => t > ini + 0.1 && t < fim - 0.1;
+    if (s && (s.tipo === "el" || s.tipo === "foto")) {
+      const lista = () => (s.tipo === "el" ? atual.config.elementos : atual.config.fotos) || [];
+      const x = lista()[s.i];
+      if (x && x.tipo !== "flash" && corta(n(x.inicio), n(x.fim))) {
+        guardar();
+        const original = lista()[s.i];
+        const segunda = Object.assign({}, original, { inicio: fix(t) }, s.tipo === "foto" ? { id: novoId() } : {});
+        original.fim = fix(t);
+        lista().splice(s.i + 1, 0, segunda);
+        lt.sel = { tipo: s.tipo, i: s.i + 1 };
+        mudou();
+        return irNaPrevia(t);
+      }
+      if (x) return P.toast("Ponha o cursor (linha vermelha) no meio do bloco selecionado para dividir.", "erro");
+    }
+    if (s && s.tipo === "musica") return P.toast("A música não se divide: puxe as pontas do bloco dela para cortar o começo ou o fim.", "erro");
+    if (s && s.tipo === "efeito") return P.toast("Efeito sonoro é um toque curto: não dá para dividir.", "erro");
+    // o trecho de vídeo selecionado, ou o que está embaixo do cursor
+    const inis = iniciosDosClipes(atual.clips);
+    let k = s && s.tipo === "clip" ? s.i : -1;
+    if (k < 0 || !atual.clips[k] || !corta(inis[k], inis[k] + durClipe(atual.clips[k]))) {
+      k = atual.clips.findIndex((x, i) => corta(inis[i], inis[i] + durClipe(x)));
+    }
+    if (k < 0) return P.toast("Ponha o cursor (linha vermelha) no meio de um trecho para dividir.", "erro");
+    dividirClipe(k, t - inis[k]);
+    irNaPrevia(t);
   }
 
   async function apagarSelecionado() {
@@ -2039,7 +2118,10 @@
       c.efeitos[s.i][k] = k === "tipo" ? v : fix(k === "volume" ? Math.min(100, num) : num);
     } else if (s.tipo === "hook") c.hook = v.trim();
     else if (s.tipo === "musica" && c.musica) {
-      c.musica = Object.assign({}, c.musica, { [k]: k === "volume" ? Math.min(100, num) : fix(num) });
+      const total = totalVideo(atual.clips);
+      if (k === "comeca") c.musica = Object.assign({}, c.musica, { comeca: fix(Math.min(num, Math.max(0, total - 0.5))) });
+      else if (k === "termina") c.musica = Object.assign({}, c.musica, { termina: num >= total - 0.05 ? null : fix(Math.max(n(c.musica.comeca) + 0.5, num)) });
+      else c.musica = Object.assign({}, c.musica, { [k]: k === "volume" ? Math.min(100, num) : fix(num) });
     } else if (s.tipo === "frase") {
       const f = frasesDe(c.palavras)[s.i];
       if (!f) return;
@@ -2069,7 +2151,7 @@
     }
     mudou();
     // a prévia para onde a mudança aparece (no fim, se mexeu no "até")
-    if (s.tipo !== "musica" && s.tipo !== "hook" && k !== "volume") mostrarNaPrevia(lt.sel, k === "fim" ? "d" : null);
+    if (s.tipo !== "hook" && k !== "volume" && !(s.tipo === "musica" && k === "inicio")) mostrarNaPrevia(lt.sel, k === "fim" || k === "termina" ? "d" : null);
   }
 
   /* =========================================================
@@ -2123,7 +2205,7 @@
     if (!carregarEditorVideo.promessa) {
       carregarEditorVideo.promessa = new Promise((ok, falha) => {
         const s = document.createElement("script");
-        s.src = "editor-video.js?v=5";
+        s.src = "editor-video.js?v=6";
         s.onload = () => (window.EditorVideo ? ok(window.EditorVideo) : falha(new Error("player não carregou")));
         s.onerror = () => { carregarEditorVideo.promessa = null; falha(new Error("não consegui baixar o player")); };
         document.head.appendChild(s);
@@ -2235,7 +2317,10 @@
         palavras: c.palavras || [], palavrasPorVez: n(c.palavrasPorVez) || undefined, palavrasNaCor: c.palavrasNaCor || [],
         elementos: (c.elementos || []).filter((x) => x.tipo && ((x.texto || "").trim() || x.tipo === "flash")),
         somClipes: c.somClipes == null ? 1 : n(c.somClipes) / 100,
-        musica: urlMusica ? { arquivo: urlMusica, volume: n(m.volume ?? 60) / 100, inicio: n(m.inicio) } : undefined,
+        musica: urlMusica ? {
+          arquivo: urlMusica, volume: n(m.volume ?? 60) / 100, inicio: n(m.inicio),
+          comeca: n(m.comeca), termina: m.termina != null ? n(m.termina) : null
+        } : undefined,
         fonteLegenda: viva.bootzy || undefined,
         estilo: c.estilo || undefined,
         fotos: (c.fotos || []).map((f) => ({ src: urlDe(f.caminho), inicio: n(f.inicio), fim: n(f.fim), lugar: f.lugar || "grupo" })).filter((f) => f.src),

@@ -800,7 +800,7 @@ tr.deslizando:hover{background:transparent}
 .lt-clipe{background:linear-gradient(180deg,#5fc5d0,#3e9fab);color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.3)}
 .lt-apagado{background:repeating-linear-gradient(45deg,#6b7276,#6b7276 6px,#5b6266 6px,#5b6266 12px)}
 .lt-legenda{background:#b9a6f2}
-.lt-musica{background:#7fd38f;cursor:pointer}
+.lt-musica{background:#7fd38f}
 .lt-efeito{background:#f4a28c;padding:0 6px;font-size:10.5px}
 .lt-foto{background:#f7d9e3}
 .lt-miniatura{width:72px;height:90px;object-fit:cover;border-radius:6px;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
