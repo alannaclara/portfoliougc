@@ -163,6 +163,8 @@
         // texto de uma animação: a prévia muda enquanto digita
         const campoAnim = ev.target.dataset && ev.target.dataset.evAnimCampo;
         if (campoAnim === "texto" || campoAnim === "extra") { mudarAnimacao(Number(ev.target.dataset.i), campoAnim, ev.target.value, true); return; }
+        // código HEX digitado ao lado do quadradinho de cor: a prévia muda quando o código fica completo
+        if (ev.target.dataset && ev.target.dataset.corHex) { hexDigitado(ev.target, false); return; }
         const txt = ev.target.id && P.$(`#${ev.target.id}-txt`, s);
         if (txt) txt.textContent = ev.target.value + "%";
         // "Ajustes finos": a prévia muda enquanto você digita, arrasta ou escolhe a cor
@@ -622,8 +624,10 @@
     const opcoes = (tipo) => Object.entries(TIPOS).map(([v, [t]]) => `<option value="${v}"${v === tipo ? " selected" : ""}>${t}</option>`).join("");
     return `
       <div class="grade-campos" style="margin-bottom:12px">
-        <div class="campo"><label for="ed-cor">Cor da marca</label>
-          <input id="ed-cor" type="color" value="${P.esc(c.corMarca || nicho.cor)}"></div>
+        <div class="campo"><label for="ed-cor-hex">Cor da marca</label>
+          ${campoDeCor("corMarca", (c.corMarca || nicho.cor).toUpperCase(), "Código HEX da cor da marca")}
+          <input id="ed-cor" type="hidden" value="${P.esc((c.corMarca || nicho.cor).toUpperCase())}">
+          <span class="campo-ajuda">Clique no quadradinho para escolher no degradê, ou digite o código HEX (ex.: #EA1D2C).</span></div>
       </div>
       ${c.elementos.length ? `<div class="tabela-rolagem"><table class="tabela ed-tabela ed-elementos">
         <thead><tr><th>Tipo</th><th>Texto</th><th>De</th><th>Até</th><th>Extra</th><th></th></tr></thead>
@@ -834,6 +838,13 @@
     const linha = ev.target.closest("[data-abrir]");
     if (linha) { trocarDeVideo(); atual = normalizar(lista.find((e) => e.id === linha.dataset.abrir)); return desenhar(); }
 
+    // quadradinho de cor (Cor do título ou Cor da marca): abre ou fecha o degradê
+    const corAbrir = ev.target.closest("[data-cor-abrir]");
+    if (corAbrir) {
+      if (viva.seletor && viva.seletor.alvo === corAbrir.dataset.corAbrir) fecharSeletorCor(); else abrirSeletorCor(corAbrir);
+      return;
+    }
+
     const tirarAnexo = ev.target.closest("[data-tirar-anexo]");
     if (tirarAnexo) {
       const [a] = anexos.splice(Number(tirarAnexo.dataset.tirarAnexo), 1);
@@ -897,6 +908,7 @@
   }
 
   function aoMudar(ev) {
+    if (ev.target.dataset && ev.target.dataset.corHex) return hexDigitado(ev.target, true); // saiu do campo HEX
     if (ev.target.closest("#ev") && mudancaViva(ev)) return;
     if (ev.target.id === "ed-fotos") {
       const arquivos = Array.from(ev.target.files || []);
@@ -1016,6 +1028,192 @@
     return null;
   }
 
+  /* ---------- Seletor de cor: degradê + código HEX ----------
+     O seletor do navegador abre em RGB; este mostra o degradê (tom × brilho e a faixa de cores)
+     e o código HEX para digitar. Usado na Cor do título e na Cor da marca. */
+  const hexParaRgb = (hex) => {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || "").trim());
+    if (!m) return null;
+    const v = parseInt(m[1], 16);
+    return [v >> 16, (v >> 8) & 255, v & 255];
+  };
+  const rgbParaHex = (r, g, b) => "#" + [r, g, b].map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, "0")).join("").toUpperCase();
+  const rgbParaHsv = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const d = max - Math.min(r, g, b);
+    let h = 0;
+    if (d) {
+      if (max === r) h = ((g - b) / d) % 6;
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    return [h, max ? d / max : 0, max];
+  };
+  const hsvParaRgb = (h, s, v) => {
+    const c = v * s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = v - c;
+    const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+    return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+  };
+  // "#c9a27e", "c9a27e" e (ao terminar) "#fa3" viram "#C9A27E"; o resto é inválido
+  const normalizarHex = (valor, aceitaCurto) => {
+    let s = String(valor || "").trim().replace(/^#/, "");
+    if (aceitaCurto && /^[0-9a-f]{3}$/i.test(s)) s = s.split("").map((c) => c + c).join("");
+    return /^[0-9a-f]{6}$/i.test(s) ? "#" + s.toUpperCase() : null;
+  };
+  const corAtual = (alvo) => (alvo === "corMarca"
+    ? ((P.$("#ed-cor", secao) || {}).value || atual.config.corMarca || "#F5D547")
+    : (estiloAtual()[alvo] || "#C9A27E")).toUpperCase();
+
+  // Quadradinho que abre o degradê + campo HEX
+  function campoDeCor(alvo, hex, rotulo, desligado) {
+    const b = desligado ? " disabled" : "";
+    return `<div class="cor-campo">
+      <button type="button" class="cor-botao" data-cor-abrir="${alvo}" style="background:${P.esc(hex)}" title="Escolher no degradê" aria-label="Escolher a cor no degradê"${b}></button>
+      <input class="cor-hex-campo" data-cor-hex="${alvo}" value="${P.esc(hex)}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="${P.esc(rotulo)}"${b}>
+    </div>`;
+  }
+
+  // Aplica a cor escolhida (no degradê ou digitada) no lugar certo, com a prévia ao vivo
+  function aplicarCor(alvo, hex, terminou) {
+    if (!atual || travado()) return;
+    if (alvo === "corMarca") {
+      const campo = P.$("#ed-cor", secao);
+      if (!campo) return;
+      campo.value = hex;
+      ajusteNaPrevia(campo, terminou); // mostra, vai até onde a cor aparece e salva ao terminar
+    } else {
+      if (!viva.corGuardada) { // começo de uma escolha de cor: um Ctrl+Z por escolha e a prévia vai até um título
+        guardar();
+        viva.corGuardada = true;
+        mostrarTitulo(true);
+      }
+      atual.config.estilo = Object.assign({}, atual.config.estilo, { [alvo]: hex });
+      atualizarPrevia();
+      if (terminou) { viva.corGuardada = false; salvarDepois(); }
+    }
+    viva.corPendente = !terminou;
+    // a cor nova aparece no quadradinho, no campo HEX e nas bolinhas (sem redesenhar: o degradê continua aberto)
+    P.$$(`[data-cor-abrir="${alvo}"]`, secao).forEach((b) => { b.style.background = hex; });
+    P.$$(`[data-cor-hex="${alvo}"]`, secao).forEach((i) => { if (document.activeElement !== i) i.value = hex; });
+    if (alvo === "corTitulo") P.$$('.ev-cor[data-ev-estilo="corTitulo"]', secao).forEach((b) => b.classList.toggle("ev-cor-sel", b.dataset.valor.toUpperCase() === hex));
+  }
+
+  // Fonte ou cor do título mudou: a prévia vai até o primeiro título (e avisa se ele não está em itálico)
+  function mostrarTitulo(avisar) {
+    const x = (atual.config.elementos || []).filter((e) => ["hook", "titulo", "destaque", "elegante"].includes(e.tipo))
+      .sort((a, b) => n(a.inicio) - n(b.inicio))[0];
+    if (x) irNaPrevia(n(x.inicio) + Math.min(0.9, Math.max(0, (n(x.fim) - n(x.inicio)) / 2)));
+    viva.avisos = viva.avisos || new Set();
+    if (avisar && !estiloAtual().tituloItalico && !viva.avisos.has("corTitulo")) {
+      viva.avisos.add("corTitulo");
+      P.toast("A cor do título aparece nos títulos em itálico: escolha uma fonte em “Título · parte grande em itálico” para ver.");
+    }
+  }
+
+  // Digitou no campo HEX ao lado do quadradinho
+  function hexDigitado(campo, terminou) {
+    const hex = normalizarHex(campo.value, terminou);
+    if (hex) {
+      aplicarCor(campo.dataset.corHex, hex, terminou);
+      if (terminou) campo.value = hex;
+    } else if (terminou) {
+      campo.value = corAtual(campo.dataset.corHex);
+      P.toast("Use um código HEX, como #C9A27E (seis letras ou números depois do #).", "erro");
+    }
+  }
+
+  function abrirSeletorCor(botao) {
+    fecharSeletorCor();
+    const alvo = botao.dataset.corAbrir;
+    let [h, s, v] = rgbParaHsv(...(hexParaRgb(corAtual(alvo)) || [201, 162, 126]));
+    const caixa = document.createElement("div");
+    caixa.className = "sc";
+    caixa.setAttribute("role", "dialog");
+    caixa.setAttribute("aria-label", "Escolher cor");
+    caixa.innerHTML = `
+      <div class="sc-area"><div class="sc-branco"></div><div class="sc-preto"></div><span class="sc-alvo"></span></div>
+      <div class="sc-matiz"><span class="sc-alvo-matiz"></span></div>
+      <div class="sc-linha"><span class="sc-amostra"></span>
+        <label>HEX <input class="sc-hex" maxlength="7" spellcheck="false" autocomplete="off"></label>
+        <button type="button" class="botao botao-principal sc-ok">OK</button></div>`;
+    document.body.appendChild(caixa);
+    // abre embaixo do quadradinho (ou em cima, se não couber)
+    const r = botao.getBoundingClientRect();
+    const alto = caixa.offsetHeight || 270;
+    const largo = caixa.offsetWidth || 256;
+    let topo = r.bottom + 8;
+    if (topo + alto > window.innerHeight - 8) topo = Math.max(8, r.top - alto - 8);
+    caixa.style.top = topo + "px";
+    caixa.style.left = Math.min(window.innerWidth - largo - 8, Math.max(8, r.left)) + "px";
+
+    const area = caixa.querySelector(".sc-area");
+    const alvoArea = caixa.querySelector(".sc-alvo");
+    const matiz = caixa.querySelector(".sc-matiz");
+    const alvoMatiz = caixa.querySelector(".sc-alvo-matiz");
+    const campoHex = caixa.querySelector(".sc-hex");
+    const amostra = caixa.querySelector(".sc-amostra");
+    const desenhar = () => {
+      area.style.background = `hsl(${h}, 100%, 50%)`;
+      alvoArea.style.left = s * 100 + "%";
+      alvoArea.style.top = (1 - v) * 100 + "%";
+      alvoMatiz.style.left = (h / 360) * 100 + "%";
+      const hex = rgbParaHex(...hsvParaRgb(h, s, v));
+      amostra.style.background = hex;
+      if (document.activeElement !== campoHex) campoHex.value = hex;
+      return hex;
+    };
+    // arrastar no degradê ou na faixa: a prévia muda junto; ao soltar, salva
+    const arrastavel = (el, aoMover) => (ev) => {
+      ev.preventDefault();
+      campoHex.blur();
+      const mover = (e) => {
+        const rr = el.getBoundingClientRect();
+        aoMover(Math.min(1, Math.max(0, (e.clientX - rr.left) / rr.width)), Math.min(1, Math.max(0, (e.clientY - rr.top) / rr.height)));
+        aplicarCor(alvo, desenhar(), false);
+      };
+      mover(ev);
+      window.addEventListener("pointermove", mover);
+      window.addEventListener("pointerup", () => { window.removeEventListener("pointermove", mover); aplicarCor(alvo, desenhar(), true); }, { once: true });
+    };
+    area.addEventListener("pointerdown", arrastavel(area, (x, y) => { s = x; v = 1 - y; }));
+    matiz.addEventListener("pointerdown", arrastavel(matiz, (x) => { h = Math.min(359.9, x * 360); }));
+    const usarHex = (terminou) => {
+      const hex = normalizarHex(campoHex.value, terminou);
+      if (!hex) return false;
+      [h, s, v] = rgbParaHsv(...hexParaRgb(hex));
+      desenhar();
+      aplicarCor(alvo, hex, terminou);
+      return true;
+    };
+    campoHex.addEventListener("input", () => usarHex(false));
+    campoHex.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); if (usarHex(true)) fecharSeletorCor(); else P.toast("Use um código HEX, como #C9A27E.", "erro"); }
+      if (e.key === "Escape") fecharSeletorCor();
+    });
+    caixa.querySelector(".sc-ok").addEventListener("click", () => { usarHex(true); fecharSeletorCor(); });
+    desenhar();
+    viva.seletor = { caixa, alvo };
+    // clicou fora: fecha (e guarda o que estava escolhido)
+    viva.seletorFora = (e) => { if (!caixa.contains(e.target) && !e.target.closest("[data-cor-abrir]")) fecharSeletorCor(); };
+    setTimeout(() => document.addEventListener("pointerdown", viva.seletorFora, true), 0);
+    campoHex.focus();
+    campoHex.select();
+  }
+
+  function fecharSeletorCor() {
+    if (!viva.seletor) return;
+    document.removeEventListener("pointerdown", viva.seletorFora, true);
+    const { caixa, alvo } = viva.seletor;
+    viva.seletor = null;
+    caixa.remove();
+    if (viva.corPendente && atual) aplicarCor(alvo, corAtual(alvo), true); // digitou sem apertar Enter: salva também
+  }
+
   // Quando o ajuste não tem onde aparecer, explica o porquê (uma vez só)
   function avisoDoAjuste(alvo) {
     viva.avisos = viva.avisos || new Set();
@@ -1130,6 +1328,7 @@
 
   // Ao abrir outro vídeo ou voltar para a lista, nada do vídeo anterior fica pendurado
   function trocarDeVideo() {
+    fecharSeletorCor();
     soltarVideo();
     soltarPlayer();
     limparAnexos();
@@ -2183,6 +2382,8 @@
     atualizarPrevia();
     if (redesenhar === "tudo") desenharEditor(); else desenharAbaViva();
     salvarDepois();
+    // mexeu na fonte ou na cor do título: a prévia vai até um título para mostrar
+    if (k === "corTitulo" || k === "tituloItalico" || k === "tituloPrimeira") mostrarTitulo(k === "corTitulo");
   }
 
   /* ---------- Desenho ---------- */
@@ -2264,7 +2465,7 @@
         <div class="ev-opcoes">${fontes.primeira.map((f) => opcao("tituloPrimeira", f.chave, est.tituloPrimeira || "interTight", f.nome, f.desc, fonteBotao("primeira", f), ocupado)).join("")}</div>
         <p class="ev-rot">Cor do título</p>
         <div class="ev-cores">${CORES_TITULO.map((cor) => `<button type="button" class="ev-cor${(est.corTitulo || "#C9A27E").toUpperCase() === cor ? " ev-cor-sel" : ""}" data-ev-estilo="corTitulo" data-valor="${cor}" style="background:${cor}" aria-label="Cor ${cor}"${ocupado ? " disabled" : ""}></button>`).join("")}
-          <label class="ev-cor-livre" title="Outra cor"><input type="color" data-ev-cor="corTitulo" value="${P.esc(est.corTitulo || "#C9A27E")}"${ocupado ? " disabled" : ""}></label></div>
+          ${campoDeCor("corTitulo", (est.corTitulo || "#C9A27E").toUpperCase(), "Código HEX da cor do título", ocupado)}</div>
         ${est.tituloItalico ? "" : `<p class="mudo pequeno">As fontes do título valem quando a parte em itálico não é “Do nicho”.</p>`}
         <p class="ev-rot">Legenda</p>
         <div class="ev-opcoes">${opcao("legendaFonte", "bootzy", est.legendaFonte || "bootzy", "Bootzy", "a sua fonte", "font-family:BootzyPainel,sans-serif", ocupado)}
@@ -2647,7 +2848,6 @@
   function mudancaViva(ev) {
     const t = ev.target;
     if (t.dataset.evChave) { mudarEstilo(t.dataset.evChave, t.checked); return true; }
-    if (t.dataset.evCor) { mudarEstilo(t.dataset.evCor, t.value.toUpperCase()); return true; }
     if (t.dataset.evAnimCampo) {
       const k = t.dataset.evAnimCampo;
       // texto e detalhe já valeram enquanto digitava: ao sair do campo, só atualiza a linha do tempo
