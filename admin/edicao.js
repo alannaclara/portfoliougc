@@ -577,7 +577,7 @@
           .map(([v, t]) => `<option value="${v}"${P.num(c.palavrasPorVez) === v ? " selected" : ""}>${t}</option>`).join("")}</select></div>
       <div class="campo"><label for="ed-na-cor">Palavras na cor da marca</label>
         <input id="ed-na-cor" value="${P.esc(c.palavrasNaCor.join(", "))}" placeholder="site, bio, grátis">
-        <span class="campo-ajuda">Separe com vírgula</span></div>
+        <span class="campo-ajuda">Separe com vírgula. A legenda sai numa cor só; essas palavras só ficam coloridas escolhendo “Palavra + cor” na edição ao vivo.</span></div>
       <div class="campo largo"><label>Fala transcrita</label>
         ${c.palavras.length ? `<div class="ed-palavras" id="ed-palavras">${c.palavras.map((p, i) =>
           `<input data-palavra="${i}" value="${P.esc(p.texto)}" size="${Math.max(2, p.texto.length)}" title="${seg(p.inicio)}">`).join("")}</div>
@@ -1701,7 +1701,7 @@
     telaCheia: ["Tela cheia", "a foto toma a tela toda"]
   };
   const ANIMACOES = { quique: ["Pop com quique", "o padrão"], adesivo: ["Adesivo", "cai girando"], flash: ["Flash", "revela da luz"], subir: ["Subir", "sobe devagar"], seco: ["Corte seco", "só aparece"] };
-  const JEITOS_LEGENDA = { "": ["Do nicho", "como já está"], palavra: ["Uma palavra", "uma grande por vez"], palavraCor: ["Palavra + cor", "palavras-chave na cor"], karaoke: ["Karaokê", "a palavra falada acende"], linhas: ["Frases calmas", "poucas palavras pequenas"] };
+  const JEITOS_LEGENDA = { "": ["Uma cor só", "o padrão"], palavra: ["Uma palavra", "uma grande por vez"], palavraCor: ["Palavra + cor", "palavras-chave na cor"], karaoke: ["Karaokê", "a palavra falada acende"], linhas: ["Frases calmas", "poucas palavras pequenas"] };
   const CAIXAS_LEGENDA = { minusculas: ["minúsculas", "o padrão"], normal: ["Como falado", "maiúscula só no começo"], maiusculas: ["MAIÚSCULAS", "tudo grande"] };
   const POSICOES_LEGENDA = { "": ["Do nicho", "como já está"], peito: ["Altura do peito", "o normal"], rosto: ["Perto do rosto", "acompanha você"], baixo: ["Mais embaixo", "longe do rosto"] };
   const SONS_FOTO = [["cliqueDuplo", "Clique duplo"], ["clique", "Clique"], ["cliqueSuave", "Clique suave"], ["popSuave", "Pop suave"], ["pop", "Pop"], ["adesivo", "Tapa de adesivo"], ["obturador", "Obturador de câmera"], ["nenhum", "Sem som"]];
@@ -1727,7 +1727,7 @@
     if (!carregarEditorVideo.promessa) {
       carregarEditorVideo.promessa = new Promise((ok, falha) => {
         const s = document.createElement("script");
-        s.src = "editor-video.js?v=3";
+        s.src = "editor-video.js?v=4";
         s.onload = () => (window.EditorVideo ? ok(window.EditorVideo) : falha(new Error("player não carregou")));
         s.onerror = () => { carregarEditorVideo.promessa = null; falha(new Error("não consegui baixar o player")); };
         document.head.appendChild(s);
