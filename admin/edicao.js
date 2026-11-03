@@ -592,7 +592,7 @@
         <span class="campo-ajuda">Separe com vírgula. A legenda sai numa cor só; essas palavras só ficam coloridas escolhendo “Palavra + cor” na edição ao vivo.</span></div>
       <div class="campo largo"><label>Fala transcrita</label>
         ${c.palavras.length ? `<div class="ed-palavras" id="ed-palavras">${c.palavras.map((p, i) =>
-          `<input data-palavra="${i}" value="${P.esc(p.texto)}" size="${Math.max(2, p.texto.length)}" title="${seg(p.inicio)}">`).join("")}</div>
+          `<input data-palavra="${i}"${p.ch != null ? ` data-ch="${P.esc(p.ch)}" data-s="${P.esc(String(p.s))}"` : ""} value="${P.esc(p.texto)}" size="${Math.max(2, p.texto.length)}" title="${seg(p.inicio)}">`).join("")}</div>
           <span class="campo-ajuda">${P.plural(c.palavras.length, "palavra", "palavras")}. Clique numa palavra para corrigir a grafia (o tempo continua o mesmo).</span>`
         : `<p class="mudo pequeno">Clique em "Gerar legenda automática" para o seu computador transcrever a fala.</p>`}
         <span class="sr">${P.esc(texto)}</span></div>
@@ -678,7 +678,11 @@
       if (P.$("#ed-por-vez", secao)) c.palavrasPorVez = n(v("ed-por-vez"));
       if (P.$("#ed-na-cor", secao)) c.palavrasNaCor = (v("ed-na-cor") || "").split(",").map((s) => s.trim()).filter(Boolean);
       P.$$("[data-palavra]", secao).forEach((inp) => {
-        const p = c.palavras[Number(inp.dataset.palavra)];
+        // só o que você mudou; a palavra presa à fala é achada pela origem (a ordem pode ter mudado)
+        if (inp.value === inp.defaultValue) return;
+        const p = inp.dataset.ch
+          ? [...c.palavras, ...(c.palavrasFora || [])].find((w) => w.ch === inp.dataset.ch && String(w.s) === inp.dataset.s)
+          : c.palavras[Number(inp.dataset.palavra)];
         if (p) p.texto = inp.value.trim() || p.texto;
       });
       if (P.$("#ed-cor", secao)) c.corMarca = v("ed-cor");
@@ -708,12 +712,28 @@
     };
   }
 
-  // Guarda na memória o que está digitado na tela, antes de redesenhar
-  function absorver() { if (atual && P.$("#ed-titulo", secao)) Object.assign(atual, lerTela()); }
+  // Guarda na memória o que está digitado na tela, antes de redesenhar. Se o início ou o fim de um clipe
+  // mudou na lista dos "Ajustes finos", textos, efeitos, fotos e legenda vão junto, igual na linha do tempo
+  // (antes a legenda ficava no lugar antigo e saía do tempo da fala). Devolve true quando os clipes mudaram.
+  function absorver() {
+    if (!atual || !P.$("#ed-titulo", secao)) return false;
+    const tela = lerTela();
+    const tempo = (x) => `${vazio(x.inicio) ? "" : n(x.inicio)}|${vazio(x.fim) ? "" : n(x.fim)}`;
+    const mexeu = tela.clips.length === atual.clips.length && tela.clips.some((x, i) => tempo(x) !== tempo(atual.clips[i]));
+    if (!mexeu) { Object.assign(atual, tela); return false; }
+    Object.assign(atual, tela, { clips: atual.clips });
+    const ancoras = ancorar();
+    ancoras.forEach((a) => { a.clipe = tela.clips[atual.clips.indexOf(a.clipe)] || a.clipe; });
+    atual.clips = tela.clips;
+    reaplicar(ancoras);
+    return true;
+  }
 
   async function salvarTela(silencioso) {
-    const dados = lerTela();
-    const ok = await salvar(dados);
+    absorver();
+    realinharPalavras();
+    const { titulo, modelo, config, clips, drive_url } = atual;
+    const ok = await salvar({ titulo, modelo, config, clips, drive_url });
     if (ok && !silencioso) P.toast("Vídeo salvo.");
     return ok;
   }
@@ -955,10 +975,12 @@
   // terminou = saiu do campo (change): além de mostrar, salva e acerta a linha do tempo
   function ajusteNaPrevia(alvo, terminou) {
     if (!atual || travado()) return;
+    // início/fim de clipe só valem quando você termina de digitar (no meio, "1" de "15" cortaria o clipe)
+    if (!terminou && alvo.matches && alvo.matches("[data-tempo]")) return;
     clearTimeout(viva.ajusteT);
     const aplicar = () => {
       if (!atual) return;
-      absorver();
+      const mexeuClipes = absorver();
       atualizarPrevia();
       // a primeira mexida num campo leva a prévia até onde ele aparece (as seguintes só atualizam)
       const qual = campoDoAjuste(alvo);
@@ -969,7 +991,8 @@
       }
       if (terminou) {
         viva.ajusteVisto = null; // voltando a mexer nesse campo depois, a prévia vai até ele de novo
-        redesenharLinha();
+        // clipe mudou: textos e legenda andaram junto, então a tabela também precisa mostrar os tempos novos
+        if (mexeuClipes) desenharEditor(); else redesenharLinha();
         if (viva.aba === "animacoes" || viva.aba === "finalizar") desenharAbaViva();
         salvarDepois();
         avisoDoAjuste(alvo);
@@ -1273,8 +1296,10 @@
     const i = atual.clips.findIndex((x) => x.id === id);
     const j = i + passo;
     if (i < 0 || j < 0 || j >= atual.clips.length) return;
+    const ancoras = ancorar(); // textos, legenda e efeitos trocam de lugar junto com os clipes
     [atual.clips[i], atual.clips[j]] = [atual.clips[j], atual.clips[i]];
-    if (await salvar({ clips: atual.clips })) desenharEditor();
+    reaplicar(ancoras);
+    if (await salvar({ clips: atual.clips, config: atual.config })) desenharEditor();
   }
 
   async function tirarClipe(id) {
@@ -1285,8 +1310,10 @@
       if (erro) return P.toast(erro, "erro");
     }
     absorver();
+    const ancoras = ancorar(); // o que vem depois chega para trás junto com o vídeo
     atual.clips = atual.clips.filter((c) => c.id !== id);
-    if (await salvar({ clips: atual.clips })) { P.toast("Clipe tirado."); desenharEditor(); }
+    reaplicar(ancoras);
+    if (await salvar({ clips: atual.clips, config: atual.config })) { P.toast("Clipe tirado."); desenharEditor(); }
   }
 
   async function pedir(status) {
@@ -1444,7 +1471,9 @@
     const airlearn = e.modelo === "airlearn";
     if (!e.clips.length && !c.elementos.length && !(c.legendas || []).length) return "";
     const total = totalVideo(e.clips);
-    const fins = [...c.elementos.map((x) => n(x.fim)), ...(c.legendas || []).map((l) => n(l.fim)),
+    // texto que passa do fim do vídeo é desenhado só até o fim (depois dele não aparece mesmo)
+    const ateOFim = (ini, fim) => Math.min(fim, Math.max(total, ini + 0.5));
+    const fins = [...c.elementos.map((x) => ateOFim(n(x.inicio), n(x.fim))), ...(c.legendas || []).map((l) => n(l.fim)),
       ...(c.palavras || []).map((p) => n(p.fim)), ...(c.efeitos || []).map((x) => n(x.inicio) + 0.5)];
     const dur = Math.max(total, 5, ...fins);
     if (!lt.pps) lt.pps = Math.max(14, Math.min(120, Math.floor(((secao.clientWidth || 900) - LT_NOME - 60) / dur)));
@@ -1475,7 +1504,7 @@
     if (airlearn) {
       trilhas += trilha("Hook", bloco("hook", 0, 0, Math.max(total, 1), c.hook || "(sem hook)", "lt-texto", { fixo: true }));
     } else {
-      const ordem = c.elementos.map((x, i) => ({ i, inicio: n(x.inicio), fim: x.tipo === "flash" ? n(x.inicio) + 0.3 : n(x.fim) }))
+      const ordem = c.elementos.map((x, i) => ({ i, inicio: n(x.inicio), fim: x.tipo === "flash" ? n(x.inicio) + 0.3 : ateOFim(n(x.inicio), n(x.fim)) }))
         .sort((a, b) => a.inicio - b.inicio);
       const r = raias(ordem);
       const qtd = Math.max(1, ...r.map((v) => v + 1));
@@ -1634,22 +1663,37 @@
   }
 
   function mudou() {
+    realinharPalavras();
+    cortarNoFim();
     desenharEditor();
     salvarDepois();
+  }
+
+  // Texto e foto que passam do fim do vídeo acabam no fim (o que vem depois do fim nem aparece)
+  function cortarNoFim() {
+    const total = totalVideo(atual.clips);
+    const c = atual.config;
+    [...(c.elementos || []), ...(c.fotos || [])].forEach((x) => {
+      if (x.tipo !== "flash" && n(x.fim) > total + 0.01 && n(x.inicio) < total - 0.2) x.fim = fix(total);
+    });
   }
 
   /* ---------- Mexer num clipe leva junto o que está em cima dele ---------- */
   function ancorar() {
     const inis = iniciosDosClipes(atual.clips);
+    const total = totalVideo(atual.clips);
     const achar = (t) => { let k = 0; inis.forEach((a, i) => { if (t >= a - 0.001) k = i; }); return k; };
     const c = atual.config;
     const marcar = (obj, colado) => {
       const k = achar(n(obj.inicio));
       const x = atual.clips[k];
-      return x ? { obj, colado, clipe: x, chave: chavePrevia(x), src: n(obj.inicio) - inis[k] + n(x.inicio), dur: obj.fim != null ? n(obj.fim) - n(obj.inicio) : 0 } : null;
+      // ia até o fim do vídeo (título fixo, por exemplo): continua indo até o fim novo
+      const noFim = !colado && obj.fim != null && n(obj.fim) >= total - 0.05;
+      return x ? { obj, colado, noFim, clipe: x, chave: chavePrevia(x), src: n(obj.inicio) - inis[k] + n(x.inicio), dur: obj.fim != null ? n(obj.fim) - n(obj.inicio) : 0 } : null;
     };
-    // palavras e frases da Airlearn somem junto com o clipe; textos, efeitos e fotos ficam onde estão
-    return [...(c.palavras || []).map((o) => marcar(o, true)), ...(c.legendas || []).map((o) => marcar(o, true)),
+    // palavras e frases da Airlearn somem junto com o clipe; textos, efeitos e fotos ficam onde estão.
+    // Palavra que sabe de onde veio (ch/s) não precisa de âncora: o realinharPalavras acha o lugar dela.
+    return [...(c.palavras || []).filter((o) => o.ch == null).map((o) => marcar(o, true)), ...(c.legendas || []).map((o) => marcar(o, true)),
       ...(c.elementos || []).map((o) => marcar(o, false)), ...(c.efeitos || []).map((o) => marcar(o, false)),
       ...(c.fotos || []).map((o) => marcar(o, false))].filter(Boolean);
   }
@@ -1660,6 +1704,7 @@
     const fora = new Set();
     const contem = (x, src) => src >= n(x.inicio) - 0.05 && src < n(x.inicio) + durClipe(x);
     ancoras.forEach((a) => {
+      if (a.noFim) a.obj.fim = fix(total);
       // o mesmo pedaço; se ele não tem mais esse segundo do vídeo (cortou uma palavra no meio, dividiu),
       // o outro pedaço do mesmo vídeo que tem
       let k = atual.clips.indexOf(a.clipe);
@@ -1681,12 +1726,78 @@
       }
       const t = Math.min(inis[k] + (src - ini), Math.max(0, total - 0.1));
       a.obj.inicio = fix(t);
-      if (a.obj.fim != null) a.obj.fim = fix(t + a.dur);
+      // texto, foto e efeito não passam do fim do vídeo (lá eles nem aparecem)
+      if (a.obj.fim != null) a.obj.fim = fix(a.noFim ? total : a.colado ? t + a.dur : Math.max(t + 0.2, Math.min(total, t + a.dur)));
     });
     const c = atual.config;
     const filtrar = (lista) => (Array.isArray(lista) ? lista.filter((o) => !fora.has(o)) : lista);
     c.palavras = filtrar(c.palavras);
     c.legendas = filtrar(c.legendas);
+    realinharPalavras();
+  }
+
+  /* ---------- Legenda presa à fala ----------
+     Cada palavra guarda de onde veio no vídeo original: ch (a chave do vídeo), s (o segundo em que começa)
+     e d (quanto dura). Mexa como mexer nos trechos (linha do tempo, Ajustes finos, aba Cortar), a palavra
+     aparece sempre junto da fala. Palavra de um pedaço que saiu do vídeo vai para "palavrasFora" e volta
+     sozinha se o pedaço voltar; a que você apagou fica lá marcada como apagada (não volta). */
+  function realinharPalavras() {
+    if (!atual || atual.modelo === "airlearn") return false;
+    const c = atual.config;
+    const todas = [...(c.palavras || []), ...(c.palavrasFora || [])];
+    const presas = todas.filter((w) => w.ch != null);
+    if (!presas.length) return false; // legenda antiga, sem a origem de cada palavra: fica como está
+    const vivos = atual.clips.filter((x) => !x.apagado);
+    const inis = iniciosDosClipes(vivos);
+    const antes = (c.palavras || []).map((w) => `${w.texto}@${w.inicio}`).join("|");
+    // fala que entrou no vídeo (esticou um trecho, trocou a tomada) e ainda não tem palavra: vem da transcrição
+    if (viva.transcricao && viva.idVideo === atual.id) {
+      const corr = c.correcoes || {};
+      vivos.forEach((x) => {
+        const ch = chavePrevia(x);
+        const ini = n(x.inicio);
+        const fim = ini + durClipe(x);
+        const doVideo = presas.filter((p) => p.ch === ch);
+        (viva.transcricao[ch] || []).forEach((w, i) => {
+          if (w.inicio < ini - 0.02 || w.inicio >= fim) return;
+          if (doVideo.some((p) => n(p.s) < w.fim - 0.01 && n(p.s) + n(p.d) > w.inicio + 0.01)) return;
+          const texto = String(corr[`${ch}|${i}`] ?? w.texto).replace(/[.,!?;:…]+$/, "").trim();
+          if (!texto) return;
+          const nova = { texto, inicio: 0, fim: 0, ch, s: w.inicio, d: fix(w.fim - w.inicio) };
+          doVideo.push(nova);
+          presas.push(nova);
+          todas.push(nova);
+        });
+      });
+    }
+    const dentro = [];
+    const fora = [];
+    todas.forEach((w) => {
+      if (w.ch == null) { dentro.push(w); return; }
+      const s = n(w.s);
+      const k = w.apagada ? -1 : vivos.findIndex((x) => chavePrevia(x) === w.ch && s >= n(x.inicio) - 0.02 && s < n(x.inicio) + durClipe(x));
+      if (k < 0) { fora.push(w); return; }
+      const x = vivos[k];
+      const ini = n(x.inicio);
+      // o / of: o quanto você empurrou o começo e o fim dessa palavra na linha do tempo
+      w.inicio = fix(inis[k] + s - ini + n(w.o));
+      w.fim = fix(Math.max(w.inicio + 0.05, inis[k] + Math.min(s + Math.max(0.05, n(w.d)), ini + durClipe(x)) - ini + n(w.of)));
+      dentro.push(w);
+    });
+    dentro.sort((a, b) => n(a.inicio) - n(b.inicio));
+    c.palavras = dentro;
+    c.palavrasFora = fora;
+    return dentro.map((w) => `${w.texto}@${w.inicio}`).join("|") !== antes;
+  }
+
+  // Mudou o tempo de uma palavra à mão (arrastou ou esticou a frase): guarda como empurrão, sem perder a origem
+  function tempoDaPalavra(p, inicio, fim) {
+    if (p.ch != null) {
+      p.o = fix(n(p.o) + inicio - n(p.inicio));
+      p.of = fix(n(p.of) + fim - n(p.fim));
+    }
+    p.inicio = fix(inicio);
+    p.fim = fix(fim);
   }
 
   /* ---------- Arrastar blocos ---------- */
@@ -1890,8 +2001,7 @@
     const escala = (fim - inicio) / Math.max(0.01, f.fim - f.inicio);
     for (let k = f.de; k <= f.ate; k++) {
       const p = c.palavras[k];
-      p.inicio = fix(inicio + (n(p.inicio) - f.inicio) * escala);
-      p.fim = fix(inicio + (n(p.fim) - f.inicio) * escala);
+      tempoDaPalavra(p, inicio + (n(p.inicio) - f.inicio) * escala, inicio + (n(p.fim) - f.inicio) * escala);
     }
     c.palavras.sort((x, y) => x.inicio - y.inicio);
   }
@@ -2072,7 +2182,8 @@
     else if (s.tipo === "leg") c.legendas.splice(s.i, 1);
     else if (s.tipo === "frase") {
       const f = frasesDe(c.palavras)[s.i];
-      if (f) c.palavras.splice(f.de, f.ate - f.de + 1);
+      // a palavra apagada fica guardada como apagada: assim a transcrição não traz ela de volta
+      if (f) c.palavrasFora = [...(c.palavrasFora || []), ...c.palavras.splice(f.de, f.ate - f.de + 1).filter((w) => w.ch != null).map((w) => Object.assign(w, { apagada: true }))];
     } else if (s.tipo === "clip") {
       const x = atual.clips[s.i];
       if (!x) return;
@@ -2130,9 +2241,19 @@
         if (!novas.length) { lt.historico.pop(); return; }
         const antigas = c.palavras.slice(f.de, f.ate + 1);
         const passo = (f.fim - f.inicio) / novas.length;
-        c.palavras.splice(f.de, antigas.length, ...novas.map((texto, j) => (novas.length === antigas.length
-          ? { texto, inicio: antigas[j].inicio, fim: antigas[j].fim }
-          : { texto, inicio: fix(f.inicio + j * passo), fim: fix(f.inicio + (j + 1) * passo) })));
+        // mesma quantidade: cada palavra só troca de texto (e continua presa à fala)
+        if (novas.length === antigas.length) c.palavras.splice(f.de, antigas.length, ...novas.map((texto, j) => Object.assign({}, antigas[j], { texto })));
+        else {
+          // outra quantidade: as novas dividem o pedaço de fala das antigas (se todas vieram do mesmo vídeo)
+          const ch = antigas[0].ch;
+          const mesmo = ch != null && antigas.every((w) => w.ch === ch);
+          const s0 = mesmo ? n(antigas[0].s) : 0;
+          const ds = mesmo ? (n(antigas[antigas.length - 1].s) + n(antigas[antigas.length - 1].d) - s0) / novas.length : 0;
+          c.palavras.splice(f.de, antigas.length, ...novas.map((texto, j) => Object.assign(
+            { texto, inicio: fix(f.inicio + j * passo), fim: fix(f.inicio + (j + 1) * passo) },
+            mesmo ? { ch, s: fix(s0 + j * ds), d: fix(ds) } : {})));
+          if (!mesmo) c.palavrasFora = [...(c.palavrasFora || []), ...antigas.filter((w) => w.ch != null).map((w) => Object.assign({}, w, { apagada: true }))];
+        }
       } else {
         const ini = k === "inicio" ? num : f.inicio;
         const fim = k === "fim" ? num : f.fim;
@@ -2205,7 +2326,7 @@
     if (!carregarEditorVideo.promessa) {
       carregarEditorVideo.promessa = new Promise((ok, falha) => {
         const s = document.createElement("script");
-        s.src = "editor-video.js?v=6";
+        s.src = "editor-video.js?v=7";
         s.onload = () => (window.EditorVideo ? ok(window.EditorVideo) : falha(new Error("player não carregou")));
         s.onerror = () => { carregarEditorVideo.promessa = null; falha(new Error("não consegui baixar o player")); };
         document.head.appendChild(s);
@@ -2257,6 +2378,8 @@
       viva.carregando = false;
     }
     if (atual && atual.id === id) {
+      // com a transcrição na mão, a legenda confere se falta alguma fala dos trechos que estão no vídeo
+      if (realinharPalavras()) redesenharLinha();
       atualizarPrevia();
       desenharAbaViva();
       // ainda falta prévia de algum trecho: confere de novo daqui a pouco (o estagiário prepara sozinho)
@@ -2763,6 +2886,8 @@
       <section class="ev-secao"><h3>Som original dos clipes</h3>
         <p class="ev-rot">Volume da sua voz e do ambiente: <b id="ev-vol-clip">${n(c.somClipes ?? 100)}%</b></p>
         <input type="range" class="ev-faixa" min="0" max="100" step="5" value="${n(c.somClipes ?? 100)}" data-ev-clipes="1" data-txt="ev-vol-clip" data-sufixo="%"${bloqueio}>
+        <label class="ev-marcar"><input type="checkbox" data-ev-chave="vozTratada"${est.vozTratada !== false ? " checked" : ""}${bloqueio}> voz tratada no 4K</label>
+        <p class="mudo pequeno">Tira o grave embolado, deixa a fala mais clara, suaviza o “s” e acerta o volume para o Instagram. Sem filtro de ruído, então a voz não fica robotizada. Só aparece no 4K (a prévia toca o som original).</p>
       </section>
       <div class="ev-rodape"><button class="botao botao-principal" type="button" data-ev-aba="finalizar">Próximo: finalizar ›</button></div>`;
   }
@@ -3062,7 +3187,8 @@
         if (w.inicio < ini - 0.02 || w.inicio >= ini + dur) return;
         const texto = String(correcoes[`${ch}|${i}`] ?? w.texto).replace(/[.,!?;:…]+$/, "").trim();
         if (!texto) return;
-        saida.push({ texto, inicio: fix(t + Math.max(0, w.inicio - ini)), fim: fix(t + Math.min(ini + dur, w.fim) - ini) });
+        // ch/s/d: de onde a palavra veio (ver realinharPalavras)
+        saida.push({ texto, inicio: fix(t + Math.max(0, w.inicio - ini)), fim: fix(t + Math.min(ini + dur, w.fim) - ini), ch, s: w.inicio, d: fix(w.fim - w.inicio) });
       });
       t += dur;
     });
@@ -3122,7 +3248,8 @@
       }
     }
     reaplicar(ancoras);
-    atual.config.palavras = palavrasDaTranscricao();
+    // legenda presa à fala já se arrumou no reaplicar; a antiga é refeita pela transcrição
+    if (![...atual.config.palavras, ...(atual.config.palavrasFora || [])].some((w) => w.ch != null)) atual.config.palavras = palavrasDaTranscricao();
     mudou();
   }
 
@@ -3137,7 +3264,10 @@
     if (novo == null || novo.trim() === atualTexto) return;
     guardar();
     atual.config.correcoes = Object.assign({}, correcoes, { [ref]: novo.trim() });
-    atual.config.palavras = palavrasDaTranscricao();
+    const c = atual.config;
+    const presa = [...c.palavras, ...(c.palavrasFora || [])].find((p) => p.ch === ch && Math.abs(n(p.s) - w.inicio) < 0.01);
+    if (presa) presa.texto = novo.trim().replace(/[.,!?;:…]+$/, "") || presa.texto;
+    else if (!c.palavras.some((p) => p.ch != null)) c.palavras = palavrasDaTranscricao();
     mudou();
   }
 
