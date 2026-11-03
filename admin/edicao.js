@@ -926,6 +926,11 @@
       absorver();
       desenharEditor();
     }
+    // qualquer campo dos "Ajustes finos" (tempos, textos, cor...) aparece na prévia ao vivo
+    if (atual && ev.target.closest(".ed-ajustes") && ev.target.type !== "file") {
+      absorver();
+      atualizarPrevia();
+    }
   }
 
   function criar() {
@@ -1404,6 +1409,8 @@
       a.el.style.left = Math.max(0, a.left0 + a.w0 - w) + "px";
       a.el.style.width = w + "px";
     } else a.el.style.width = Math.max(8, a.w0 + a.dx) + "px";
+    // a prévia ao vivo acompanha o arraste
+    if (!a.agendada) { a.agendada = true; requestAnimationFrame(() => previaDoArrasto(a)); }
   }
 
   function aoSoltar() {
@@ -1422,6 +1429,14 @@
 
   function aplicarArrasto(a, dt) {
     guardar();
+    moverNoArrasto(a, dt);
+    mudou();
+    mostrarNaPrevia(lt.sel, a.ponta);
+  }
+
+  // A mudança do arraste nos dados (sem guardar nem redesenhar): usada ao soltar e,
+  // numa cópia, enquanto arrasta (para a prévia acompanhar o movimento)
+  function moverNoArrasto(a, dt) {
     const c = atual.config;
     const mexer = (obj, minimo) => {
       let ini = n(obj.inicio);
@@ -1469,7 +1484,62 @@
       }
       reaplicar(ancoras);
     }
-    mudou();
+  }
+
+  // Enquanto arrasta: aplica o movimento numa cópia, mostra no player e volta tudo como estava
+  // (os dados de verdade só mudam ao soltar). No máximo uma vez por quadro da tela.
+  function previaDoArrasto(a) {
+    a.agendada = false;
+    if (!viva.ctrl || lt.arrasto !== a || !a.moveu) return;
+    if (!a.antes) a.antes = JSON.stringify({ config: atual.config, clips: atual.clips });
+    const real = { config: atual.config, clips: atual.clips, sel: lt.sel };
+    const copia = JSON.parse(a.antes);
+    atual.config = copia.config;
+    atual.clips = copia.clips;
+    lt.sel = { tipo: a.tipo, i: a.i };
+    try {
+      moverNoArrasto(a, a.dx / lt.pps);
+      viva.ctrl.atualizar(propsDaPrevia());
+      const t = tempoParaMostrar(lt.sel, a.ponta);
+      if (t != null) viva.ctrl.irPara(Math.max(0, t));
+    } finally {
+      atual.config = real.config;
+      atual.clips = real.clips;
+      lt.sel = real.sel;
+    }
+  }
+
+  // Em que segundo a prévia mostra o que foi mexido: logo depois da entrada (ou no fim, se mexeu na ponta do fim)
+  function tempoParaMostrar(sel, ponta) {
+    if (!sel || !atual) return null;
+    const c = atual.config;
+    const fim = ponta === "d";
+    if (sel.tipo === "el") {
+      const x = (c.elementos || [])[sel.i];
+      if (!x) return null;
+      if (x.tipo === "flash") return n(x.inicio);
+      return fim ? Math.max(n(x.inicio), n(x.fim) - 0.05) : n(x.inicio) + Math.min(0.6, Math.max(0, (n(x.fim) - n(x.inicio)) / 2));
+    }
+    if (sel.tipo === "leg") { const l = (c.legendas || [])[sel.i]; return l ? (fim ? n(l.fim) - 0.05 : n(l.inicio) + 0.15) : null; }
+    if (sel.tipo === "frase") { const f = frasesDe(c.palavras || [])[sel.i]; return f ? (fim ? f.fim - 0.05 : f.inicio + 0.05) : null; }
+    if (sel.tipo === "foto") { const f = (c.fotos || [])[sel.i]; return f ? (fim ? n(f.fim) - 0.05 : n(f.inicio) + 0.5) : null; }
+    if (sel.tipo === "efeito") { const x = (c.efeitos || [])[sel.i]; return x ? n(x.inicio) : null; }
+    if (sel.tipo === "clip") {
+      const x = atual.clips[sel.i];
+      if (!x) return null;
+      const ini = iniciosDosClipes(atual.clips)[sel.i];
+      return fim ? ini + durClipe(x) - 0.05 : ini + 0.05;
+    }
+    return null;
+  }
+
+  // Depois de cada mudança na linha do tempo, a prévia para no ponto mexido (assim a mudança aparece)
+  function mostrarNaPrevia(sel, ponta) {
+    const t = tempoParaMostrar(sel, ponta);
+    if (t == null) return;
+    lt.cursor = Math.max(0, t);
+    posicionarCursor();
+    if (viva.ctrl) { viva.ctrl.pausar(); viva.ctrl.irPara(lt.cursor); }
   }
 
   // Muda início/fim de uma frase da legenda esticando ou encolhendo as palavras dela
@@ -1525,12 +1595,20 @@
   /* ---------- Cliques e botões da linha do tempo ---------- */
   function cliqueNaLinha(ev) {
     const botao = ev.target.closest("[data-lt-acao]");
-    if (botao) return acaoDaLinha(botao.dataset.ltAcao, botao);
+    if (botao) {
+      const acao = botao.dataset.ltAcao;
+      // criou, duplicou, dividiu ou moveu: a prévia vai até lá para mostrar
+      return Promise.resolve(acaoDaLinha(acao, botao)).then(() => {
+        if (["mais-texto", "mais-efeito", "mais-leg", "duplicar", "mover", "dividir"].includes(acao)) mostrarNaPrevia(lt.sel);
+      });
+    }
     if (lt.ignorarClique) return;
     const bloco = ev.target.closest(".lt-bloco");
     if (bloco) {
       lt.sel = { tipo: bloco.dataset.lt, i: Number(bloco.dataset.i) };
-      return desenharEditor();
+      desenharEditor();
+      mostrarNaPrevia(lt.sel); // clicou num bloco: a prévia vai até ele
+      return;
     }
     if (ev.target.closest(".lt-pista") && !ev.target.closest(".lt-regua") && lt.sel) {
       lt.sel = null;
@@ -1690,6 +1768,8 @@
       reaplicar(ancoras);
     }
     mudou();
+    // a prévia para onde a mudança aparece (no fim, se mexeu no "até")
+    if (s.tipo !== "musica" && s.tipo !== "hook" && k !== "volume") mostrarNaPrevia(lt.sel, k === "fim" ? "d" : null);
   }
 
   /* =========================================================
@@ -1879,7 +1959,8 @@
       viva.host = document.createElement("div");
       viva.host.className = "ev-host";
     }
-    if (viva.host.parentNode !== vaga) vaga.appendChild(viva.host);
+    vigiarPlayer();
+    posicionarPlayer();
     if (!viva.ctrl) {
       try {
         const EV = await carregarEditorVideo();
@@ -1905,7 +1986,71 @@
     prepararPrevia(false);
   }
 
+  /* ---------- Mini prévia flutuante ----------
+     Mexendo na linha do tempo, o player grande sai da tela: a prévia vai para o canto da tela
+     (o mesmo player, só muda de lugar) e volta sozinha quando o player grande aparece de novo. */
+  // A cada rolagem da página (no máximo a cada 60 ms) confere se o player grande está à vista
+  function vigiarPlayer() {
+    if (viva.aoRolar) return;
+    viva.aoRolar = () => {
+      if (viva.rolarT) return;
+      viva.rolarT = setTimeout(() => { viva.rolarT = null; if (atual && viva.host) posicionarPlayer(); }, 60);
+    };
+    window.addEventListener("scroll", viva.aoRolar, { passive: true, capture: true });
+    window.addEventListener("resize", viva.aoRolar, { passive: true });
+  }
+
+  // Mais de 30% do player grande aparecendo na tela?
+  function playerGrandeAVista(vaga) {
+    const r = vaga.getBoundingClientRect();
+    const aparece = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+    return r.height > 0 && aparece / r.height > 0.3;
+  }
+
+  function posicionarPlayer() {
+    if (!viva.host || !atual) return;
+    const vaga = P.$("#ev-player", secao);
+    const aVista = !!vaga && playerGrandeAVista(vaga);
+    if (aVista) viva.miniFechada = false; // escondeu a mini? ela volta a aparecer da próxima vez
+    // só com a aba Edição aberta na tela (em outra aba do painel a mini some)
+    const usarMini = !!vaga && !aVista && !viva.miniFechada && !!secao.offsetParent;
+    if (usarMini) {
+      const lugar = garantirMini().querySelector(".ev-flutuante-video");
+      if (viva.host.parentNode !== lugar) lugar.appendChild(viva.host);
+      viva.mini.classList.add("ev-visivel");
+    } else {
+      if (viva.mini) viva.mini.classList.remove("ev-visivel");
+      if (vaga && viva.host.parentNode !== vaga) vaga.appendChild(viva.host);
+    }
+  }
+
+  function garantirMini() {
+    if (viva.mini) return viva.mini;
+    const m = document.createElement("div");
+    m.className = "ev-flutuante";
+    m.innerHTML = `<div class="ev-flutuante-topo"><span>Prévia</span>
+      <button type="button" data-ev-mini="subir" title="Voltar para o player grande" aria-label="Voltar para o player grande">${P.icone("subir", "ico-p")}</button>
+      <button type="button" data-ev-mini="fechar" title="Esconder" aria-label="Esconder a prévia">${P.icone("x", "ico-p")}</button></div>
+      <div class="ev-flutuante-video"></div>`;
+    m.addEventListener("click", (ev) => {
+      const b = ev.target.closest("[data-ev-mini]");
+      if (!b) return;
+      if (b.dataset.evMini === "fechar") { viva.miniFechada = true; posicionarPlayer(); }
+      else { const card = P.$("#ev", secao); if (card) card.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    });
+    document.body.appendChild(m);
+    viva.mini = m;
+    return m;
+  }
+
   function soltarPlayer() {
+    if (viva.aoRolar) {
+      window.removeEventListener("scroll", viva.aoRolar, { capture: true });
+      window.removeEventListener("resize", viva.aoRolar);
+      viva.aoRolar = null;
+    }
+    if (viva.mini) { viva.mini.remove(); viva.mini = null; }
+    viva.miniFechada = false;
     if (viva.ctrl) viva.ctrl.destruir();
     if (viva.host) viva.host.remove();
     clearTimeout(viva.espera);

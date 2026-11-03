@@ -863,6 +863,17 @@ tr.deslizando:hover{background:transparent}
 .ev-foto-bib:hover .ev-foto-apagar{display:grid}
 .ev-foto-apagar .ico{width:12px;height:12px}
 .ev-resumo{margin:0 0 12px;padding-left:18px;line-height:1.8;font-size:14px}
+/* Mini prévia flutuante: aparece quando o player grande sai da tela (mexendo na linha do tempo) */
+.ev-flutuante{position:fixed;right:16px;bottom:16px;z-index:60;width:250px;display:none;border-radius:14px;overflow:hidden;background:#15191b;box-shadow:0 18px 50px rgba(0,0,0,.38)}
+.ev-flutuante.ev-visivel{display:block}
+.ev-flutuante-topo{display:flex;align-items:center;gap:4px;padding:5px 6px 5px 10px;background:#22282b;color:#d6dee0;font-size:12px;font-weight:700}
+.ev-flutuante-topo span{flex:1}
+.ev-flutuante-topo button{display:grid;place-items:center;width:26px;height:26px;padding:0;border:0;border-radius:6px;background:transparent;color:#d6dee0;cursor:pointer}
+.ev-flutuante-topo button:hover{background:rgba(255,255,255,.12)}
+.ev-flutuante-topo .ico{width:14px;height:14px}
+.ev-flutuante-video{width:100%;aspect-ratio:9/16}
+@media (max-width:640px){.ev-flutuante{width:132px;right:10px;bottom:10px}}
+
 /* Aba Animações: lista com ver, editar e excluir */
 .ev-anim-nova{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
 .ev-anim-nova select{min-height:36px;padding:6px 10px;border:1px solid var(--linha-forte);border-radius:var(--raio-sm);background:#fff;font:inherit;max-width:100%}
