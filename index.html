@@ -61,7 +61,8 @@
 
 /* ===== BASE ===== */
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:calc(var(--topo) + var(--aviso) + 8px);-webkit-text-size-adjust:100%}
+/* overflow-x no html também: rede de segurança para nada nunca deixar a página mais larga que a tela */
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--topo) + var(--aviso) + 8px);-webkit-text-size-adjust:100%;overflow-x:hidden;overflow-x:clip}
 body{margin:0;background:var(--creme);color:var(--tinta);font-family:var(--sans);font-size:1.0625rem;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 @supports (overflow:clip){body{overflow-x:clip}}
 img{display:block;max-width:100%;height:auto}
@@ -200,7 +201,8 @@ section{padding-block:var(--secao)}
 .capa h1 span{display:block}
 .capa h1 em{display:inline-block;margin-left:.55em}
 .capa-frase{max-width:31ch;margin-bottom:36px;font-family:var(--serif);font-size:clamp(1.3rem,2.3vw,1.75rem);font-weight:300;line-height:1.35}
-.numeros-capa{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:clamp(40px,5vw,64px);border-top:1px solid var(--tinta)}
+/* A terceira coluna é mais larga porque o número dela é o mais comprido ("+395 MIL") */
+.numeros-capa{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,.75fr) minmax(0,1.4fr);margin-top:clamp(40px,5vw,64px);border-top:1px solid var(--tinta)}
 .numeros-capa li{padding:20px 12px 0 0}
 .numeros-capa li+li{padding-left:clamp(12px,2vw,24px);border-left:1px solid var(--linha)}
 .num{display:block;font-family:var(--serif);font-weight:400;line-height:1;letter-spacing:-.02em;color:var(--tinta);font-variant-numeric:lining-nums}
@@ -266,6 +268,11 @@ section{padding-block:var(--secao)}
    um pouco desfocadas e as de trás desfocadas. Em cima, as fotos passam por trás da
    faixa de logos: o recorte começa logo abaixo das logos, então elas nunca ficam escondidas. */
 .sobre-roda{position:relative;align-self:stretch;min-height:420px}
+/* O círculo de fotos tem uma camada que vai além das bordas da tela (o degradê que esconde as fotos
+   embaixo da faixa de logos). Sem este corte, alguns celulares (Samsung, por exemplo) achavam que a
+   página tinha o dobro da largura e mostravam tudo encolhido. O corte é só para os lados: em cima
+   as fotos continuam passando por trás da faixa. */
+.sobre{overflow-x:clip}
 .roda{position:absolute;top:calc(-1 * (var(--entre) + var(--faixa-respiro)));bottom:calc(-1 * var(--entre));left:0;right:0;pointer-events:none;clip-path:polygon(-100vw 2px,200vw 2px,200vw 100%,-100vw 100%)}
 /* As fotos aparecem aos poucos logo abaixo das logos, em vez de cortadas numa linha reta */
 .roda::before{content:"";position:absolute;top:0;left:-100vw;right:-100vw;height:clamp(60px,7vw,100px);background:linear-gradient(var(--creme) 10%,rgba(243,238,233,0));z-index:200}
@@ -566,12 +573,24 @@ div.video:not([data-video]){cursor:default}
 @media (max-width:480px){
   .numeros-capa li{padding-right:8px}
   .numeros-capa li+li{padding-left:10px}
+  /* Em celular pequeno o número acompanha a largura da tela, para o "+395 MIL" caber no espaço dele */
+  .numeros-capa .num{font-size:min(1.7rem,5.2vw)}
   .num-rotulo{font-size:.76rem}
   .botoes .btn{flex:1 1 100%}
   .servicos-cta .btn{width:100%}
   .video{--por-tela:1.6}
   .seta{width:44px;height:44px}
   .video-info{padding:14px}
+}
+/* Celular bem estreito (320 a 380 pixels): o nome, o PT/EN e o botão do menu
+   ficam um pouco menores para os três caberem na barra de cima */
+@media (max-width:380px){
+  .topo .container{gap:10px}
+  .logo{font-size:1.22rem}
+  .logo-estrela{width:22px;height:22px}
+  .idioma button{min-width:32px;padding:5px 7px;font-size:.7rem}
+  .sanduiche{width:44px;height:44px;flex:none}
+  .aviso{font-size:.7rem;gap:8px}
 }
 
 /* ===== PALETA DOS BLOCOS (#5aacba) =====
