@@ -17,6 +17,9 @@
   let videos = [];
   let leads = [];          // quem preencheu o formulário do site e ainda não foi para o funil
   let temNoFunil = true;   // a coluna no_funil existe no banco?
+  let cliques = [];        // cada vez que alguém abriu um vídeo no site
+  let temCliques = true;   // a tabela video_cliques existe no banco?
+  let periodoCliques = 30; // dias; 0 = desde o começo
   const VISTOS = "pf-leads-vistos";
 
   const nomeNicho = (n) => NICHOS[n] || (n ? n.charAt(0).toUpperCase() + n.slice(1) : "Sem nicho");
@@ -80,6 +83,17 @@
         </div>
         <div class="cartao">
           <div class="cartao-topo">
+            <h2>Vídeos mais assistidos no site</h2>
+            <div class="filtros" id="pf-periodo" role="group" aria-label="Período">
+              <button class="filtro" type="button" data-dias="7">7 dias</button>
+              <button class="filtro" type="button" data-dias="30">30 dias</button>
+              <button class="filtro" type="button" data-dias="0">Desde o começo</button>
+            </div>
+          </div>
+          <div class="cartao-corpo" id="pf-assistidos"><p class="carregando">Carregando...</p></div>
+        </div>
+        <div class="cartao">
+          <div class="cartao-topo">
             <h2>Meus vídeos</h2>
             <div class="grupo-botoes">
               <span class="mudo pequeno">Arraste pela alcinha para mudar a ordem no site</span>
@@ -99,6 +113,12 @@
       P.$("#pf-atualizar", s).addEventListener("click", () => carregar());
       P.$("#pf-recados", s).addEventListener("click", aoClicarNoRecado);
       P.$("#pf-vistos", s).addEventListener("click", () => { marcarVistos(); desenharRecados(); });
+      P.$("#pf-periodo", s).addEventListener("click", (e) => {
+        const b = e.target.closest("[data-dias]");
+        if (!b) return;
+        periodoCliques = Number(b.dataset.dias);
+        desenharMaisAssistidos();
+      });
       prepararAtualizacaoAutomatica();
       await carregar();
     },
@@ -111,11 +131,15 @@
     const inicio = new Date();
     inicio.setHours(0, 0, 0, 0);
     inicio.setDate(inicio.getDate() - 13);
-    const [rv, rs, rm] = await Promise.all([
+    const [rv, rs, rm, rc] = await Promise.all([
       P.lerSeguro("videos", (q) => q.order("ordem", { ascending: true }).order("criado_em", { ascending: true })),
       P.lerSeguro("visitas", (q) => q.gte("data", inicio.toISOString()).order("data", { ascending: true }).limit(20000)),
-      P.lerSeguro("marcas", (q) => q.eq("origem", "site").order("criado_em", { ascending: false }))
+      P.lerSeguro("marcas", (q) => q.eq("origem", "site").order("criado_em", { ascending: false })),
+      P.lerSeguro("video_cliques", (q) => q.order("data", { ascending: false }).limit(20000))
     ]);
+    // Sem a tabela, a lista mostra o aviso dentro dela, sem encher o topo de erro
+    temCliques = !rc.erro;
+    cliques = rc.dados;
     if (rv.erro) P.avisar(avisos, rv.erro);
     if (rs.erro) P.avisar(avisos, rs.erro);
     if (rm.erro) P.avisar(avisos, rm.erro);
@@ -130,6 +154,7 @@
     desenharNumeros(visitas);
     desenharGrafico(visitas);
     desenharOrigens(visitas);
+    desenharMaisAssistidos();
     desenharVideos();
     const hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
     P.$("#pf-atualizado", secao).textContent = `Atualizado às ${hora}. Quem preenche o formulário aparece aqui em até 12 segundos, sem você precisar recarregar nada. As suas próprias visitas, com o login do painel aberto neste navegador, não entram na conta.`;
@@ -349,6 +374,57 @@
       const largura = Math.round(P.divide(qtd, maior) * 100);
       return `<div class="origem-linha"><span>${P.esc(nome)}</span><span class="mudo">${P.inteiro(qtd)} (${pct}%)</span><span class="origem-trilho"><span style="width:${largura}%"></span></span></div>`;
     }).join("")}</div>`;
+  }
+
+  /* ---------- Vídeos mais assistidos no site ----------
+     O site grava o código do YouTube (ou o link, quando não é YouTube) de cada
+     vídeo aberto. Aqui esse código é ligado de volta ao vídeo da tabela. */
+  const idYoutube = (url) => {
+    const m = String(url || "").match(/(?:shorts\/|[?&]v=|youtu\.be\/|embed\/|live\/)([\w-]{11})/);
+    return m ? m[1] : "";
+  };
+
+  function desenharMaisAssistidos() {
+    const alvo = P.$("#pf-assistidos", secao);
+    P.$$("#pf-periodo [data-dias]", secao).forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.dias) === periodoCliques)));
+
+    if (!temCliques) {
+      alvo.innerHTML = `<p class="vazio">Falta criar no banco o lugar onde o site anota os vídeos abertos. Rode o arquivo video-cliques.sql no SQL Editor do Supabase.</p>`;
+      return;
+    }
+
+    const desde = periodoCliques ? Date.now() - periodoCliques * 86400000 : 0;
+    const doPeriodo = cliques.filter((c) => !desde || new Date(c.data).getTime() >= desde);
+    if (!doPeriodo.length) {
+      alvo.innerHTML = `<p class="vazio">${cliques.length
+        ? "Ninguém abriu vídeo nesse período. Escolha um período maior aqui em cima."
+        : "Aqui vai aparecer quais vídeos as pessoas mais abrem no seu portfólio. A contagem começou agora, então os números vão aparecendo conforme as visitas chegam. As suas próprias visitas, logada no painel, não entram."}</p>`;
+      return;
+    }
+
+    const porChave = {};
+    videos.forEach((v) => { const k = idYoutube(v.link) || v.link; if (k) porChave[k] = v; });
+    const conta = {};
+    doPeriodo.forEach((c) => {
+      if (!conta[c.video]) conta[c.video] = { qtd: 0, titulo: c.titulo, video: porChave[c.video] };
+      conta[c.video].qtd++;
+    });
+    const lista = Object.values(conta).sort((a, b) => b.qtd - a.qtd).slice(0, 10);
+    const maior = lista[0].qtd;
+    const nuncaAbertos = videos.filter(noAr).filter((v) => !conta[idYoutube(v.link) || v.link]).length;
+
+    alvo.innerHTML = `<div class="origens">${lista.map((x, i) => {
+      const v = x.video;
+      const nome = v ? (v.titulo || v.marca || "Sem título") : (x.titulo || "Vídeo que saiu do site");
+      const detalhe = v ? nomeNicho(v.nicho) : "não está mais na lista";
+      const largura = Math.round(P.divide(x.qtd, maior) * 100);
+      return `<div class="origem-linha">
+        <span><b>${i + 1}.</b> ${P.esc(nome)} <span class="mudo pequeno">${P.esc(detalhe)}</span></span>
+        <span class="mudo">${P.plural(x.qtd, "vez", "vezes")}</span>
+        <span class="origem-trilho"><span style="width:${largura}%"></span></span>
+      </div>`;
+    }).join("")}</div>
+    <p class="mudo pequeno" style="margin-top:12px">${P.plural(doPeriodo.length, "vídeo aberto", "vídeos abertos")} no período.${nuncaAbertos ? ` ${P.plural(nuncaAbertos, "vídeo no ar ainda não foi aberto", "vídeos no ar ainda não foram abertos")} nenhuma vez.` : ""}</p>`;
   }
 
   /* ---------- Tabela dos vídeos ---------- */
