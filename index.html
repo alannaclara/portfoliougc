@@ -2002,6 +2002,7 @@ function abrirVideo(card) {
   definirTamanhoDoPlayer(quadro);
   ajustarPlayer();
   $("#fechar-player").focus();
+  registrarClique(id, card.dataset.marca);
 }
 function aoFecharVideo() {
   if (!cardAberto) return;
@@ -2409,12 +2410,17 @@ function deOndeVeio() {
   return fonte.slice(0, 100);
 }
 
+// Visitante de verdade: não é teste no computador nem você logada no painel
+async function ehVisitante() {
+  if (!window.banco) return false;
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === "file:") return false;
+  const { data } = await banco.auth.getSession();
+  return !(data && data.session);
+}
+
 async function registrarVisita() {
-  if (!window.banco) return;
-  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === "file:") return;
   try {
-    const { data } = await banco.auth.getSession();
-    if (data && data.session) return; // é você, logada no painel: não conta
+    if (!(await ehVisitante())) return;
     await banco.from("visitas").insert({
       pagina: (location.pathname || "/").slice(0, 300),
       origem: deOndeVeio()
@@ -2424,6 +2430,26 @@ async function registrarVisita() {
   }
 }
 registrarVisita();
+
+/* ---------- Registro de vídeo aberto ----------
+   Grava qual vídeo foi aberto (o código do YouTube ou o link) e o nome do card,
+   na tabela video_cliques. É daí que sai a lista de mais assistidos do painel. */
+async function registrarClique(video, titulo) {
+  try {
+    if (!video || !(await ehVisitante())) return;
+    await banco.from("video_cliques").insert({
+      video: String(video).slice(0, 300),
+      titulo: String(titulo || "").slice(0, 200)
+    });
+  } catch (erro) {
+    /* se não der, o vídeo abre normal */
+  }
+}
+// Vídeo que não é do YouTube abre numa aba nova: conta o clique no link
+document.addEventListener("click", (e) => {
+  const link = e.target.closest("a.video[href]");
+  if (link) registrarClique(link.href, $(".video-titulo", link)?.textContent);
+});
 
 /* ---------- Ano automático no rodapé ---------- */
 $("#ano").textContent = new Date().getFullYear();
