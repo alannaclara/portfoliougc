@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alanna Clara | UGC Creator no Seu Influencer</title>
+<meta name="description" content="Alanna Clara, UGC Creator em Curitiba. Vídeos de beleza, tech, gastronomia e casa com cara de indicação de amiga. Veja os vídeos do seu nicho e me aprove na campanha.">
+<meta name="theme-color" content="#f1f0ea">
+<meta property="og:title" content="Alanna Clara | UGC Creator no Seu Influencer">
+<meta property="og:description" content="Vídeos com cara de indicação de amiga. Veja os vídeos do seu nicho e me aprove na campanha.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="fotos/estrela.png">
+<link rel="apple-touch-icon" href="fotos/estrela.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://i.ytimg.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add("js");</script>
+<style>
+/* =========================================================
+   PÁGINA SEU INFLUENCER
+   Versão curta do portfólio, feita para as marcas que chegam
+   pelo seu perfil na plataforma Seu Influencer.
+   Visual inspirado no site da Seu Influencer: fundo creme,
+   roxo, verde-limão e rosa, botões redondos e cards com sombra dura.
+   ========================================================= */
+:root {
+  --fundo: #f1f0ea;
+  --fundo-2: #f7f6f2;
+  --branco: #ffffff;
+  --tinta: #141414;
+  --tinta-2: #55534e;
+  --cinza: #8d8b84;
+  --linha: #e2e0d8;
+  --roxo: #6b3bf8;
+  --roxo-escuro: #5428e0;
+  --roxo-claro: #efeaff;
+  --lima: #d7ff00;
+  --rosa: #e84ca7;
+  --vermelho: #ff3b3b;
+  --sombra: 0 8px 20px rgba(20, 20, 20, .06);
+  --sombra-roxa: 0 14px 30px rgba(107, 59, 248, .32);
+  --largura: 1180px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 96px; -webkit-text-size-adjust: 100%; overflow-x: clip; }
+body {
+  font-family: "Poppins", system-ui, sans-serif;
+  background: var(--fundo);
+  color: var(--tinta);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+ul, ol { list-style: none; }
+.container { width: min(var(--largura), 100% - 32px); margin-inline: auto; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 3px solid var(--roxo); outline-offset: 3px; border-radius: 10px; }
+.mao { font-family: "Caveat", cursive; font-weight: 600; line-height: 1; }
+.pular { position: absolute; left: 12px; top: -60px; z-index: 100; background: var(--tinta); color: #fff; padding: 10px 16px; border-radius: 999px; text-decoration: none; }
+.pular:focus { top: 12px; }
+
+/* Estrelinha de 4 pontas usada como enfeite */
+.faisca { position: absolute; width: 28px; height: 28px; pointer-events: none; fill: currentColor; }
+
+/* ===== BARRA DE CIMA ===== */
+.topo { position: fixed; top: 14px; left: 0; right: 0; z-index: 50; pointer-events: none; }
+.topo-barra {
+  pointer-events: auto;
+  width: min(980px, 100% - 24px);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, .94);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 999px;
+  padding: 8px 8px 8px 20px;
+  box-shadow: 0 10px 24px rgba(20, 20, 20, .08);
+}
+.logo { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 1.05rem; letter-spacing: -.02em; text-decoration: none; white-space: nowrap; }
+.logo b { color: var(--roxo); font-weight: 600; }
+.logo svg { width: 15px; height: 15px; color: var(--roxo); fill: currentColor; }
+.menu { display: flex; gap: 2px; margin-left: auto; }
+.menu a { display: block; padding: 8px 14px; border-radius: 999px; text-decoration: none; font-size: .9rem; font-weight: 500; color: var(--tinta-2); transition: background .2s, color .2s; }
+.menu a:hover { background: var(--roxo-claro); color: var(--roxo); }
+.botao-lima { background: var(--lima); color: var(--tinta); font-weight: 600; font-size: .9rem; padding: 10px 18px; border-radius: 999px; text-decoration: none; white-space: nowrap; transition: transform .2s; }
+.botao-lima:hover { transform: translateY(-1px); }
+
+/* ===== CAPA ===== */
+.capa { position: relative; isolation: isolate; padding: 128px 0 40px; overflow-x: clip; }
+.capa::before, .capa::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; pointer-events: none; }
+.capa::before { width: 560px; height: 560px; right: -140px; top: 40px; background: radial-gradient(circle, rgba(215, 255, 0, .38), transparent 66%); }
+.capa::after { width: 520px; height: 520px; left: -220px; top: 260px; background: radial-gradient(circle, rgba(107, 59, 248, .12), transparent 66%); }
+.capa-grade { display: grid; grid-template-columns: 1.02fr 1fr; gap: 40px; align-items: center; }
+
+.etiqueta {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--branco); border: 1px solid var(--linha); border-radius: 999px;
+  padding: 5px 14px 5px 5px; font-size: .82rem; font-weight: 500; box-shadow: var(--sombra);
+}
+.etiqueta .tag { white-space: nowrap; background: var(--lima); border-radius: 999px; padding: 3px 10px; font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.etiqueta .ponto { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, .2); }
+
+h1 { font-size: clamp(2.3rem, 5.1vw, 3.75rem); line-height: 1.1; letter-spacing: -.035em; font-weight: 600; margin: 20px 0 18px; }
+.sublinhado { color: var(--roxo); font-weight: 700; text-decoration: underline 5px var(--vermelho); text-underline-offset: 9px; text-decoration-skip-ink: none; }
+.lead { font-size: 1.06rem; color: var(--tinta-2); max-width: 33em; }
+.marca-texto { background: var(--lima); color: var(--tinta); font-weight: 600; border-radius: 8px; padding: 1px 7px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+
+.pilulas { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 30px; }
+.pilula { display: flex; align-items: center; gap: 10px; border-radius: 999px; padding: 6px 16px 6px 6px; font-size: .86rem; font-weight: 500; box-shadow: var(--sombra); }
+.pilula b { font-weight: 700; }
+.pilula .ic { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .92); font-size: .9rem; }
+.p-lima { background: var(--lima); }
+.p-roxo { background: var(--roxo); color: #fff; box-shadow: 0 12px 26px rgba(107, 59, 248, .2); }
+.p-rosa { background: var(--rosa); color: #fff; }
+
+.botao-roxo {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--roxo); color: #fff; font-weight: 600; font-size: 1rem;
+  padding: 16px 28px; border-radius: 999px; text-decoration: none;
+  box-shadow: var(--sombra-roxa); transition: transform .2s, background .2s;
+}
+.botao-roxo:hover { background: var(--roxo-escuro); transform: translateY(-2px); }
+.botao-roxo .seta { transition: transform .2s; }
+.botao-roxo:hover .seta { transform: translateX(3px); }
+
+/* Leque de vídeos da capa */
+.leque { position: relative; padding-top: 52px; }
+.leque-nota { position: absolute; top: 4px; left: 8%; color: var(--roxo); font-size: 1.6rem; transform: rotate(-4deg); white-space: nowrap; }
+.leque-nota span { display: inline-block; animation: aponta 1.6s ease-in-out infinite; }
+@keyframes aponta { 50% { transform: translateY(4px); } }
+/* O giro fica no vídeo (e não no item) para os selos ficarem sempre por cima de todos os vídeos */
+.leque-lista { display: flex; justify-content: center; align-items: flex-start; padding: 0 6px 48px; isolation: isolate; }
+.leque-item { position: relative; flex: 0 0 29%; max-width: 176px; margin-inline: -2%; }
+.leque-item:nth-child(1) { top: 28px; --giro: -7deg; --z: 1; }
+.leque-item:nth-child(2) { top: 6px; --giro: -2.5deg; --z: 2; }
+.leque-item:nth-child(3) { top: 0; --giro: 3deg; --z: 3; }
+.leque-item:nth-child(4) { top: 24px; --giro: 8deg; --z: 4; }
+.cartao {
+  position: relative; z-index: var(--z); display: block; width: 100%; aspect-ratio: 9 / 16;
+  border-radius: 22px; overflow: hidden; background: #2a2928;
+  border: 4px solid var(--branco); box-shadow: 0 26px 50px rgba(20, 20, 20, .25);
+  cursor: pointer; transform: rotate(var(--giro));
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1);
+}
+.leque-item:hover .cartao, .cartao:focus-visible { z-index: 6; transform: rotate(var(--giro)) translateY(-10px) scale(1.04); }
+.cartao img, .video img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.selo {
+  position: absolute; left: -12px; bottom: -22px; z-index: 10;
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 8px 13px; border-radius: 14px; line-height: 1.15;
+  box-shadow: 0 10px 22px rgba(20, 20, 20, .22); transform: rotate(calc(var(--giro) - 3deg));
+  pointer-events: none;
+}
+.selo strong { font-size: 1.2rem; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
+.selo span { font-size: .7rem; font-weight: 500; white-space: nowrap; }
+.selo-roxo { background: var(--roxo); color: #fff; }
+.selo-lima { background: var(--lima); color: var(--tinta); }
+.selo-rosa { background: var(--rosa); color: #fff; }
+.selo-preto { background: var(--tinta); color: #fff; }
+.leque-item:nth-child(4) .selo { left: auto; right: -12px; }
+@media (min-width: 901px) and (max-width: 1100px) {
+  .selo { padding: 7px 11px; }
+  .selo strong { font-size: 1rem; }
+  .selo span { font-size: .64rem; }
+}
+
+/* Botão de play que aparece por cima das capas */
+.play {
+  position: absolute; z-index: 3; right: 10px; top: 10px;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255, 255, 255, .9); color: var(--tinta);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .18);
+  transition: transform .2s, background .2s;
+}
+.play svg { width: 13px; height: 13px; margin-left: 2px; fill: currentColor; }
+.cartao:hover .play, .video:hover .play { background: var(--lima); transform: scale(1.08); }
+
+/* Prévia sem som (YouTube) por cima da capa */
+.previa { position: absolute; inset: 0; z-index: 1; overflow: hidden; opacity: 0; transition: opacity .45s; pointer-events: none; }
+.previa.pronta { opacity: 1; }
+.previa iframe {
+  position: absolute; top: 50%; left: 50%; border: 0;
+  width: 1080px; height: 1920px;
+  transform: translate(-50%, -50%) scale(var(--encolhe, .2));
+}
+
+/* ===== FAIXA DE MARCAS ===== */
+.faixa { background: var(--branco); padding: 24px 0 26px; border-block: 1px solid var(--linha); overflow: hidden; }
+.faixa-titulo { text-align: center; font-size: .74rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--cinza); margin-bottom: 14px; }
+.faixa-trilho { display: flex; width: max-content; animation: rolar 48s linear infinite; }
+.faixa:hover .faixa-trilho { animation-play-state: paused; }
+.faixa-trilho ul { display: flex; align-items: center; gap: 44px; padding-right: 44px; }
+.faixa-trilho img { width: 76px; height: 76px; object-fit: contain; }
+@keyframes rolar { to { transform: translateX(-50%); } }
+
+/* ===== TÍTULOS DAS SEÇÕES ===== */
+.secao { position: relative; padding: 92px 0; }
+.cabeca { text-align: center; max-width: 760px; margin: 0 auto 30px; position: relative; }
+.cabeca .mao { color: var(--roxo); font-size: 1.7rem; display: block; margin-bottom: 6px; transform: rotate(-2deg); }
+h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -.03em; font-weight: 600; }
+.bloco-lima { background: var(--lima); border-radius: 12px; padding: 0 .2em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.cabeca p:not(.mao) { color: var(--tinta-2); margin-top: 12px; }
+
+/* ===== VÍDEOS POR NICHO ===== */
+.nichos {
+  background-image: radial-gradient(rgba(20, 20, 20, .09) 1px, transparent 1.3px);
+  background-size: 22px 22px;
+}
+.filtros { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 30px; }
+.filtro {
+  background: var(--branco); border: 1px solid var(--linha); border-radius: 999px;
+  padding: 9px 17px; font-size: .9rem; font-weight: 500;
+  transition: background .2s, color .2s, border-color .2s, transform .2s;
+}
+.filtro:hover { border-color: var(--roxo); color: var(--roxo); }
+.filtro .qtd { color: var(--cinza); margin-left: 6px; font-size: .8rem; }
+.filtro[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: #fff; }
+.filtro[aria-pressed="true"] .qtd { color: var(--lima); }
+.grade { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.grade li[hidden] { display: none; }
+.grade li.entrando { animation: entrar .45s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes entrar { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+.video {
+  position: relative; display: block; width: 100%; aspect-ratio: 9 / 16;
+  border-radius: 20px; overflow: hidden; background: #2a2928;
+  box-shadow: var(--sombra); cursor: pointer; text-decoration: none; color: #fff;
+}
+.video img { transition: transform .5s; }
+.video:hover img { transform: scale(1.05); }
+.video .info {
+  position: absolute; z-index: 2; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; gap: 1px;
+  padding: 34px 12px 12px; background: linear-gradient(to top, rgba(0, 0, 0, .72), transparent);
+  color: #fff; line-height: 1.25;
+}
+.video .info b { font-weight: 600; font-size: .9rem; }
+.video .info small { font-size: .72rem; opacity: .85; }
+.vazio { text-align: center; color: var(--tinta-2); }
+
+/* ===== SOBRE ===== */
+.sobre-grade { display: grid; grid-template-columns: 330px 1fr; gap: 64px; align-items: center; max-width: 1000px; margin-inline: auto; }
+.moldura-caixa { position: relative; padding: 12px; }
+.moldura {
+  position: relative; aspect-ratio: 4 / 5; border-radius: 30px; overflow: hidden;
+  background: var(--lima); border: 3px solid var(--tinta);
+  box-shadow: 10px 10px 0 var(--roxo); transform: rotate(-3deg);
+}
+.moldura::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(20, 20, 20, .14) 1.2px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+.rosto { position: absolute; left: 50%; bottom: -6%; width: 118%; max-width: none; transform: translateX(-50%); }
+.rosto-piscando { opacity: 0; animation: piscar 3.4s infinite; }
+@keyframes piscar { 0%, 86% { opacity: 0; } 88%, 95% { opacity: 1; } 97%, 100% { opacity: 0; } }
+.adesivo {
+  position: absolute; z-index: 2; top: -4px; right: -8px;
+  background: var(--rosa); color: #fff; font-size: 1.45rem;
+  padding: 6px 16px 8px; border-radius: 16px; transform: rotate(8deg);
+  box-shadow: 0 10px 22px rgba(232, 76, 167, .35);
+}
+.sobre-texto .mao { color: var(--roxo); font-size: 1.7rem; display: block; margin-bottom: 4px; }
+.sobre-texto h2 { margin-bottom: 16px; }
+.sobre-texto p { color: var(--tinta-2); font-size: 1.04rem; max-width: 36em; }
+.sobre-texto p + p { margin-top: 10px; }
+.sobre-texto p b { color: var(--tinta); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip { background: var(--branco); border: 1px solid var(--linha); border-radius: 999px; padding: 6px 14px; font-size: .84rem; font-weight: 500; }
+.chip b { font-weight: 700; }
+.chip-lima { background: var(--lima); border-color: var(--lima); font-weight: 600; }
+.chip-roxo { background: var(--roxo-claro); border-color: var(--roxo-claro); color: var(--roxo); }
+.chip[hidden] { display: none; }
+.marcas-linha { margin-top: 18px; font-size: .86rem; color: var(--cinza); }
+.marcas-linha b { color: var(--tinta); font-weight: 600; }
+
+/* ===== COMO FUNCIONA ===== */
+.passos-lista { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: passo; }
+.passo {
+  position: relative; border: 2px solid var(--tinta); border-radius: 24px;
+  padding: 22px 22px 26px; box-shadow: 6px 6px 0 var(--tinta);
+  transition: transform .2s, box-shadow .2s;
+}
+.passo:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--tinta); }
+.passo .num {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 700; font-size: .9rem; margin-bottom: 18px;
+}
+.passo .emoji { position: absolute; top: 18px; right: 20px; font-size: 1.7rem; }
+.passo h3 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: 6px; }
+.passo p { font-size: .92rem; line-height: 1.5; }
+.passo-roxo { background: var(--roxo); color: #fff; }
+.passo-roxo .num { background: var(--lima); color: var(--tinta); }
+.passo-lima { background: var(--lima); }
+.passo-lima .num { background: var(--tinta); color: #fff; }
+.passo-rosa { background: var(--rosa); color: #fff; }
+.passo-rosa .num { background: #fff; color: var(--rosa); }
+.passo-branco { background: var(--branco); }
+.passo-branco .num { background: var(--roxo); color: #fff; }
+
+/* ===== CHAMADA FINAL ===== */
+.final { padding: 0 0 72px; }
+.final-caixa {
+  position: relative; overflow: hidden; isolation: isolate;
+  background: var(--tinta); color: #fff; border-radius: 36px;
+  padding: clamp(48px, 7vw, 84px) 24px; text-align: center;
+}
+.final-caixa::before {
+  content: ""; position: absolute; z-index: -1; width: 520px; height: 520px; left: 50%; top: -260px;
+  transform: translateX(-50%); border-radius: 50%;
+  background: radial-gradient(circle, rgba(107, 59, 248, .45), transparent 65%);
+}
+.final-caixa h2 { font-size: clamp(1.9rem, 4.8vw, 3.3rem); max-width: 16em; margin-inline: auto; }
+.final-caixa .lima { color: var(--lima); }
+.final-caixa p { color: rgba(255, 255, 255, .72); margin: 16px auto 0; max-width: 34em; }
+.final-botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 32px; }
+.botao-branco {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #fff; color: var(--tinta); font-weight: 600;
+  padding: 16px 28px; border-radius: 999px; text-decoration: none; transition: transform .2s;
+}
+.botao-branco:hover { transform: translateY(-2px); }
+.final .faisca { color: var(--lima); }
+
+/* ===== RODAPÉ ===== */
+.rodape { padding: 0 0 36px; font-size: .84rem; color: var(--cinza); }
+.rodape-linha { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; }
+.rodape a { color: var(--tinta-2); }
+
+/* ===== PLAYER (vídeo com som) ===== */
+.player {
+  margin: auto; border: 0; padding: 0; background: transparent; color: #fff;
+  width: min(420px, 100vw - 32px, (100vh - 150px) * 9 / 16);
+  max-width: none; max-height: none; overflow: visible;
+}
+.player::backdrop { background: rgba(20, 20, 20, .78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.player[open] { animation: abrir .3s cubic-bezier(.2, .8, .2, 1); }
+@keyframes abrir { from { opacity: 0; transform: translateY(16px) scale(.97); } }
+.player-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.player-legenda { font-weight: 600; line-height: 1.25; }
+.player-legenda small { display: block; font-weight: 500; font-size: .76rem; color: var(--lima); }
+.fechar { width: 42px; height: 42px; flex: none; border-radius: 50%; background: #fff; color: var(--tinta); display: grid; place-items: center; font-size: 1.5rem; line-height: 1; }
+.fechar:hover { background: var(--lima); }
+.player-caixa { position: relative; aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden; background: #000; }
+.player-caixa iframe {
+  position: absolute; top: 50%; left: 50%; border: 0;
+  width: var(--larg, 720px); height: var(--alt, 1280px);
+  transform: translate(-50%, -50%) scale(var(--encolhe, .5));
+}
+
+/* ===== APARECER AO ROLAR ===== */
+.js .revelar { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .8, .2, 1); }
+.js .revelar.visivel { opacity: 1; transform: none; }
+
+/* ===== TELAS MENORES ===== */
+@media (max-width: 1000px) {
+  .grade { grid-template-columns: repeat(4, 1fr); }
+  .passos-lista { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  .capa { padding-top: 108px; }
+  .capa-grade { grid-template-columns: 1fr; gap: 12px; }
+  .leque { max-width: 560px; margin-inline: auto; width: 100%; }
+  .sobre-grade { grid-template-columns: 1fr; gap: 36px; }
+  .moldura-caixa { width: min(300px, 82%); margin-inline: auto; }
+}
+@media (max-width: 720px) {
+  .menu { display: none; }
+  .botao-lima { margin-left: auto; padding: 9px 16px; }
+  .topo-barra { padding-left: 16px; }
+  .secao { padding: 68px 0; }
+  .grade { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .filtros { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding: 2px 16px 6px; scrollbar-width: none; }
+  .filtros::-webkit-scrollbar { display: none; }
+  .filtro { flex: none; }
+  .passos-lista { grid-template-columns: 1fr; }
+  .pilula { font-size: .8rem; padding-right: 13px; }
+  .botao-roxo, .botao-branco { width: 100%; justify-content: center; }
+  .capa .botao-roxo { width: auto; }
+  .final .faisca, .cabeca .faisca { display: none; }
+  .faixa-trilho img { width: 60px; height: 60px; }
+  .faixa-trilho ul { gap: 32px; padding-right: 32px; }
+}
+@media (max-width: 520px) {
+  .leque-nota { font-size: 1.35rem; left: 4%; }
+  .leque-item { margin-inline: -2.2%; }
+  .cartao { border-width: 3px; border-radius: 16px; }
+  .selo { padding: 5px 8px; border-radius: 10px; left: -7px; bottom: -16px; }
+  .leque-item:nth-child(4) .selo { right: -7px; }
+  .selo strong { font-size: .86rem; }
+  .selo span { font-size: .56rem; }
+  .play { width: 28px; height: 28px; right: 7px; top: 7px; }
+  .play svg { width: 11px; height: 11px; }
+  .video { border-radius: 16px; }
+  .rodape-linha { flex-direction: column; }
+}
+
+/* ===== MOVIMENTO REDUZIDO ===== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .revelar { opacity: 1; transform: none; }
+  .faixa-trilho { flex-wrap: wrap; width: auto; justify-content: center; }
+  .faixa-trilho ul[aria-hidden] { display: none; }
+  .faixa-trilho ul { flex-wrap: wrap; justify-content: center; padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<!-- Desenhos usados mais de uma vez -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <path id="d-faisca" d="M12 0c.7 6.4 5.6 11.3 12 12-6.4.7-11.3 5.6-12 12-.7-6.4-5.6-11.3-12-12C6.4 11.3 11.3 6.4 12 0z"/>
+    <path id="d-play" d="M3 1.5v13l11-6.5z"/>
+  </defs>
+</svg>
+
+<!-- ================= BARRA DE CIMA ================= -->
+<header class="topo">
+  <nav class="topo-barra" aria-label="Menu">
+    <a class="logo" href="#topo" aria-label="Alanna Clara, voltar ao topo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#d-faisca"/></svg>
+      <span>alanna<b>clara</b></span>
+    </a>
+    <ul class="menu">
+      <li><a href="#nichos">Nichos</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#como">Como funciona</a></li>
+    </ul>
+    <a class="botao-lima" href="#nichos">Ver vídeos</a>
+  </nav>
+</header>
+
+<main id="conteudo">
+
+<!-- ================= CAPA ================= -->
+<section class="capa" id="topo" aria-labelledby="capa-titulo">
+  <div class="container capa-grade">
+    <div class="capa-texto">
+      <p class="etiqueta"><span class="tag">Seu Influencer</span> UGC Creator · agenda aberta <span class="ponto" aria-hidden="true"></span></p>
+      <h1 id="capa-titulo">Alanna Clara.<br>UGC com cara de<br><span class="sublinhado">indicação de amiga.</span></h1>
+      <p class="lead">Vídeos de beleza, tech, gastronomia e casa que despertam desejo e <span class="marca-texto">levam a pessoa a comprar</span>. Aperta o play e sente se é a cara da sua marca.</p>
+      <ul class="pilulas" aria-label="O que eu garanto">
+        <li class="pilula p-lima"><span class="ic" aria-hidden="true">📝</span><span>Roteiro aprovado <b>antes de gravar</b></span></li>
+        <li class="pilula p-roxo"><span class="ic" aria-hidden="true">🔁</span><span><b>1 ajuste</b> incluso</span></li>
+        <li class="pilula p-rosa"><span class="ic" aria-hidden="true">⚡</span><span>Entrega em <b>72h úteis</b></span></li>
+      </ul>
+      <a class="botao-roxo" href="#nichos">Ver vídeos do meu nicho <span class="seta" aria-hidden="true">→</span></a>
+    </div>
+
+    <!-- Os 4 vídeos em leque vêm da lista CAPA, no script lá embaixo -->
+    <div class="leque">
+      <p class="leque-nota mao" aria-hidden="true">toca num vídeo pra ouvir <span>👇</span></p>
+      <ul class="leque-lista" id="leque"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MARCAS ================= -->
+<div class="faixa" role="region" aria-labelledby="faixa-titulo">
+  <p class="faixa-titulo" id="faixa-titulo">Marcas que já confiaram em mim</p>
+  <div class="faixa-trilho">
+    <ul id="marcas"></ul>
+    <ul id="marcas-copia" aria-hidden="true"></ul>
+  </div>
+</div>
+
+<!-- ================= VÍDEOS POR NICHO ================= -->
+<section class="secao nichos" id="nichos" aria-labelledby="nichos-titulo">
+  <div class="container">
+    <header class="cabeca revelar">
+      <svg class="faisca" viewBox="0 0 24 24" style="color:var(--roxo);left:4%;top:8px" aria-hidden="true"><use href="#d-faisca"/></svg>
+      <h2 id="nichos-titulo">Qual é o <span class="bloco-lima">nicho</span> da sua marca?</h2>
+      <p>Escolhe um nicho e dá o play com som. No computador, é só passar o mouse para ver a prévia.</p>
+    </header>
+    <!-- Os botões e os vídeos vêm do painel (aba Portfólio, tabela videos). Reserva: lista RESERVA no script -->
+    <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar vídeos por nicho"></div>
+    <p class="sr" id="status-filtro" aria-live="polite"></p>
+    <ul class="grade" id="grade"></ul>
+  </div>
+</section>
+
+<!-- ================= SOBRE ================= -->
+<section class="secao sobre" id="sobre" aria-labelledby="sobre-titulo">
+  <div class="container sobre-grade">
+    <div class="moldura-caixa revelar">
+      <div class="moldura" role="img" aria-label="Foto da Alanna Clara">
+        <img class="rosto" src="fotos/alanna-olhos-abertos.webp" alt="" decoding="async" loading="lazy">
+        <img class="rosto rosto-piscando" src="fotos/alanna-piscadinha.webp" alt="" decoding="async" loading="lazy">
+      </div>
+      <span class="adesivo mao" aria-hidden="true">oiee!</span>
+    </div>
+    <div class="sobre-texto revelar">
+      <span class="mao">muito prazer ✨</span>
+      <h2 id="sobre-titulo">Eu sou a Alanna Clara.</h2>
+      <p>Tenho <b>20 anos</b> e sou <b>UGC Creator, universitária e maquiadora profissional</b> em <b>Curitiba (PR)</b>. Há 3 anos crio conteúdo que aproxima a marca de quem compra.</p>
+      <p>Meu jeito é simples e descomplicado: <b>conexão real</b> com quem assiste, desejo pelo produto e foco em <b>conversão</b>.</p>
+      <!-- Os números do Instagram vêm do painel (Visão Geral). Se o banco não responder, eles somem. -->
+      <ul class="chips">
+        <li class="chip chip-lima">Creator UGC no Seu Influencer</li>
+        <li class="chip" id="m-seguidores" hidden></li>
+        <li class="chip" id="m-engajamento" hidden></li>
+        <li class="chip" id="m-publico" hidden></li>
+        <li class="chip chip-roxo">+260 vídeos entregues</li>
+        <li class="chip chip-roxo">+395 mil views somadas</li>
+      </ul>
+      <p class="marcas-linha">Já criei para <b>Garnier</b>, <b>Dove</b>, <b>Coca-Cola</b>, <b>L’Oréal</b>, <b>Maybelline</b> e mais de 15 marcas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COMO FUNCIONA ================= -->
+<section class="secao passos" id="como" aria-labelledby="como-titulo">
+  <div class="container">
+    <header class="cabeca revelar">
+      <span class="mao">e depois?</span>
+      <h2 id="como-titulo">Você me aprovou. <span class="sublinhado">Olha o que acontece.</span></h2>
+    </header>
+    <ol class="passos-lista">
+      <li class="passo passo-roxo revelar">
+        <span class="num">01</span><span class="emoji" aria-hidden="true">📋</span>
+        <h3>Briefing</h3>
+        <p>Estudo o briefing e o produto com calma antes de pensar em qualquer ideia.</p>
+      </li>
+      <li class="passo passo-lima revelar">
+        <span class="num">02</span><span class="emoji" aria-hidden="true">✍️</span>
+        <h3>Roteiro</h3>
+        <p>O roteiro chega num link só seu. Você aprova ou pede ajuste antes de eu gravar.</p>
+      </li>
+      <li class="passo passo-rosa revelar">
+        <span class="num">03</span><span class="emoji" aria-hidden="true">🎬</span>
+        <h3>Gravação</h3>
+        <p>Gravo seguindo o roteiro aprovado, no cenário e no ritmo que combinam com o produto.</p>
+      </li>
+      <li class="passo passo-branco revelar">
+        <span class="num">04</span><span class="emoji" aria-hidden="true">🚀</span>
+        <h3>Entrega</h3>
+        <p>Vídeo editado em até 72 horas úteis, com uma rodada de ajuste inclusa.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= CHAMADA FINAL ================= -->
+<section class="final" aria-labelledby="final-titulo">
+  <div class="container">
+    <div class="final-caixa revelar">
+      <svg class="faisca" viewBox="0 0 24 24" style="left:7%;top:18%" aria-hidden="true"><use href="#d-faisca"/></svg>
+      <svg class="faisca" viewBox="0 0 24 24" style="right:8%;bottom:20%;width:20px;height:20px;color:var(--rosa)" aria-hidden="true"><use href="#d-faisca"/></svg>
+      <h2 id="final-titulo">Combinou com a sua marca? <span class="lima">Me aprova na campanha</span> e a gente começa pelo roteiro.</h2>
+      <p>É só voltar para a Seu Influencer e me aprovar. O resto eu cuido daqui.</p>
+      <div class="final-botoes">
+        <a class="botao-roxo" href="https://app.seuinfluencer.com/">Voltar pra Seu Influencer <span class="seta" aria-hidden="true">→</span></a>
+        <a class="botao-branco" href="./">Ver meu portfólio completo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="rodape">
+  <div class="container rodape-linha">
+    <p>© <span id="ano">2026</span> Alanna Clara · UGC Creator em Curitiba (PR)</p>
+    <p><a href="privacidade.html">Política de privacidade</a></p>
+  </div>
+</footer>
+
+<!-- Player: abre o vídeo com som por cima da página -->
+<dialog class="player" id="player" aria-labelledby="player-legenda">
+  <div class="player-topo">
+    <p class="player-legenda" id="player-legenda"></p>
+    <button class="fechar" id="fechar-player" type="button" aria-label="Fechar vídeo">×</button>
+  </div>
+  <div class="player-caixa" id="player-caixa"></div>
+</dialog>
+
+<!-- Endereço e chave pública do banco (o mesmo arquivo do site principal) -->
+<script src="js/banco.js"></script>
+<script>
+/* =========================================================
+   O QUE VOCÊ PODE TROCAR SEM MEXER NO RESTO
+   ========================================================= */
+
+// CAPA: os 4 vídeos do leque, da esquerda para a direita.
+// video = link do YouTube | marca = nome que aparece no player
+// numero e rotulo = o selo colorido embaixo do vídeo (use só números reais)
+// cor = roxo, lima, rosa ou preto
+const CAPA = [
+  { video: "https://youtube.com/shorts/snd1jFWqe1o", marca: "Garnier",               nicho: "Beleza",      numero: "+260",      rotulo: "vídeos entregues",          cor: "lima" },
+  { video: "https://youtube.com/shorts/w6rjR5aPjyY", marca: "Coca-Cola",             nicho: "Gastronomia", numero: "Coca-Cola", rotulo: "publi no perfil",           cor: "rosa" },
+  { video: "https://youtube.com/shorts/LRWg2w6ejd8", marca: "Tour Curitiba",         nicho: "Turismo",     numero: "+64 mil",   rotulo: "views · Tour Curitiba",     cor: "roxo" },
+  { video: "https://youtube.com/shorts/z1aXTErZ794", marca: "L’Oréal Profissionnel", nicho: "Beleza",      numero: "+395 mil",  rotulo: "views somadas",             cor: "preto" }
+];
+
+// Qual vídeo do leque toca sozinho, sem som, no computador (0 = primeiro). Use -1 para nenhum.
+const CAPA_TOCANDO = 2;
+
+// MARCAS: as logos da faixa (mesmas imagens da pasta logos do site principal).
+const MARCAS = [
+  { nome: "Garnier",               logo: "logos/garnier.png" },
+  { nome: "L’Oréal Profissionnel", logo: "logos/loreal-profissionnel.png" },
+  { nome: "Creamy",                logo: "logos/creamy.png" },
+  { nome: "Dove",                  logo: "logos/dove.png" },
+  { nome: "Maybelline",            logo: "logos/maybelline.png" },
+  { nome: "Elseve L’Oréal Paris",  logo: "logos/elseve.png" },
+  { nome: "Coca-Cola",             logo: "logos/coca-cola.png" },
+  { nome: "SOOE Beauty",           logo: "logos/sooe-beauty.png" },
+  { nome: "La Roche-Posay",        logo: "logos/la-roche-posay.png" },
+  { nome: "Neutrogena",            logo: "logos/neutrogena.png" },
+  { nome: "Pantene",               logo: "logos/pantene.png" },
+  { nome: "Ruby Rose",             logo: "logos/ruby-rose.png" },
+  { nome: "Matrix",                logo: "logos/matrix.png" },
+  { nome: "Rexona",                logo: "logos/rexona.png" },
+  { nome: "Color Wow",             logo: "logos/color-wow.png" },
+  { nome: "Mary & May",            logo: "logos/mary-&-may.png" },
+  { nome: "Unleashia",             logo: "logos/unleashia.png" },
+  { nome: "Dryskin",               logo: "logos/dryskin.png" },
+  { nome: "Saint Germain",         logo: "logos/saint-germain.png" },
+  { nome: "Electrolux",            logo: "logos/electrolux.png" },
+  { nome: "Tour Curitiba",         logo: "logos/tour-curitiba.png" }
+];
+
+// NICHOS: o nome bonito de cada nicho do painel. Nicho que não estiver aqui ganha a primeira letra maiúscula.
+const NICHOS = {
+  beleza: "Beleza",
+  skincare: "Skincare",
+  tech: "Tech",
+  comida: "Gastronomia & Bebidas",
+  casa: "Casa & Decoração"
+};
+
+// RESERVA: só aparece se o banco não responder, para a página nunca ficar sem vídeos.
+// Os vídeos de verdade vêm do painel (aba Portfólio), os mesmos do site principal.
+const RESERVA = [
+  { nicho: "tech",   marca: "CapCut",                video: "https://youtube.com/shorts/wif4FkWCoM4" },
+  { nicho: "tech",   marca: "Tour Curitiba",         video: "https://youtube.com/shorts/1S3TMBjJFZM" },
+  { nicho: "tech",   marca: "Tour Curitiba",         video: "https://youtube.com/shorts/ERf3iwJGRRw" },
+  { nicho: "tech",   marca: "Tour Curitiba",         video: "https://youtube.com/shorts/x0oboCoIZU8" },
+  { nicho: "beleza", marca: "Color WOW",             video: "https://youtube.com/shorts/ep5Zb2MUO1s" },
+  { nicho: "beleza", marca: "Garnier",               video: "https://youtube.com/shorts/snd1jFWqe1o" },
+  { nicho: "beleza", marca: "SOOĒ Beauty",           video: "https://youtube.com/shorts/4qQI6aPmxVs" },
+  { nicho: "beleza", marca: "L’Oréal Profissionnel", video: "https://youtube.com/shorts/z1aXTErZ794" },
+  { nicho: "beleza", marca: "Elseve L’Oréal Paris",  video: "https://youtube.com/shorts/mpdUpsj-Oes" },
+  { nicho: "beleza", marca: "Creamy",                video: "https://youtube.com/shorts/-pOFl9L-gYE" },
+  { nicho: "beleza", marca: "Dove",                  video: "https://youtube.com/shorts/Gw1XoSbOjy8" },
+  { nicho: "beleza", marca: "Elseve L’Oréal Paris",  video: "https://youtube.com/shorts/9bYHcFGqsuU" },
+  { nicho: "beleza", marca: "Neutrogena",            video: "https://youtube.com/shorts/T4j1OE_99Aw" },
+  { nicho: "beleza", marca: "Creamy",                video: "https://youtube.com/shorts/43qWjraJ1iQ" },
+  { nicho: "casa",   marca: "Electrolux",            video: "https://youtube.com/shorts/OzO3IoBsJ50" },
+  { nicho: "comida", marca: "Coca-Cola",             video: "https://youtube.com/shorts/w6rjR5aPjyY", formato: "Publicação no perfil" }
+];
+
+/* =========================================================
+   DAQUI PARA BAIXO É O FUNCIONAMENTO DA PÁGINA
+   ========================================================= */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const calmo = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const temMouse = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+const BANCO = window.BANCO_URL || "https://rwlbefdxfnvbupwpkdxm.supabase.co";
+const CHAVE = window.BANCO_CHAVE || "sb_publishable_tv2nNBYjdyxghXpteQmpIg_RCKMpamg";
+const CABECALHO = { apikey: CHAVE, Authorization: "Bearer " + CHAVE };
+
+const idYoutube = (url) => {
+  const m = String(url || "").match(/(?:shorts\/|[?&]v=|youtu\.be\/|embed\/)([\w-]{11})/);
+  return m ? m[1] : "";
+};
+const nomeNicho = (n) => NICHOS[n] || (n ? n.charAt(0).toUpperCase() + n.slice(1) : "Outros");
+const capaDe = (id) => `https://i.ytimg.com/vi/${id}/oar2.jpg`;
+const PLAY = `<span class="play" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#d-play"/></svg></span>`;
+
+// Capa na melhor definição: a vertical do Shorts, depois a grande, por último a pequena
+document.addEventListener("error", (e) => {
+  const img = e.target;
+  if (!img.dataset || !img.dataset.yt) return;
+  const passo = Number(img.dataset.tentativa || 0);
+  const proxima = ["maxresdefault", "hqdefault"][passo];
+  if (!proxima) return;
+  img.dataset.tentativa = passo + 1;
+  img.src = `https://i.ytimg.com/vi/${img.dataset.yt}/${proxima}.jpg`;
+}, true);
+
+/* ---------- Leque da capa ---------- */
+function montarLeque() {
+  $("#leque").innerHTML = CAPA.map((v, i) => {
+    const id = idYoutube(v.video);
+    if (!id) return "";
+    return `<li class="leque-item">
+      <div class="cartao" role="button" tabindex="0" data-video="${id}" data-marca="${esc(v.marca)}" data-nicho="${esc(v.nicho || "")}" aria-label="${esc(`Assistir vídeo com som: ${v.marca}`)}">
+        <img src="${capaDe(id)}" data-yt="${id}" alt="" decoding="async"${i > 1 ? ' loading="lazy"' : ""}>
+        ${PLAY}
+      </div>
+      <span class="selo selo-${esc(v.cor || "roxo")}" aria-hidden="true"><strong>${esc(v.numero)}</strong><span>${esc(v.rotulo)}</span></span>
+    </li>`;
+  }).join("");
+}
+montarLeque();
+
+/* ---------- Faixa de marcas ---------- */
+function montarMarcas() {
+  const itens = MARCAS.map((m) => `<li><img src="${esc(m.logo)}" alt="${esc(m.nome)}" width="76" height="76" loading="lazy" decoding="async"></li>`).join("");
+  $("#marcas").innerHTML = itens;
+  $("#marcas-copia").innerHTML = itens.replace(/alt="[^"]*"/g, 'alt=""');
+}
+montarMarcas();
+
+/* ---------- Vídeos por nicho ---------- */
+const grade = $("#grade");
+const filtros = $("#filtros");
+
+const doBanco = (v) => ({
+  nicho: String(v.nicho || "").trim().toLowerCase() || "outros",
+  marca: v.marca || v.titulo || "",
+  video: v.link || "",
+  formato: v.formato || ""
+});
+
+function cardVideo(t) {
+  const id = idYoutube(t.video);
+  const nicho = nomeNicho(t.nicho);
+  const titulo = t.marca || nicho;
+  const linha = [nicho, t.formato].filter(Boolean).join(" · ");
+  const info = `<span class="info"><b>${esc(titulo)}</b><small>${esc(linha)}</small></span>`;
+  if (!id) {
+    // Link que não é do YouTube (Instagram, TikTok, Drive): abre numa aba nova
+    if (!/^https?:\/\//i.test(String(t.video || ""))) return "";
+    return `<a class="video" href="${esc(t.video)}" target="_blank" rel="noopener" aria-label="${esc(`Ver vídeo: ${titulo} (abre em nova aba)`)}">${PLAY}${info}</a>`;
+  }
+  return `<div class="video" role="button" tabindex="0" data-video="${id}" data-marca="${esc(titulo)}" data-nicho="${esc(nicho)}" aria-label="${esc(`Assistir vídeo: ${titulo}, ${nicho}`)}">
+      <img src="${capaDe(id)}" data-yt="${id}" alt="" loading="lazy" decoding="async">
+      ${PLAY}${info}
+    </div>`;
+}
+
+function montarVideos(lista) {
+  const cards = lista.map((t) => ({ t, html: cardVideo(t) })).filter((c) => c.html);
+  if (!cards.length) {
+    grade.innerHTML = "";
+    filtros.innerHTML = `<p class="vazio">Vídeos novos chegando em breve.</p>`;
+    return;
+  }
+  grade.innerHTML = cards.map((c) => `<li data-nicho="${esc(c.t.nicho)}">${c.html}</li>`).join("");
+
+  // Botões de filtro: o nicho com mais vídeos primeiro
+  const conta = {};
+  cards.forEach((c) => { conta[c.t.nicho] = (conta[c.t.nicho] || 0) + 1; });
+  const ordemFixa = Object.keys(NICHOS);
+  const posicao = (n) => (ordemFixa.includes(n) ? ordemFixa.indexOf(n) : 99);
+  const nichos = Object.keys(conta).sort((a, b) => conta[b] - conta[a] || posicao(a) - posicao(b));
+  filtros.innerHTML = [["todos", "Todos", cards.length]].concat(nichos.map((n) => [n, nomeNicho(n), conta[n]]))
+    .map(([chave, nome, qtd]) => `<button class="filtro" type="button" data-filtro="${esc(chave)}" aria-pressed="${chave === "todos"}">${esc(nome)}<span class="qtd" aria-hidden="true">${qtd}</span></button>`)
+    .join("");
+  ligarPrevias(grade);
+}
+
+filtros.addEventListener("click", (e) => {
+  const botao = e.target.closest(".filtro");
+  if (!botao) return;
+  const escolha = botao.dataset.filtro;
+  $$(".filtro", filtros).forEach((b) => b.setAttribute("aria-pressed", String(b === botao)));
+  let n = 0;
+  $$("li", grade).forEach((li) => {
+    const mostra = escolha === "todos" || li.dataset.nicho === escolha;
+    li.hidden = !mostra;
+    li.classList.remove("entrando");
+    if (mostra) {
+      void li.offsetWidth; // reinicia a animação de entrada
+      li.style.animationDelay = Math.min(n, 11) * 0.035 + "s";
+      li.classList.add("entrando");
+      n++;
+    }
+  });
+  $("#status-filtro").textContent = escolha === "todos"
+    ? `Mostrando todos os ${n} vídeos`
+    : `Mostrando ${n} ${n === 1 ? "vídeo" : "vídeos"} de ${nomeNicho(escolha)}`;
+});
+
+async function carregarVideos() {
+  let lista = RESERVA;
+  try {
+    const parar = new AbortController();
+    const relogio = setTimeout(() => parar.abort(), 6000);
+    const endereco = BANCO + "/rest/v1/videos?select=titulo,link,nicho,formato,marca&visivel=eq.true&exemplo=eq.false&order=ordem.asc";
+    const resposta = await fetch(endereco, { headers: CABECALHO, signal: parar.signal });
+    clearTimeout(relogio);
+    if (resposta.ok) {
+      const dados = await resposta.json();
+      if (Array.isArray(dados) && dados.length) lista = dados.map(doBanco);
+    }
+  } catch (erro) {
+    /* sem banco agora: fica com a lista reserva */
+  }
+  montarVideos(lista);
+}
+carregarVideos();
+
+/* ---------- Números do Instagram (os mesmos do site principal) ---------- */
+const formatar = (n) => Number(n).toLocaleString("pt-BR");
+async function carregarMetricas() {
+  try {
+    const resposta = await fetch(BANCO + "/rest/v1/rpc/metricas_publicas", {
+      method: "POST", headers: { ...CABECALHO, "Content-Type": "application/json" }, body: "{}"
+    });
+    if (!resposta.ok) return;
+    const m = await resposta.json();
+    const mostrar = (id, html) => { const el = $(id); el.innerHTML = html; el.hidden = false; };
+    if (m && m.conta && m.conta.seguidores) mostrar("#m-seguidores", `<b>${formatar(m.conta.seguidores)}</b> seguidores no Instagram`);
+    if (m && m.medias && m.medias.engajamento) mostrar("#m-engajamento", `<b>${String(m.medias.engajamento).replace(".", ",")}%</b> de engajamento`);
+    const genero = (m && m.publico && m.publico.genero) || [];
+    const mulheres = (genero.find((g) => g.nome === "F") || {}).valor || 0;
+    const homens = (genero.find((g) => g.nome === "M") || {}).valor || 0;
+    if (mulheres + homens > 0) mostrar("#m-publico", `<b>${Math.round(mulheres / (mulheres + homens) * 100)}%</b> público feminino`);
+  } catch (erro) {
+    /* sem números agora: os chips continuam escondidos */
+  }
+}
+carregarMetricas();
+
+/* ---------- Prévia sem som (YouTube) ---------- */
+const EMBED = "https://www.youtube-nocookie.com/embed/";
+
+// O YouTube escolhe a definição pelo tamanho do quadro. O quadro nasce grande
+// (1080 x 1920) e é encolhido na tela, para o vídeo vir em alta.
+function encolherPara(caixa, quadro, largura, altura, folga) {
+  const w = caixa.offsetWidth, h = caixa.offsetHeight;
+  if (!w || !h) return;
+  quadro.style.setProperty("--encolhe", Math.max(w / largura, h / altura) * (folga || 1));
+}
+function falarCom(quadro, id) {
+  const falar = (msg) => { try { quadro.contentWindow.postMessage(JSON.stringify(msg), "*"); } catch (erro) { /* sem problema */ } };
+  falar({ event: "listening", id: id, channel: "widget" });
+  falar({ event: "command", func: "setPlaybackQuality", args: ["highres"] });
+  return falar;
+}
+function iniciarPrevia(card) {
+  if ($(".previa", card) || player.open) return;
+  const id = card.dataset.video;
+  const caixa = document.createElement("span");
+  caixa.className = "previa";
+  caixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0&enablejsapi=1" title="Prévia sem som" tabindex="-1" aria-hidden="true" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  const quadro = caixa.firstElementChild;
+  card.appendChild(caixa);
+  encolherPara(caixa, quadro, 1080, 1920, 1.18); // a sobra esconde as bordas pretas
+  quadro.addEventListener("load", () => {
+    const falar = falarCom(quadro, id);
+    falar({ event: "command", func: "mute", args: [] });
+    falar({ event: "command", func: "playVideo", args: [] });
+  });
+}
+function pararPrevia(card) {
+  const caixa = $(".previa", card);
+  if (caixa) caixa.remove();
+}
+// A prévia só aparece quando o vídeo começa a tocar de verdade (enquanto isso, fica a capa)
+window.addEventListener("message", (e) => {
+  if (!/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin)) return;
+  let dados;
+  try { dados = typeof e.data === "string" ? JSON.parse(e.data) : e.data; } catch (erro) { return; }
+  if (!dados) return;
+  const estado = dados.event === "onStateChange" ? dados.info : (dados.info && dados.info.playerState);
+  if (estado !== 1) return;
+  $$(".previa iframe").forEach((quadro) => {
+    if (quadro.contentWindow === e.source) quadro.parentElement.classList.add("pronta");
+  });
+});
+function ligarPrevias(area) {
+  if (!temMouse || calmo) return;
+  $$("[data-video]", area).forEach((card) => {
+    let espera;
+    card.addEventListener("mouseenter", () => { espera = setTimeout(() => iniciarPrevia(card), 200); });
+    card.addEventListener("mouseleave", () => {
+      clearTimeout(espera);
+      if (!card.classList.contains("sempre")) pararPrevia(card);
+    });
+  });
+}
+ligarPrevias($("#leque"));
+
+// O vídeo escolhido em CAPA_TOCANDO toca sozinho, sem som, enquanto a capa está na tela (só no computador)
+const cartaoTocando = $$(".cartao")[CAPA_TOCANDO];
+let capaNaTela = true;
+function tocarCapa() {
+  if (!cartaoTocando) return;
+  if (capaNaTela && !player.open) iniciarPrevia(cartaoTocando); else pararPrevia(cartaoTocando);
+}
+if (cartaoTocando && temMouse && !calmo) {
+  cartaoTocando.classList.add("sempre");
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(([e]) => { capaNaTela = e.isIntersecting; tocarCapa(); }, { threshold: 0.25 }).observe($("#leque"));
+  } else {
+    setTimeout(tocarCapa, 1200);
+  }
+}
+
+/* ---------- Player com som ---------- */
+const player = $("#player");
+const playerCaixa = $("#player-caixa");
+let cardAberto = null;
+
+function larguraDoPlayer() {
+  return Math.min(420, window.innerWidth - 32, (window.innerHeight - 150) * 9 / 16);
+}
+function ajustarPlayer() {
+  const quadro = $("iframe", playerCaixa);
+  if (!quadro) return;
+  encolherPara(playerCaixa, quadro, parseFloat(quadro.style.getPropertyValue("--larg")), parseFloat(quadro.style.getPropertyValue("--alt")));
+}
+if (window.ResizeObserver) new ResizeObserver(ajustarPlayer).observe(playerCaixa);
+
+function abrirVideo(card) {
+  pararPrevia(card);
+  cardAberto = card;
+  const id = card.dataset.video;
+  $("#player-legenda").innerHTML = `${card.dataset.nicho ? `<small>${esc(card.dataset.nicho)}</small>` : ""}${esc(card.dataset.marca)}`;
+  playerCaixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1" title="${esc(`Vídeo: ${card.dataset.marca}`)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  const quadro = $("iframe", playerCaixa);
+  const larg = Math.min(1080, Math.max(360, Math.round(larguraDoPlayer() * 2)));
+  quadro.style.setProperty("--larg", larg + "px");
+  quadro.style.setProperty("--alt", Math.round(larg * 16 / 9) + "px");
+  quadro.addEventListener("load", () => falarCom(quadro, id));
+  if (typeof player.showModal === "function") player.showModal(); else player.setAttribute("open", "");
+  ajustarPlayer();
+  tocarCapa(); // para a prévia da capa enquanto o player está aberto
+  $("#fechar-player").focus();
+  registrarClique(id, card.dataset.marca);
+}
+function aoFechar() {
+  if (!cardAberto) return;
+  playerCaixa.innerHTML = ""; // para o vídeo
+  const card = cardAberto;
+  cardAberto = null;
+  card.focus({ preventScroll: true });
+  tocarCapa();
+}
+function fecharVideo() {
+  if (player.open) { if (typeof player.close === "function") player.close(); else player.removeAttribute("open"); }
+  aoFechar();
+}
+player.addEventListener("close", aoFechar);
+$("#fechar-player").addEventListener("click", fecharVideo);
+player.addEventListener("click", (e) => { if (e.target === player) fecharVideo(); }); // clique fora do vídeo
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && player.open) { e.preventDefault(); fecharVideo(); } });
+
+document.addEventListener("click", (e) => {
+  const card = e.target.closest("[data-video]");
+  if (card) abrirVideo(card);
+});
+document.addEventListener("keydown", (e) => {
+  const card = e.target.closest && e.target.closest("[data-video]");
+  if (card && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); abrirVideo(card); }
+});
+
+/* ---------- Aparecer ao rolar ---------- */
+if ("IntersectionObserver" in window && !calmo) {
+  const vigia = new IntersectionObserver((entradas) => {
+    entradas.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("visivel"); vigia.unobserve(e.target); } });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  $$(".revelar").forEach((el) => vigia.observe(el));
+} else {
+  $$(".revelar").forEach((el) => el.classList.add("visivel"));
+}
+
+/* ---------- Visitas e vídeos abertos (aparecem no painel) ----------
+   Esta página existe só para o perfil da Seu Influencer, então quem chega
+   sem origem conhecida conta como Seu Influencer.
+   Não conta testes no computador nem você logada no painel neste navegador. */
+function deOndeVeio() {
+  const params = new URLSearchParams(location.search);
+  const utm = params.get("utm_source") || params.get("ref");
+  let host = "";
+  try { host = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : ""; } catch (erro) { host = ""; }
+  const fonte = String(utm || host).toLowerCase();
+  if (!fonte || host === location.hostname || fonte.replace(/[\s_-]/g, "").includes("seuinfluencer")) return "Seu Influencer";
+  if (fonte.includes("instagram") || fonte === "ig") return "Instagram";
+  if (fonte.includes("google")) return "Google";
+  if (fonte.includes("whatsapp") || fonte.includes("wa.me")) return "WhatsApp";
+  return fonte.slice(0, 100);
+}
+// Guarda a origem na aba: se a marca clicar em "Ver meu portfólio completo", o site principal já sabe de onde ela veio
+const ORIGEM = (() => {
+  const agora = deOndeVeio();
+  try {
+    const guardada = sessionStorage.getItem("origem");
+    if (guardada && guardada !== "Direto") return guardada;
+    sessionStorage.setItem("origem", agora);
+  } catch (erro) { /* navegação privada */ }
+  return agora;
+})();
+
+function ehVisitante() {
+  if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === "file:") return false;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      if (/^sb-.+-auth-token$/.test(localStorage.key(i))) return false; // você logada no painel
+    }
+  } catch (erro) { /* sem acesso ao armazenamento: conta normal */ }
+  return true;
+}
+function gravar(tabela, dados) {
+  if (!ehVisitante()) return;
+  try {
+    fetch(BANCO + "/rest/v1/" + tabela, {
+      method: "POST",
+      headers: { ...CABECALHO, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify(dados),
+      keepalive: true
+    }).catch(() => {});
+  } catch (erro) { /* se não der, a página continua normal */ }
+}
+gravar("visitas", { pagina: (location.pathname || "/").slice(0, 300), origem: ORIGEM.slice(0, 300) });
+function registrarClique(video, titulo) {
+  gravar("video_cliques", { video: String(video).slice(0, 300), titulo: String(titulo || "").slice(0, 200) });
+}
+// Vídeo que não é do YouTube abre numa aba nova: conta o clique no link
+grade.addEventListener("click", (e) => {
+  const link = e.target.closest("a.video[href]");
+  if (link) registrarClique(link.href, $(".info b", link)?.textContent);
+});
+
+$("#ano").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
