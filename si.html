@@ -623,8 +623,9 @@ const CAPA = [
   { video: "https://youtube.com/shorts/z1aXTErZ794", marca: "L’Oréal Profissionnel", nicho: "Beleza",      numero: "+395 mil",  rotulo: "views somadas",             cor: "preto" }
 ];
 
-// Qual vídeo do leque toca sozinho, sem som, no computador (0 = primeiro). Use -1 para nenhum.
-const CAPA_TOCANDO = 2;
+// Quais vídeos do leque tocam sozinhos, sem som, no computador (0 = primeiro, 1 = segundo...).
+// Deixe [] para nenhum.
+const CAPA_TOCANDO = [0, 1, 2, 3];
 
 // MARCAS: as logos da faixa (mesmas imagens da pasta logos do site principal).
 const MARCAS = [
@@ -908,15 +909,22 @@ function ligarPrevias(area) {
 }
 ligarPrevias($("#leque"));
 
-// O vídeo escolhido em CAPA_TOCANDO toca sozinho, sem som, enquanto a capa está na tela (só no computador)
-const cartaoTocando = $$(".cartao")[CAPA_TOCANDO];
+// Os vídeos de CAPA_TOCANDO tocam sozinhos, sem som, enquanto a capa está na tela (só no computador).
+// Eles entram um de cada vez, com um respiro, para a página não engasgar carregando os 4 juntos.
+const cartoesTocando = (temMouse && !calmo) ? $$(".cartao").filter((c, i) => CAPA_TOCANDO.includes(i)) : [];
+cartoesTocando.forEach((cartao) => cartao.classList.add("sempre"));
 let capaNaTela = true;
+let esperasCapa = [];
 function tocarCapa() {
-  if (!cartaoTocando) return;
-  if (capaNaTela && !player.open) iniciarPrevia(cartaoTocando); else pararPrevia(cartaoTocando);
+  esperasCapa.forEach(clearTimeout);
+  esperasCapa = [];
+  cartoesTocando.forEach((cartao, i) => {
+    if (!capaNaTela || player.open) { pararPrevia(cartao); return; }
+    if ($(".previa", cartao)) return;
+    esperasCapa.push(setTimeout(() => { if (capaNaTela && !player.open) iniciarPrevia(cartao); }, i * 350));
+  });
 }
-if (cartaoTocando && temMouse && !calmo) {
-  cartaoTocando.classList.add("sempre");
+if (cartoesTocando.length) {
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(([e]) => { capaNaTela = e.isIntersecting; tocarCapa(); }, { threshold: 0.25 }).observe($("#leque"));
   } else {
