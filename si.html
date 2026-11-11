@@ -194,12 +194,29 @@ h1 { font-size: clamp(2.3rem, 4.6vw, 3.75rem); line-height: 1.1; letter-spacing:
 }
 
 /* ===== FAIXA DE MARCAS ===== */
-.faixa { background: var(--branco); padding: 24px 0 26px; border-block: 1px solid var(--linha); overflow: hidden; }
-.faixa-titulo { text-align: center; font-size: .74rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--cinza); margin-bottom: 14px; }
+/* Fundo roxo com pontinhos, como a faixa de números do site da Seu Influencer.
+   As logos ficam em cartões brancos para as escuras (L'Oréal, Matrix) continuarem aparecendo. */
+.faixa {
+  position: relative; overflow: hidden; padding: 40px 0 46px;
+  background-color: var(--roxo);
+  background-image: radial-gradient(rgba(255, 255, 255, .16) 1.1px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+.faixa-titulo {
+  display: table; margin: 0 auto 24px; padding: 7px 16px;
+  background: var(--lima); color: var(--tinta); border-radius: 999px;
+  font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+}
+.faixa-brilho { position: absolute; z-index: 2; font-size: 1.9rem; line-height: 1; pointer-events: none; }
 .faixa-trilho { display: flex; width: max-content; animation: rolar 48s linear infinite; }
 .faixa:hover .faixa-trilho { animation-play-state: paused; }
-.faixa-trilho ul { display: flex; align-items: center; gap: 44px; padding-right: 44px; }
-.faixa-trilho img { width: 76px; height: 76px; object-fit: contain; }
+.faixa-trilho ul { display: flex; align-items: center; gap: 18px; padding-right: 18px; }
+.faixa-trilho li {
+  display: grid; place-items: center; width: 128px; height: 92px;
+  background: var(--branco); border-radius: 22px;
+  box-shadow: 0 12px 26px rgba(30, 8, 90, .3);
+}
+.faixa-trilho img { width: 86px; height: 86px; object-fit: contain; }
 @keyframes rolar { to { transform: translateX(-50%); } }
 
 /* ===== TÍTULOS DAS SEÇÕES ===== */
@@ -397,8 +414,11 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
   .botao-roxo, .botao-branco { width: 100%; justify-content: center; }
   .capa .botao-roxo { width: auto; }
   .final .faisca, .cabeca .faisca { display: none; }
-  .faixa-trilho img { width: 60px; height: 60px; }
-  .faixa-trilho ul { gap: 32px; padding-right: 32px; }
+  .faixa { padding: 32px 0 36px; }
+  .faixa-trilho li { width: 100px; height: 72px; border-radius: 18px; }
+  .faixa-trilho img { width: 66px; height: 66px; }
+  .faixa-trilho ul { gap: 12px; padding-right: 12px; }
+  .faixa-brilho { font-size: 1.4rem; }
 }
 @media (max-width: 520px) {
   .leque-nota { font-size: 1.35rem; left: 4%; }
@@ -486,7 +506,9 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
 
 <!-- ================= MARCAS ================= -->
 <div class="faixa" role="region" aria-labelledby="faixa-titulo">
-  <p class="faixa-titulo" id="faixa-titulo">Marcas que já confiaram em mim</p>
+  <span class="faixa-brilho" style="left:7%;top:22px" aria-hidden="true">✨</span>
+  <span class="faixa-brilho" style="right:8%;top:16px;font-size:1.3rem" aria-hidden="true">✨</span>
+  <p class="faixa-titulo" id="faixa-titulo">✨ Marcas que já confiaram em mim</p>
   <div class="faixa-trilho">
     <ul id="marcas"></ul>
     <ul id="marcas-copia" aria-hidden="true"></ul>
