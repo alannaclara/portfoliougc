@@ -253,7 +253,9 @@
           ? `<input type="checkbox" data-marcar${m.selecionada ? " checked" : ""}${podeEnviar ? "" : " disabled"} aria-label="${podeEnviar ? `Incluir ${P.esc(m.nome || "esta marca")} no disparo de e-mails` : "Sem e-mail, não dá para incluir no disparo"}" title="${podeEnviar ? "Incluir no disparo de e-mails" : "Esta marca está sem e-mail"}">`
           : ""}</td>
         <td><button class="estrela${m.favorita ? " ativa" : ""}" type="button" data-estrela aria-pressed="${!!m.favorita}" aria-label="${m.favorita ? "Tirar dos favoritos" : "Marcar como favorita"}" title="${m.favorita ? "Favorita. Clique para tirar" : "Marcar como favorita (vai para o topo)"}">${P.icone("estrela")}</button></td>
-        <td><b>${P.esc(m.nome || "Sem nome")}</b>${P.pilulaExemplo(m)}${m.origem === "site" ? ` <span class="pilula p-pessego" title="Chegou pelo formulário do site">site</span>` : ""}${m.enviado_em ? ` <span class="pilula p-ciano" title="Recebeu um e-mail seu em ${P.dataBR(m.enviado_em)}">e-mail ${P.dataBR(m.enviado_em).slice(0, 5)}</span>` : ""}</td>
+        <td><b>${P.esc(m.nome || "Sem nome")}</b>${P.pilulaExemplo(m)}${m.veio_de === "Seu Influencer"
+          ? ` <span class="pilula p-lilas" title="Clicou no seu link na Seu Influencer e preencheu o formulário do site">Seu Influencer</span>`
+          : m.origem === "site" ? ` <span class="pilula p-pessego" title="Chegou pelo formulário do site${m.veio_de ? `, vindo de ${P.esc(m.veio_de)}` : ""}">site</span>` : ""}${m.enviado_em ? ` <span class="pilula p-ciano" title="Recebeu um e-mail seu em ${P.dataBR(m.enviado_em)}">e-mail ${P.dataBR(m.enviado_em).slice(0, 5)}</span>` : ""}</td>
         <td class="curta">${m.nicho ? P.pilula(nomeNicho(m.nicho), corNicho(m.nicho)) : `<span class="mudo pequeno">sem nicho</span>`}</td>
         <td class="curta">${linkInsta ? `<a class="link-tabela" href="${linkInsta}" target="_blank" rel="noopener">${P.esc(insta)}</a>` : ""}</td>
         <td class="curta">${m.email ? `<a class="link-tabela" href="mailto:${P.esc(m.email)}">${P.esc(m.email)}</a>` : ""}</td>

@@ -239,6 +239,9 @@
           <div class="recado-quem">
             <b>${P.esc(l.nome || "Sem nome")}</b>
             ${ehNovo(l) ? `<span class="pilula p-pessego">novo</span>` : ""}
+            ${l.veio_de === "Seu Influencer"
+              ? `<span class="pilula p-lilas" title="Clicou no seu link na Seu Influencer">veio da Seu Influencer</span>`
+              : l.veio_de && l.veio_de !== "Direto" ? `<span class="mudo pequeno">veio do ${P.esc(l.veio_de)}</span>` : ""}
           </div>
           <span class="mudo pequeno" title="${P.esc(l.criado_em ? new Date(l.criado_em).toLocaleString("pt-BR") : "")}">${P.esc(quandoFoi(l.criado_em))}</span>
         </div>
