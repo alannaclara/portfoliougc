@@ -310,6 +310,20 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
 .marcas-linha { margin-top: 22px; font-size: clamp(.9rem, 1.1vw, 1.05rem); color: var(--cinza); }
 .marcas-linha b { color: var(--tinta); font-weight: 600; }
 
+/* Sobre com fundo rosa (aprovado por ela; para voltar ao creme, tire a classe sobre-rosa da seção) */
+.sobre-rosa {
+  background-color: var(--rosa);
+  background-image: radial-gradient(rgba(255, 255, 255, .18) 1.1px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+.sobre-rosa .sobre-texto h2, .sobre-rosa .sobre-texto p b, .sobre-rosa .marcas-linha b { color: #fff; }
+.sobre-rosa .sobre-texto p, .sobre-rosa .marcas-linha { color: rgba(255, 255, 255, .88); }
+.sobre-rosa .sobre-texto .mao { color: var(--lima); }
+.sobre-rosa .chip { border-color: transparent; }
+.sobre-rosa .chip-roxo { background: var(--roxo); color: #fff; }
+.sobre-rosa .adesivo { background: var(--roxo); box-shadow: 0 10px 22px rgba(30, 8, 90, .35); }
+.sobre-rosa .moldura { box-shadow: 10px 10px 0 var(--tinta); }
+
 /* ===== COMO FUNCIONA ===== */
 .passos-lista { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: passo; }
 .passo {
@@ -531,7 +545,7 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
 </section>
 
 <!-- ================= SOBRE ================= -->
-<section class="secao sobre" id="sobre" aria-labelledby="sobre-titulo">
+<section class="secao sobre sobre-rosa" id="sobre" aria-labelledby="sobre-titulo">
   <div class="container sobre-grade">
     <div class="moldura-caixa revelar">
       <div class="moldura" role="img" aria-label="Foto da Alanna Clara dando uma piscadinha">
