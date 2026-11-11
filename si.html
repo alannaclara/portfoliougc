@@ -97,7 +97,7 @@ ul, ol { list-style: none; }
 .capa::before, .capa::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; pointer-events: none; }
 .capa::before { width: 560px; height: 560px; right: -140px; top: 40px; background: radial-gradient(circle, rgba(215, 255, 0, .38), transparent 66%); }
 .capa::after { width: 520px; height: 520px; left: -220px; top: 260px; background: radial-gradient(circle, rgba(107, 59, 248, .12), transparent 66%); }
-.capa-grade { display: grid; grid-template-columns: 1.02fr 1fr; gap: 40px; align-items: center; }
+.capa-grade { display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 40px; align-items: center; }
 
 .etiqueta {
   display: inline-flex; align-items: center; gap: 9px;
@@ -107,7 +107,7 @@ ul, ol { list-style: none; }
 .etiqueta .tag { white-space: nowrap; background: var(--lima); border-radius: 999px; padding: 3px 10px; font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .etiqueta .ponto { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, .2); }
 
-h1 { font-size: clamp(2.3rem, 5.1vw, 3.75rem); line-height: 1.1; letter-spacing: -.035em; font-weight: 600; margin: 20px 0 18px; }
+h1 { font-size: clamp(2.3rem, 4.6vw, 3.75rem); line-height: 1.1; letter-spacing: -.035em; font-weight: 600; margin: 20px 0 18px; }
 .sublinhado { color: var(--roxo); font-weight: 700; text-decoration: underline 5px var(--vermelho); text-underline-offset: 9px; text-decoration-skip-ink: none; }
 .lead { font-size: 1.06rem; color: var(--tinta-2); max-width: 33em; }
 .marca-texto { background: var(--lima); color: var(--tinta); font-weight: 600; border-radius: 8px; padding: 1px 7px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
@@ -137,7 +137,7 @@ h1 { font-size: clamp(2.3rem, 5.1vw, 3.75rem); line-height: 1.1; letter-spacing:
 @keyframes aponta { 50% { transform: translateY(4px); } }
 /* O giro fica no vídeo (e não no item) para os selos ficarem sempre por cima de todos os vídeos */
 .leque-lista { display: flex; justify-content: center; align-items: flex-start; padding: 0 6px 48px; isolation: isolate; }
-.leque-item { position: relative; flex: 0 0 29%; max-width: 176px; margin-inline: -2%; }
+.leque-item { position: relative; flex: 0 0 34%; max-width: 240px; margin-inline: -4%; }
 .leque-item:nth-child(1) { top: 28px; --giro: -7deg; --z: 1; }
 .leque-item:nth-child(2) { top: 6px; --giro: -2.5deg; --z: 2; }
 .leque-item:nth-child(3) { top: 0; --giro: 3deg; --z: 3; }
@@ -158,17 +158,16 @@ h1 { font-size: clamp(2.3rem, 5.1vw, 3.75rem); line-height: 1.1; letter-spacing:
   box-shadow: 0 10px 22px rgba(20, 20, 20, .22); transform: rotate(calc(var(--giro) - 3deg));
   pointer-events: none;
 }
-.selo strong { font-size: 1.2rem; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
-.selo span { font-size: .7rem; font-weight: 500; white-space: nowrap; }
+.selo strong { font-size: 1.32rem; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
+.selo span { font-size: .74rem; font-weight: 500; white-space: nowrap; }
 .selo-roxo { background: var(--roxo); color: #fff; }
 .selo-lima { background: var(--lima); color: var(--tinta); }
 .selo-rosa { background: var(--rosa); color: #fff; }
 .selo-preto { background: var(--tinta); color: #fff; }
-.leque-item:nth-child(4) .selo { left: auto; right: -12px; }
+.leque-item:nth-child(4) .selo { left: auto; right: 4px; }
 @media (min-width: 901px) and (max-width: 1100px) {
-  .selo { padding: 7px 11px; }
-  .selo strong { font-size: 1rem; }
-  .selo span { font-size: .64rem; }
+  .selo strong { font-size: 1.12rem; }
+  .selo span { font-size: .68rem; }
 }
 
 /* Botão de play que aparece por cima das capas */
@@ -182,6 +181,8 @@ h1 { font-size: clamp(2.3rem, 5.1vw, 3.75rem); line-height: 1.1; letter-spacing:
 }
 .play svg { width: 13px; height: 13px; margin-left: 2px; fill: currentColor; }
 .cartao:hover .play, .video:hover .play { background: var(--lima); transform: scale(1.08); }
+/* No leque, o lado direito de cada vídeo fica por baixo do vizinho: o play vai para a esquerda */
+.cartao .play { right: auto; left: 10px; }
 
 /* Prévia sem som (YouTube) por cima da capa */
 .previa { position: absolute; inset: 0; z-index: 1; overflow: hidden; opacity: 0; transition: opacity .45s; pointer-events: none; }
@@ -403,11 +404,17 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
   .leque-nota { font-size: 1.35rem; left: 4%; }
   .leque-item { margin-inline: -2.2%; }
   .cartao { border-width: 3px; border-radius: 16px; }
+  /* 4 × 33% − 8 × 4% = 100%: o leque ocupa a largura certinha, sem sair da tela */
+  .leque-lista { padding-inline: 12px; }
+  .leque-item { flex-basis: 33%; margin-inline: -4%; }
   .selo { padding: 5px 8px; border-radius: 10px; left: -7px; bottom: -16px; }
-  .leque-item:nth-child(4) .selo { right: -7px; }
-  .selo strong { font-size: .86rem; }
-  .selo span { font-size: .56rem; }
+  .leque-item:nth-child(1) .selo { left: 4px; }
+  .leque-item:nth-child(3) .selo { left: -1px; }
+  .leque-item:nth-child(4) .selo { right: 4px; }
+  .selo strong { font-size: .8rem; }
+  .selo span { font-size: .54rem; }
   .play { width: 28px; height: 28px; right: 7px; top: 7px; }
+  .cartao .play { left: 7px; }
   .play svg { width: 11px; height: 11px; }
   .video { border-radius: 16px; }
   .rodape-linha { flex-direction: column; }
