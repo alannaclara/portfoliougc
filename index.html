@@ -2256,12 +2256,19 @@ document.addEventListener("input", (e) => {
 async function salvarLead(nome, email, obs) {
   if (!window.banco) return false;
   try {
-    const { error } = await banco.from("marcas").insert({
+    const contato = {
       nome: String(nome).trim().slice(0, 200),
       email: String(email).trim().slice(0, 200),
       obs: String(obs).trim().slice(0, 3000),
-      origem: "site"
-    });
+      origem: "site",
+      veio_de: ORIGEM_DA_VISITA
+    };
+    let { error } = await banco.from("marcas").insert(contato);
+    // Se o banco ainda não tiver o campo veio_de, manda sem ele: o recado nunca se perde
+    if (error) {
+      delete contato.veio_de;
+      ({ error } = await banco.from("marcas").insert(contato));
+    }
     return !error;
   } catch (erro) {
     return false;
@@ -2397,6 +2404,7 @@ function deOndeVeio() {
   try { host = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, "") : ""; } catch (erro) { host = ""; }
   const fonte = String(utm || host).toLowerCase();
   if (!fonte || host === location.hostname) return "Direto";
+  if (fonte.replace(/[\s_-]/g, "").includes("seuinfluencer")) return "Seu Influencer";
   if (fonte.includes("instagram") || fonte === "ig") return "Instagram";
   if (fonte.includes("google")) return "Google";
   if (fonte.includes("tiktok")) return "TikTok";
@@ -2409,6 +2417,18 @@ function deOndeVeio() {
   if (fonte.includes("linktr")) return "Linktree";
   return fonte.slice(0, 100);
 }
+
+// Por onde a pessoa chegou nesta visita. Fica guardado enquanto a aba estiver aberta,
+// para o formulário saber a origem mesmo depois de recarregar ou rolar a página.
+const ORIGEM_DA_VISITA = (() => {
+  const agora = deOndeVeio();
+  try {
+    if (agora !== "Direto") sessionStorage.setItem("origem", agora);
+    return sessionStorage.getItem("origem") || agora;
+  } catch (erro) {
+    return agora;
+  }
+})();
 
 // Visitante de verdade: não é teste no computador nem você logada no painel
 async function ehVisitante() {
@@ -2423,7 +2443,7 @@ async function registrarVisita() {
     if (!(await ehVisitante())) return;
     await banco.from("visitas").insert({
       pagina: (location.pathname || "/").slice(0, 300),
-      origem: deOndeVeio()
+      origem: ORIGEM_DA_VISITA
     });
   } catch (erro) {
     /* se não der, o site continua normal */
