@@ -258,9 +258,20 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
   background-image: radial-gradient(rgba(20, 20, 20, .14) 1.2px, transparent 1.5px);
   background-size: 18px 18px;
 }
-.rosto { position: absolute; left: 50%; bottom: -6%; width: 118%; max-width: none; transform: translateX(-50%); }
-.rosto-piscando { opacity: 0; animation: piscar 3.4s infinite; }
-@keyframes piscar { 0%, 86% { opacity: 0; } 88%, 95% { opacity: 1; } 97%, 100% { opacity: 0; } }
+/* Cabeça inteira e centralizada na moldura (a moldura é 4:5, por isso a altura é 92 ÷ 1,25 = 73,6%).
+   Mesma animação da capa do portfólio principal: a cada 1,7 s a foto troca para a piscadinha
+   com um leve tombo de cabeça, e volta. */
+.rosto {
+  position: absolute; inset: 0; margin: auto; width: 92%; height: 73.6%;
+  filter: drop-shadow(0 16px 20px rgba(20, 20, 20, .25));
+  transform-origin: 50% 70%; animation: brincadeira 1.7s ease-in-out infinite;
+}
+.rosto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.rosto-aberto { animation: foto-aberta 1.7s infinite; }
+.rosto-piscada { opacity: 0; animation: foto-piscada 1.7s infinite; }
+@keyframes foto-aberta { 0%, 63.9% { opacity: 1; } 64%, 87.9% { opacity: 0; } 88%, 100% { opacity: 1; } }
+@keyframes foto-piscada { 0%, 63.9% { opacity: 0; } 64%, 87.9% { opacity: 1; } 88%, 100% { opacity: 0; } }
+@keyframes brincadeira { 0%, 60% { transform: none; } 64% { transform: rotate(3deg) scale(1.04); } 70%, 84% { transform: rotate(2deg) scale(1.02); } 90%, 100% { transform: none; } }
 .adesivo {
   position: absolute; z-index: 2; top: -4px; right: -8px;
   background: var(--rosa); color: #fff; font-size: 1.45rem;
@@ -494,9 +505,11 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
 <section class="secao sobre" id="sobre" aria-labelledby="sobre-titulo">
   <div class="container sobre-grade">
     <div class="moldura-caixa revelar">
-      <div class="moldura" role="img" aria-label="Foto da Alanna Clara">
-        <img class="rosto" src="fotos/alanna-olhos-abertos.webp" alt="" decoding="async" loading="lazy">
-        <img class="rosto rosto-piscando" src="fotos/alanna-piscadinha.webp" alt="" decoding="async" loading="lazy">
+      <div class="moldura" role="img" aria-label="Foto da Alanna Clara dando uma piscadinha">
+        <div class="rosto">
+          <img class="rosto-aberto" src="fotos/alanna-olhos-abertos.webp" alt="" width="1254" height="1254" decoding="async" loading="lazy">
+          <img class="rosto-piscada" src="fotos/alanna-piscadinha.webp" alt="" width="1254" height="1254" decoding="async" loading="lazy">
+        </div>
       </div>
       <span class="adesivo mao" aria-hidden="true">oiee!</span>
     </div>
