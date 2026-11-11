@@ -817,7 +817,7 @@ async function carregarMetricas() {
     const m = await resposta.json();
     const mostrar = (id, html) => { const el = $(id); el.innerHTML = html; el.hidden = false; };
     if (m && m.conta && m.conta.seguidores) mostrar("#m-seguidores", `<b>${formatar(m.conta.seguidores)}</b> seguidores no Instagram`);
-    if (m && m.medias && m.medias.engajamento) mostrar("#m-engajamento", `<b>${String(m.medias.engajamento).replace(".", ",")}%</b> de engajamento`);
+    if (m && m.medias && m.medias.engajamento) mostrar("#m-engajamento", `<b>${String(m.medias.engajamento).replace(".", ",")}%</b> de engajamento por alcance`);
     const genero = (m && m.publico && m.publico.genero) || [];
     const mulheres = (genero.find((g) => g.nome === "F") || {}).valor || 0;
     const homens = (genero.find((g) => g.nome === "M") || {}).valor || 0;
