@@ -226,6 +226,8 @@ h1 { font-size: clamp(2.3rem, 4.6vw, 3.75rem); line-height: 1.1; letter-spacing:
 .cabeca .mao { color: var(--roxo); font-size: 1.7rem; display: block; margin-bottom: 6px; transform: rotate(-2deg); }
 h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -.03em; font-weight: 600; }
 .bloco-lima { background: var(--lima); border-radius: 12px; padding: 0 .2em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+/* Estrelinha ao lado do título, sem encostar na primeira letra */
+.faisca-lado { display: inline-block; width: .6em; height: .6em; margin-right: .35em; vertical-align: .35em; color: var(--roxo); fill: currentColor; }
 .cabeca p:not(.mao) { color: var(--tinta-2); margin-top: 12px; }
 
 /* ===== VÍDEOS POR NICHO ===== */
@@ -534,8 +536,7 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
 <section class="secao nichos" id="nichos" aria-labelledby="nichos-titulo">
   <div class="container">
     <header class="cabeca revelar">
-      <svg class="faisca" viewBox="0 0 24 24" style="color:var(--roxo);left:4%;top:8px" aria-hidden="true"><use href="#d-faisca"/></svg>
-      <h2 id="nichos-titulo">Qual é o <span class="bloco-lima">nicho</span> da sua marca?</h2>
+      <h2 id="nichos-titulo"><svg class="faisca-lado" viewBox="0 0 24 24" aria-hidden="true"><use href="#d-faisca"/></svg>Qual é o <span class="bloco-lima">nicho</span> da sua marca?</h2>
       <p>Escolhe um nicho e dá o play com som. No computador, é só passar o mouse para ver a prévia.</p>
     </header>
     <!-- Os botões e os vídeos vêm do painel (aba Portfólio, tabela videos). Reserva: lista RESERVA no script -->
@@ -817,32 +818,35 @@ function montarVideos(lista) {
   const ordemFixa = Object.keys(NICHOS);
   const posicao = (n) => (ordemFixa.includes(n) ? ordemFixa.indexOf(n) : 99);
   const nichos = Object.keys(conta).sort((a, b) => conta[b] - conta[a] || posicao(a) - posicao(b));
-  filtros.innerHTML = [["todos", "Todos", cards.length]].concat(nichos.map((n) => [n, nomeNicho(n), conta[n]]))
-    .map(([chave, nome, qtd]) => `<button class="filtro" type="button" data-filtro="${esc(chave)}" aria-pressed="${chave === "todos"}">${esc(nome)}<span class="qtd" aria-hidden="true">${qtd}</span></button>`)
+  // Sem botão "Todos": a página abre no nicho com mais vídeos
+  filtros.innerHTML = nichos
+    .map((n, i) => `<button class="filtro" type="button" data-filtro="${esc(n)}" aria-pressed="${i === 0}">${esc(nomeNicho(n))}<span class="qtd" aria-hidden="true">${conta[n]}</span></button>`)
     .join("");
+  mostrarNicho(nichos[0], false);
   ligarPrevias(grade);
+}
+
+// Mostra só os vídeos do nicho escolhido
+function mostrarNicho(escolha, animar) {
+  $$(".filtro", filtros).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filtro === escolha)));
+  let n = 0;
+  $$("li", grade).forEach((li) => {
+    const mostra = li.dataset.nicho === escolha;
+    li.hidden = !mostra;
+    li.classList.remove("entrando");
+    if (mostra && animar) {
+      void li.offsetWidth; // reinicia a animação de entrada
+      li.style.animationDelay = Math.min(n, 11) * 0.035 + "s";
+      li.classList.add("entrando");
+    }
+    if (mostra) n++;
+  });
+  if (animar) $("#status-filtro").textContent = `Mostrando ${n} ${n === 1 ? "vídeo" : "vídeos"} de ${nomeNicho(escolha)}`;
 }
 
 filtros.addEventListener("click", (e) => {
   const botao = e.target.closest(".filtro");
-  if (!botao) return;
-  const escolha = botao.dataset.filtro;
-  $$(".filtro", filtros).forEach((b) => b.setAttribute("aria-pressed", String(b === botao)));
-  let n = 0;
-  $$("li", grade).forEach((li) => {
-    const mostra = escolha === "todos" || li.dataset.nicho === escolha;
-    li.hidden = !mostra;
-    li.classList.remove("entrando");
-    if (mostra) {
-      void li.offsetWidth; // reinicia a animação de entrada
-      li.style.animationDelay = Math.min(n, 11) * 0.035 + "s";
-      li.classList.add("entrando");
-      n++;
-    }
-  });
-  $("#status-filtro").textContent = escolha === "todos"
-    ? `Mostrando todos os ${n} vídeos`
-    : `Mostrando ${n} ${n === 1 ? "vídeo" : "vídeos"} de ${nomeNicho(escolha)}`;
+  if (botao) mostrarNicho(botao.dataset.filtro, true);
 });
 
 async function carregarVideos() {
