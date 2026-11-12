@@ -1091,9 +1091,17 @@ function gravar(tabela, dados) {
   } catch (erro) { /* se não der, a página continua normal */ }
 }
 gravar("visitas", { pagina: (location.pathname || "/").slice(0, 300), origem: ORIGEM.slice(0, 300) });
+// Anota o vídeo aberto com o endereço desta página, para o painel separar da página principal.
+// Os dois botões do fim entram na mesma tabela, com o código começando por "botao:".
 function registrarClique(video, titulo) {
-  gravar("video_cliques", { video: String(video).slice(0, 300), titulo: String(titulo || "").slice(0, 200) });
+  gravar("video_cliques", {
+    video: String(video).slice(0, 300),
+    titulo: String(titulo || "").slice(0, 200),
+    pagina: (location.pathname || "/").slice(0, 300)
+  });
 }
+$("a.botao-roxo[href*='seuinfluencer']").addEventListener("click", () => registrarClique("botao:voltar", "Voltar pra Seu Influencer"));
+$("a.botao-branco[href='./']").addEventListener("click", () => registrarClique("botao:portfolio", "Ver meu portfólio completo"));
 // Vídeo que não é do YouTube abre numa aba nova: conta o clique no link
 grade.addEventListener("click", (e) => {
   const link = e.target.closest("a.video[href]");
