@@ -20,6 +20,8 @@
   let cliques = [];        // cada vez que alguém abriu um vídeo no site
   let temCliques = true;   // a tabela video_cliques existe no banco?
   let periodoCliques = 30; // dias; 0 = desde o começo
+  let visitasSi = [];      // visitas da página da Seu Influencer (/si), desde o começo
+  let periodoSi = 30;
   const VISTOS = "pf-leads-vistos";
 
   const nomeNicho = (n) => NICHOS[n] || (n ? n.charAt(0).toUpperCase() + n.slice(1) : "Sem nicho");
@@ -94,6 +96,20 @@
         </div>
         <div class="cartao">
           <div class="cartao-topo">
+            <h2>Página da Seu Influencer</h2>
+            <div class="grupo-botoes">
+              <a class="link-tabela pequeno" href="../si" target="_blank" rel="noopener">abrir a página</a>
+              <div class="filtros" id="pf-si-periodo" role="group" aria-label="Período da página da Seu Influencer">
+                <button class="filtro" type="button" data-dias="7">7 dias</button>
+                <button class="filtro" type="button" data-dias="30">30 dias</button>
+                <button class="filtro" type="button" data-dias="0">Desde o começo</button>
+              </div>
+            </div>
+          </div>
+          <div class="cartao-corpo" id="pf-si"><p class="carregando">Carregando...</p></div>
+        </div>
+        <div class="cartao">
+          <div class="cartao-topo">
             <h2>Meus vídeos</h2>
             <div class="grupo-botoes">
               <span class="mudo pequeno">Arraste pela alcinha para mudar a ordem no site</span>
@@ -119,6 +135,12 @@
         periodoCliques = Number(b.dataset.dias);
         desenharMaisAssistidos();
       });
+      P.$("#pf-si-periodo", s).addEventListener("click", (e) => {
+        const b = e.target.closest("[data-dias]");
+        if (!b) return;
+        periodoSi = Number(b.dataset.dias);
+        desenharSi();
+      });
       prepararAtualizacaoAutomatica();
       await carregar();
     },
@@ -131,12 +153,14 @@
     const inicio = new Date();
     inicio.setHours(0, 0, 0, 0);
     inicio.setDate(inicio.getDate() - 13);
-    const [rv, rs, rm, rc] = await Promise.all([
+    const [rv, rs, rm, rc, rsi] = await Promise.all([
       P.lerSeguro("videos", (q) => q.order("ordem", { ascending: true }).order("criado_em", { ascending: true })),
       P.lerSeguro("visitas", (q) => q.gte("data", inicio.toISOString()).order("data", { ascending: true }).limit(20000)),
       P.lerSeguro("marcas", (q) => q.eq("origem", "site").order("criado_em", { ascending: false })),
-      P.lerSeguro("video_cliques", (q) => q.order("data", { ascending: false }).limit(20000))
+      P.lerSeguro("video_cliques", (q) => q.order("data", { ascending: false }).limit(20000)),
+      P.lerSeguro("visitas", (q) => q.ilike("pagina", "%/si%").order("data", { ascending: true }).limit(20000))
     ]);
+    visitasSi = rsi.dados.filter((v) => ehSi(v.pagina));
     // Sem a tabela, a lista mostra o aviso dentro dela, sem encher o topo de erro
     temCliques = !rc.erro;
     cliques = rc.dados;
@@ -155,6 +179,7 @@
     desenharGrafico(visitas);
     desenharOrigens(visitas);
     desenharMaisAssistidos();
+    desenharSi();
     desenharVideos();
     const hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
     P.$("#pf-atualizado", secao).textContent = `Atualizado às ${hora}. Quem preenche o formulário aparece aqui em até 12 segundos, sem você precisar recarregar nada. As suas próprias visitas, com o login do painel aberto neste navegador, não entram na conta.`;
@@ -330,7 +355,8 @@
   }
 
   /* ---------- Gráfico de barras dos 14 dias ---------- */
-  function desenharGrafico(visitas) {
+  // Conta as visitas de cada um dos últimos 14 dias
+  function contarDias(visitas) {
     const dias = [];
     for (let i = 13; i >= 0; i--) {
       const d = new Date();
@@ -341,6 +367,11 @@
     const porDia = {};
     visitas.forEach((v) => { const iso = P.isoData(new Date(v.data)); porDia[iso] = (porDia[iso] || 0) + 1; });
     dias.forEach((d) => { d.total = porDia[d.iso] || 0; });
+    return dias;
+  }
+
+  function desenharGrafico(visitas) {
+    const dias = contarDias(visitas);
     const total = dias.reduce((s, d) => s + d.total, 0);
     P.$("#pf-total14", secao).textContent = P.plural(total, "visita", "visitas");
     const alvo = P.$("#pf-grafico", secao);
@@ -348,9 +379,13 @@
       alvo.innerHTML = `<p class="vazio">Aqui vai aparecer um gráfico com quantas pessoas visitaram o seu portfólio em cada um dos últimos 14 dias. Assim que as primeiras visitas chegarem, as barras começam a subir.</p>`;
       return;
     }
+    alvo.innerHTML = htmlBarras(dias);
+  }
+
+  function htmlBarras(dias) {
     const maior = Math.max(...dias.map((d) => d.total));
     const hoje = P.hoje();
-    alvo.innerHTML = `<div class="grafico" role="img" aria-label="Visitas por dia nos últimos 14 dias">${dias.map((d) => {
+    return `<div class="grafico" role="img" aria-label="Visitas por dia nos últimos 14 dias">${dias.map((d) => {
       const altura = maior > 0 ? Math.max(2, Math.round((d.total / maior) * 100)) : 2;
       const rotulo = d.data.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
       return `<div class="barra-col${d.iso === hoje ? " hoje" : ""}" title="${rotulo}: ${P.plural(d.total, "visita", "visitas")}">
@@ -397,14 +432,19 @@
     }
 
     const desde = periodoCliques ? Date.now() - periodoCliques * 86400000 : 0;
-    const doPeriodo = cliques.filter((c) => !desde || new Date(c.data).getTime() >= desde);
+    const abertos = cliques.filter((c) => !ehBotao(c));
+    const doPeriodo = abertos.filter((c) => !desde || new Date(c.data).getTime() >= desde);
     if (!doPeriodo.length) {
-      alvo.innerHTML = `<p class="vazio">${cliques.length
+      alvo.innerHTML = `<p class="vazio">${abertos.length
         ? "Ninguém abriu vídeo nesse período. Escolha um período maior aqui em cima."
         : "Aqui vai aparecer quais vídeos as pessoas mais abrem no seu portfólio. A contagem começou agora, então os números vão aparecendo conforme as visitas chegam. As suas próprias visitas, logada no painel, não entram."}</p>`;
       return;
     }
+    alvo.innerHTML = htmlRanking(doPeriodo);
+  }
 
+  // Os 10 vídeos mais abertos de uma lista de cliques, com a barrinha de comparação
+  function htmlRanking(doPeriodo) {
     const porChave = {};
     videos.forEach((v) => { const k = idYoutube(v.link) || v.link; if (k) porChave[k] = v; });
     const conta = {};
@@ -416,7 +456,7 @@
     const maior = lista[0].qtd;
     const nuncaAbertos = videos.filter(noAr).filter((v) => !conta[idYoutube(v.link) || v.link]).length;
 
-    alvo.innerHTML = `<div class="origens">${lista.map((x, i) => {
+    return `<div class="origens">${lista.map((x, i) => {
       const v = x.video;
       const nome = v ? (v.titulo || v.marca || "Sem título") : (x.titulo || "Vídeo que saiu do site");
       const detalhe = v ? nomeNicho(v.nicho) : "não está mais na lista";
@@ -428,6 +468,56 @@
       </div>`;
     }).join("")}</div>
     <p class="mudo pequeno" style="margin-top:12px">${P.plural(doPeriodo.length, "vídeo aberto", "vídeos abertos")} no período.${nuncaAbertos ? ` ${P.plural(nuncaAbertos, "vídeo no ar ainda não foi aberto", "vídeos no ar ainda não foram abertos")} nenhuma vez.` : ""}</p>`;
+  }
+
+  /* ---------- Página da Seu Influencer (/si) ----------
+     As visitas dessa página têm o endereço terminando em /si. Os vídeos abertos
+     lá e os cliques nos dois botões do fim vêm de video_cliques com a mesma página;
+     os botões têm o código começando por "botao:". */
+  function ehSi(pagina) { return /\/si(\.html)?\/?$/i.test(String(pagina || "")); }
+  function ehBotao(c) { return String(c.video || "").startsWith("botao:"); }
+
+  function desenharSi() {
+    const alvo = P.$("#pf-si", secao);
+    P.$$("#pf-si-periodo [data-dias]", secao).forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.dias) === periodoSi)));
+
+    if (!visitasSi.length) {
+      alvo.innerHTML = `<p class="vazio">Aqui vão aparecer as visitas da sua página da Seu Influencer (alannaclara.github.io/portfoliougc/si): quantas marcas abriram, quais vídeos elas assistiram e quantas foram ver o seu portfólio completo. Ainda ninguém abriu. Assim que você colocar esse link no seu perfil de lá, os números começam a aparecer. As suas próprias visitas, logada no painel, não entram.</p>`;
+      return;
+    }
+
+    const desde = periodoSi ? Date.now() - periodoSi * 86400000 : 0;
+    const noPeriodo = (d) => !desde || new Date(d).getTime() >= desde;
+    const visitas = visitasSi.filter((v) => noPeriodo(v.data));
+    const daPagina = cliques.filter((c) => ehSi(c.pagina) && noPeriodo(c.data));
+    const abertos = daPagina.filter((c) => !ehBotao(c));
+    const foiPortfolio = daPagina.filter((c) => c.video === "botao:portfolio").length;
+    const voltou = daPagina.filter((c) => c.video === "botao:voltar").length;
+    const deHoje = visitasSi.filter((v) => P.isoData(new Date(v.data)) === P.hoje()).length;
+    const dasVisitas = (n) => (visitas.length ? `${Math.round(P.divide(n, visitas.length) * 100)}% das visitas` : "");
+    const celula = (rotulo, valor, sub) => `<div class="numero"><p class="numero-rotulo">${rotulo}</p><p class="numero-valor">${P.esc(valor)}</p>${sub ? `<p class="numero-sub">${P.esc(sub)}</p>` : ""}</div>`;
+    // Sem o campo "pagina" no banco, não dá para separar os cliques desta página
+    const semPagina = cliques.length && !("pagina" in cliques[0]);
+
+    alvo.innerHTML = `
+      <div class="numeros" style="--colunas:5;margin-bottom:16px">
+        ${celula("Visitas", P.inteiro(visitas.length))}
+        ${celula("Visitas hoje", P.inteiro(deHoje))}
+        ${celula("Vídeos abertos", P.inteiro(abertos.length), visitas.length ? `${P.divide(abertos.length, visitas.length).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} por visita` : "")}
+        ${celula("Foram pro portfólio completo", P.inteiro(foiPortfolio), dasVisitas(foiPortfolio))}
+        ${celula("Voltaram pra Seu Influencer", P.inteiro(voltou), dasVisitas(voltou))}
+      </div>
+      <div class="duas-colunas">
+        <div>
+          <p class="numero-rotulo" style="margin-bottom:8px">Visitas dos últimos 14 dias</p>
+          ${htmlBarras(contarDias(visitasSi))}
+        </div>
+        <div>
+          <p class="numero-rotulo" style="margin-bottom:8px">Vídeos mais assistidos nesta página</p>
+          ${abertos.length ? htmlRanking(abertos) : `<p class="vazio">Ninguém abriu vídeo nesta página no período.</p>`}
+        </div>
+      </div>
+      ${semPagina ? `<p class="mudo pequeno" style="margin-top:12px">Para separar os vídeos e os botões desta página, rode o arquivo video-cliques-pagina.sql no Supabase.</p>` : ""}`;
   }
 
   /* ---------- Tabela dos vídeos ---------- */
