@@ -549,12 +549,11 @@ const RESULTADOS = [
   { marca: "Airlearn", numero: "+5 mil",  rotulo: "views no YouTube Shorts", detalhe: "Vídeo UGC para app de idiomas." }
 ];
 
-/* DEPOIMENTOS: troque os textos de exemplo pelos depoimentos reais das marcas */
+/* DEPOIMENTOS das marcas (vazio = o bloco de depoimentos não aparece no site)
+   Para incluir um, escreva entre os colchetes neste formato:
+   { texto: "O que a marca falou sobre o seu trabalho.", nome: "Nome da pessoa", empresa: "Marca" }
+   Para mais de um, separe com vírgula. */
 const DEPOIMENTOS = [
-  { texto: "Espaço para o depoimento do Cliente 01. Cole aqui o que a marca falou sobre o roteiro, a entrega e o resultado do vídeo.", nome: "Cliente 01", empresa: "Empresa 01" },
-  { texto: "Espaço para o depoimento do Cliente 02. Uma ou duas frases curtas funcionam melhor do que um texto longo.",                nome: "Cliente 02", empresa: "Empresa 02" },
-  { texto: "Espaço para o depoimento do Cliente 03. Vale pedir para a marca citar um resultado, como views ou downloads depois do vídeo.", nome: "Cliente 03", empresa: "Empresa 03" },
-  { texto: "Espaço para o depoimento do Cliente 04. Peça autorização da marca antes de publicar o nome da pessoa e da empresa.",      nome: "Cliente 04", empresa: "Empresa 04" }
 ];
 
 /* =========================================================
@@ -737,7 +736,9 @@ function montarResultados() {
 }
 
 function montarDepoimentos() {
-  $("#lista-depoimentos").innerHTML = DEPOIMENTOS.map((d, i) => `
+  const lista = $("#lista-depoimentos");
+  lista.hidden = !DEPOIMENTOS.length;
+  lista.innerHTML = DEPOIMENTOS.map((d, i) => `
     <li class="revelar" style="--atraso:${(i % 2) * 0.1}s">
       <figure class="depoimento">
         <blockquote><p>${esc(d.texto)}</p></blockquote>
@@ -1135,8 +1136,8 @@ document.addEventListener("DOMContentLoaded", () => {
   <section class="secao numeros" id="numeros" aria-labelledby="numeros-titulo">
     <div class="container">
       <div class="cabecalho centro revelar">
-        <p class="sobretitulo">Resultados</p>
-        <h2 id="numeros-titulo">Números, resultados e o que as <span class="lima">marcas</span> dizem</h2>
+        <p class="sobretitulo">Números</p>
+        <h2 id="numeros-titulo">Resultados que <span class="lima">conectam</span></h2>
       </div>
       <!-- Vêm das listas METRICAS, RESULTADOS e DEPOIMENTOS no script -->
       <ul class="metricas" id="lista-metricas" aria-label="Métricas"></ul>
