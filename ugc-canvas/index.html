@@ -205,7 +205,8 @@ h2{font-size:clamp(2rem,1.3rem + 3vw,3.4rem);font-weight:900;letter-spacing:-.03
 .destaque{display:flex;flex-direction:column;height:100%;padding:12px;border-radius:28px;background:var(--vidro);border:1px solid var(--borda);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);text-decoration:none;transition:transform .35s var(--suave),border-color .35s,box-shadow .35s}
 .destaque:hover{transform:translateY(-6px);border-color:rgba(233,30,140,.6);box-shadow:0 30px 60px -30px rgba(233,30,140,.65)}
 .capa-916{position:relative;display:grid;place-items:center;aspect-ratio:9/16;border-radius:20px;overflow:hidden;background:linear-gradient(165deg,var(--c1),var(--c2))}
-.capa-916 img,.trabalho-capa img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.capa-916 img,.trabalho-capa img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--suave)}
+.destaque:hover .capa-916 img,a.trabalho:hover .trabalho-capa img{transform:scale(1.05)}
 .capa-916::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent 45%)}
 .destaque-ordem{position:absolute;top:14px;left:14px;z-index:2;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--lima);color:#121212;font-family:var(--titulo);font-weight:900;font-size:.85rem}
 .play{position:relative;z-index:2;display:grid;place-items:center;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;transition:transform .3s var(--suave),background-color .3s}
@@ -360,6 +361,23 @@ a.trabalho:hover .trabalho-play{transform:scale(1.08);background:var(--rosa);bor
 .captura-ok:focus{outline:none}
 
 /* =========================================================
+   PLAYER DE VÍDEO (janela que toca o vídeo no próprio site)
+   ========================================================= */
+.player{max-width:none;max-height:none;padding:0;border:0;background:transparent;color:var(--creme);overflow:visible}
+.player::backdrop{background:rgba(8,8,8,.88);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.player[open]{animation:surgir .4s var(--suave)}
+.player-caixa{display:flex;flex-direction:column;gap:12px;width:min(calc(100vw - 32px),calc((100vh - 140px) * 9 / 16),420px)}
+@supports (height:100dvh){.player-caixa{width:min(calc(100vw - 32px),calc((100dvh - 140px) * 9 / 16),420px)}}
+.player-topo{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.player-titulo{min-width:0;overflow:hidden;font-size:1.1rem;font-weight:800;line-height:1.2;white-space:nowrap;text-overflow:ellipsis}
+.player-fechar{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--borda);background:rgba(255,255,255,.08);cursor:pointer;transition:background-color .2s,border-color .2s}
+.player-fechar:hover{background:var(--rosa);border-color:var(--rosa)}
+.player-moldura{width:100%;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:#000;border:1px solid rgba(233,30,140,.5);box-shadow:0 40px 100px -30px rgba(233,30,140,.65)}
+.player-moldura iframe{display:block;width:100%;height:100%;border:0}
+.player-link{align-self:center;font-size:.9rem;color:var(--creme-suave);text-underline-offset:3px}
+.player-link:hover{color:var(--creme)}
+
+/* =========================================================
    ANIMAÇÃO DE ENTRADA AO ROLAR
    (só funciona com JavaScript ligado; sem ele tudo aparece normal)
    ========================================================= */
@@ -478,10 +496,10 @@ const NUMEROS_CAPA = [
 /* CONTEÚDOS DE DESTAQUE (os três vídeos grandes) */
 const DESTAQUES = [
   {
-    // LINK DO VÍDEO: o endereço que abre quando a pessoa clica no card
+    // LINK DO VÍDEO: link do YouTube toca aqui mesmo no site, numa janela; outros links abrem em nova aba
     link: "https://youtube.com/shorts/9W3uW9gAwgk",
-    // CAPA: caminho da imagem vertical 9:16 (exemplo: "capas/trade-ai.jpg").
-    // Deixe "" (vazio) para mostrar o bloco em degradê no lugar da capa.
+    // CAPA: deixe "" (vazio) para usar a capa do próprio YouTube, que entra sozinha.
+    // Para usar outra imagem, coloque o caminho dela aqui (exemplo: "capas/trade-ai.jpg"), vertical 9:16.
     capa: "",
     numero: "+10 mil",
     rotulo: "views no YouTube Shorts",
@@ -578,9 +596,35 @@ const linkEmail = (assunto, corpo) => {
 };
 const iconePlay = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>';
 
+/* Pega o código do vídeo em links do YouTube (shorts, watch, youtu.be ou embed) */
+function idDoYoutube(link) {
+  const achou = String(link || "").match(/(?:youtube\.com\/(?:shorts\/|watch\?(?:.*&)?v=|embed\/|live\/)|youtu\.be\/)([\w-]{11})/);
+  return achou ? achou[1] : "";
+}
+const atributosVideo = (link, titulo) => {
+  const id = idDoYoutube(link);
+  return id ? ` data-video="${id}" data-titulo="${esc(titulo)}"` : "";
+};
+
+/* Capa do card: imagem escolhida, ou a capa vertical do YouTube, ou o bloco em degradê */
 function capaOuDegrade(item, legenda, textoAlternativo) {
   if (item.capa) return `<img src="${esc(item.capa)}" alt="${esc(textoAlternativo)}" loading="lazy" decoding="async">`;
+  const id = idDoYoutube(item.link);
+  if (id) return `<img src="https://i.ytimg.com/vi/${id}/oardefault.jpg" data-reserva="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="${esc(textoAlternativo)}" loading="lazy" decoding="async">`;
   return `<span class="foto-legenda">${esc(legenda)}</span>`;
+}
+
+/* Se a capa vertical do YouTube não existir, usa a capa padrão dele */
+function ativarReservaDasCapas() {
+  $$("img[data-reserva]").forEach((img) => {
+    const trocar = () => {
+      if (!img.dataset.reserva) return;
+      img.src = img.dataset.reserva;
+      delete img.dataset.reserva;
+    };
+    img.addEventListener("error", trocar);
+    img.addEventListener("load", () => { if (img.naturalWidth && img.naturalWidth <= 120) trocar(); });
+  });
 }
 
 /* Contatos em todos os botões e textos */
@@ -623,7 +667,7 @@ function montarNumerosCapa() {
 function montarDestaques() {
   $("#lista-destaques").innerHTML = DESTAQUES.map((d, i) => `
     <li class="revelar" style="--atraso:${i * 0.12}s">
-      <a class="destaque" href="${esc(d.link)}" target="_blank" rel="noopener">
+      <a class="destaque" href="${esc(d.link)}" target="_blank" rel="noopener"${atributosVideo(d.link, d.titulo)}>
         <div class="capa-916" style="--c1:${esc(d.cores[0])};--c2:${esc(d.cores[1])}">
           ${capaOuDegrade(d, "capa do vídeo 9:16", "Capa do vídeo " + d.titulo)}
           <span class="destaque-ordem" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
@@ -634,7 +678,7 @@ function montarDestaques() {
           <p class="destaque-rotulo">${esc(d.rotulo)}</p>
           <h3>${esc(d.titulo)}</h3>
           <p class="destaque-contexto">${esc(d.contexto)}</p>
-          <span class="sr-only">Assistir ao vídeo, abre em uma nova aba.</span>
+          <span class="sr-only">Assistir ao vídeo.</span>
         </div>
       </a>
     </li>`).join("");
@@ -663,10 +707,10 @@ function montarTrabalhos() {
         <p class="trabalho-marca">${esc(t.marca)}</p>
         <h3>${esc(t.titulo)}</h3>
         <p class="trabalho-formato">${esc(t.formato)}</p>
-        ${t.link ? '<span class="sr-only">Abre em uma nova aba.</span>' : ""}
+        ${t.link ? '<span class="sr-only">Assistir ao vídeo.</span>' : ""}
       </div>`;
     const card = t.link
-      ? `<a class="trabalho" href="${esc(t.link)}" target="_blank" rel="noopener">${miolo}</a>`
+      ? `<a class="trabalho" href="${esc(t.link)}" target="_blank" rel="noopener"${atributosVideo(t.link, t.marca + ": " + t.titulo)}>${miolo}</a>`
       : `<article class="trabalho">${miolo}</article>`;
     return `<li class="revelar" data-nicho="${esc(t.nicho)}" style="--atraso:${(i % 3) * 0.1}s">${card}</li>`;
   }).join("");
@@ -902,8 +946,8 @@ function ativarCaptura() {
 
   const abrir = () => {
     if (jaApareceu()) return;
-    // se a pessoa estiver escrevendo no formulário de contato, espera um pouco mais
-    if ($("#form-contato").contains(document.activeElement)) { setTimeout(abrir, 4000); return; }
+    // se a pessoa estiver vendo um vídeo ou escrevendo no formulário de contato, espera um pouco mais
+    if (document.querySelector("dialog[open]") || $("#form-contato").contains(document.activeElement)) { setTimeout(abrir, 4000); return; }
     if (window.fecharMenu) window.fecharMenu();
     marcar();
     janela.showModal();
@@ -943,6 +987,50 @@ function ativarCaptura() {
   setTimeout(abrir, 7000);
 }
 
+/* Player: os vídeos do YouTube tocam numa janela aqui mesmo no site.
+   Com o arquivo aberto direto do computador (dois cliques), o YouTube não deixa
+   tocar dentro da página; nesse caso o card abre o vídeo no YouTube, numa nova aba.
+   No site publicado (endereço https) ele toca aqui mesmo. */
+function ativarPlayer() {
+  const janela = $("#player");
+  if (!janela || typeof janela.showModal !== "function") return;
+  const moldura = $("#player-moldura");
+
+  window.abrirPlayer = (id, titulo, link) => {
+    $("#player-titulo").textContent = titulo || "Vídeo";
+    $("#player-link").href = link || `https://youtube.com/shorts/${id}`;
+    moldura.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&playsinline=1&rel=0" title="${esc(titulo || "Vídeo")}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    // o player do YouTube puxa o foco para dentro dele; devolvemos para o botão de fechar
+    // para a tecla Esc continuar fechando a janela
+    const devolverFoco = () => {
+      if (janela.open && document.activeElement === moldura.querySelector("iframe")) $("#player-fechar").focus({ preventScroll: true });
+    };
+    moldura.querySelector("iframe").addEventListener("load", () => { devolverFoco(); setTimeout(devolverFoco, 800); });
+    if (window.fecharMenu) window.fecharMenu();
+    janela.showModal();
+    document.documentElement.classList.add("travado");
+  };
+
+  const fechar = () => { if (janela.open) janela.close(); };
+  $("#player-fechar").addEventListener("click", fechar);
+  let cliqueComecouFora = false;
+  janela.addEventListener("pointerdown", (e) => { cliqueComecouFora = e.target === janela; });
+  janela.addEventListener("click", (e) => { if (e.target === janela && cliqueComecouFora) fechar(); });
+  // ao fechar (X, fundo escuro ou Esc) o vídeo para, porque o player é removido
+  janela.addEventListener("close", () => {
+    moldura.innerHTML = "";
+    document.documentElement.classList.remove("travado");
+  });
+
+  if (!/^https?:$/.test(location.protocol)) return;
+  document.addEventListener("click", (e) => {
+    const card = e.target.closest("a[data-video]");
+    if (!card || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    window.abrirPlayer(card.dataset.video, card.dataset.titulo, card.href);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   preencherContatos();
   montarFaixa();
@@ -953,6 +1041,8 @@ document.addEventListener("DOMContentLoaded", () => {
   montarMetricas();
   montarResultados();
   montarDepoimentos();
+  ativarReservaDasCapas();
+  ativarPlayer();
   ativarMenu();
   ativarRevelar();
   ativarContadores();
@@ -1260,6 +1350,18 @@ document.addEventListener("DOMContentLoaded", () => {
       <p id="captura-ok-texto"></p>
       <a class="botao botao-lima botao-cheio" id="captura-whats" href="https://wa.me/5541998669857" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-whats"/></svg>Receber no WhatsApp</a>
     </div>
+  </div>
+</dialog>
+
+<!-- ============ PLAYER DE VÍDEO ============ -->
+<dialog class="player" id="player" aria-labelledby="player-titulo">
+  <div class="player-caixa">
+    <div class="player-topo">
+      <h2 class="player-titulo" id="player-titulo">Vídeo</h2>
+      <button type="button" class="player-fechar" id="player-fechar" aria-label="Fechar vídeo"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="player-moldura" id="player-moldura"></div>
+    <a class="player-link" id="player-link" href="https://www.youtube.com/@alannaclaram" target="_blank" rel="noopener">Assistir no YouTube</a>
   </div>
 </dialog>
 </body>
