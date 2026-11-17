@@ -254,7 +254,11 @@ a.trabalho:hover .trabalho-play{transform:scale(1.08);background:var(--rosa);bor
    5. COMO EU TE AJUDO
    ========================================================= */
 .servicos{background:#151515;--bx:92%;--by:8%;--bc:rgba(233,30,140,.18)}
-.servicos-grade{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.servicos-grade{display:grid;grid-template-columns:repeat(var(--colunas,3),1fr);gap:18px}
+.servicos-poucos .servico{padding:40px 36px 42px}
+.servicos-poucos .servico-numero{font-size:3.4rem}
+.servicos-poucos .servico h3{margin-top:22px;font-size:clamp(1.6rem,1.2rem + 1.2vw,2.2rem);font-weight:900;letter-spacing:-.02em}
+.servicos-poucos .servico p{font-size:1.08rem}
 .servico{position:relative;height:100%;padding:30px 28px 32px;border-radius:24px;overflow:hidden;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid var(--borda);transition:transform .35s var(--suave),border-color .35s}
 .servico::before{content:"";position:absolute;top:-90px;right:-90px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(233,30,140,.35),transparent 70%);transition:transform .5s var(--suave)}
 .servicos-grade li:nth-child(even) .servico::before{background:radial-gradient(circle,rgba(181,232,67,.28),transparent 70%)}
@@ -568,20 +572,12 @@ const TRABALHOS = [
   // para incluir um trabalho novo: coloque uma vírgula no fim da linha de cima e copie o mesmo formato
 ];
 
-/* SERVIÇOS (os números 01 a 06 são colocados sozinhos, na ordem da lista) */
+/* SERVIÇOS (os números 01, 02... são colocados sozinhos, na ordem da lista) */
 const SERVICOS = [
-  { titulo: "Vídeo UGC",               descricao: "Vídeo vertical com roteiro, gancho forte nos primeiros segundos e cara de indicação sincera.",
-    titulo_en: "UGC video",            descricao_en: "Vertical video with a script, a strong hook in the first seconds and the feel of an honest recommendation." },
-  { titulo: "Corte para anúncio",      descricao: "Versões curtas do mesmo vídeo, com ganchos e chamadas diferentes, prontas para testar no tráfego pago.",
-    titulo_en: "Ad cuts",              descricao_en: "Short versions of the same video, with different hooks and calls to action, ready to test in paid ads." },
-  { titulo: "Fotos do produto",        descricao: "Fotos naturais do produto em uso, pensadas para site, redes sociais e anúncios.",
-    titulo_en: "Product photos",       descricao_en: "Natural photos of the product in use, made for websites, social media and ads." },
-  { titulo: "Unboxing",                descricao: "A primeira impressão de verdade: abrir, mostrar os detalhes e testar na frente da câmera.",
-    titulo_en: "Unboxing",             descricao_en: "A genuine first impression: opening it, showing the details and testing it on camera." },
-  { titulo: "Publicação no meu perfil", descricao: "O vídeo também vai para o meu Instagram, em parceria com a sua marca, falando com quem já me acompanha.",
-    titulo_en: "Post on my profile",   descricao_en: "The video also goes on my Instagram as a collab with your brand, reaching the people who already follow me." },
-  { titulo: "Pacote mensal",           descricao: "Uma quantidade fixa de vídeos todo mês, com calendário combinado e prioridade na minha agenda.",
-    titulo_en: "Monthly package",      descricao_en: "A set number of videos every month, with an agreed calendar and priority in my schedule." }
+  { titulo: "CANVAS UGC", descricao: "Criação e operação de conta dedicada, com vídeos diários",
+    titulo_en: "CANVAS UGC", descricao_en: "Creation and management of a dedicated account, with daily videos" },
+  { titulo: "UGC TECH",   descricao: "Vídeos para o perfil da marca ou para anúncios",
+    titulo_en: "UGC TECH",   descricao_en: "Videos for the brand's profile or for ads" }
 ];
 
 /* MÉTRICAS com contador animado
@@ -882,7 +878,11 @@ function ativarFiltros() {
 }
 
 function montarServicos() {
-  $("#lista-servicos").innerHTML = SERVICOS.map((s, i) => `
+  const lista = $("#lista-servicos");
+  // até 3 serviços por linha; com 1 ou 2 serviços os cards ficam maiores
+  lista.style.setProperty("--colunas", Math.min(Math.max(SERVICOS.length, 1), 3));
+  lista.classList.toggle("servicos-poucos", SERVICOS.length <= 2);
+  lista.innerHTML = SERVICOS.map((s, i) => `
     <li class="revelar" style="--atraso:${(i % 3) * 0.1}s">
       <article class="servico">
         <span class="servico-numero" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
