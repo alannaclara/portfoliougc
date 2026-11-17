@@ -89,10 +89,10 @@ button,input,textarea{font:inherit;color:inherit}
 .topo{position:fixed;top:0;left:0;right:0;z-index:50;height:var(--topo)}
 .topo::before{content:"";position:absolute;inset:0;z-index:-1;background:rgba(18,18,18,.45);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid transparent;transition:background-color .3s,border-color .3s}
 .topo.rolou::before,.topo.aberto::before{background:rgba(18,18,18,.85);border-color:var(--borda)}
-.nav{height:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.nav{height:100%;display:flex;align-items:center;gap:16px}
 .marca{display:inline-flex;align-items:center;gap:8px;font-family:var(--titulo);font-weight:900;font-size:1.15rem;letter-spacing:-.01em;text-decoration:none;white-space:nowrap}
 .marca .ponto{width:9px;height:9px;border-radius:50%;background:var(--lima);box-shadow:0 0 14px var(--lima)}
-.menu{display:flex;align-items:center;gap:2px}
+.menu{display:flex;align-items:center;gap:2px;margin-left:auto}
 .menu a{display:inline-block;padding:8px 14px;border-radius:999px;font-size:.92rem;font-weight:500;color:var(--creme-suave);text-decoration:none;transition:color .2s,background-color .2s}
 .menu a:hover,.menu a.ativo{color:var(--creme);background:rgba(247,239,226,.08)}
 .menu a.menu-cta{margin-left:8px;background:var(--lima);color:#121212;font-weight:600}
@@ -105,6 +105,12 @@ button,input,textarea{font:inherit;color:inherit}
 .topo.aberto .sanduiche span:nth-child(1){transform:translateY(6px) rotate(45deg)}
 .topo.aberto .sanduiche span:nth-child(2){opacity:0}
 .topo.aberto .sanduiche span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+/* Idioma (PT / EN), no canto direito da barra */
+.topo-acoes{display:flex;align-items:center;gap:10px;flex:none}
+.idioma{display:inline-flex;padding:3px;border-radius:999px;border:1px solid var(--borda);background:rgba(255,255,255,.05)}
+.idioma button{min-width:38px;padding:7px 10px;border:0;border-radius:999px;background:transparent;color:var(--creme-suave);font-size:.75rem;font-weight:600;letter-spacing:.06em;line-height:1;cursor:pointer;transition:background-color .25s,color .25s}
+.idioma button:hover{color:var(--creme)}
+.idioma button[aria-pressed="true"]{background:var(--lima);color:#121212}
 
 /* =========================================================
    1. CAPA
@@ -395,6 +401,7 @@ a.trabalho:hover .trabalho-play{transform:scale(1.08);background:var(--rosa);bor
 @media (max-width:900px){
   :root{--topo:64px}
   .sanduiche{display:block}
+  .topo-acoes{margin-left:auto}
   .menu{position:fixed;top:var(--topo);left:0;right:0;flex-direction:column;align-items:stretch;gap:4px;max-height:calc(100dvh - var(--topo));overflow:auto;padding:12px 16px 24px;background:rgba(18,18,18,.97);border-bottom:1px solid var(--borda);opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .25s,transform .25s var(--suave),visibility 0s .25s}
   .topo.aberto .menu{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .25s var(--suave)}
   .menu a{display:block;padding:14px 16px;border-radius:14px;font-size:1.08rem;color:var(--creme)}
@@ -434,6 +441,11 @@ a.trabalho:hover .trabalho-play{transform:scale(1.08);background:var(--rosa);bor
   .servicos-cta{padding:22px}
   .servicos-cta .botao{width:100%}
 }
+@media (max-width:400px){
+  .marca{font-size:1rem;gap:6px}
+  .topo-acoes{gap:8px}
+  .idioma button{min-width:32px;padding:6px 8px;font-size:.7rem}
+}
 @media (max-width:359px){
   .trabalhos-grade{grid-template-columns:1fr}
   .metrica-valor{font-size:2rem}
@@ -458,6 +470,11 @@ a.trabalho:hover .trabalho-play{transform:scale(1.08);background:var(--rosa);bor
    trabalhos, serviços e depoimentos) fica aqui embaixo.
    Para editar: troque só o que está entre aspas e salve o arquivo.
    Não apague as vírgulas nem as chaves { } que separam os itens.
+
+   IDIOMA: o site tem português e inglês (botões PT / EN na barra de cima).
+   Os campos terminados em _en são a versão em inglês do campo de mesmo nome.
+   Se um campo _en faltar, aparece o texto em português no lugar.
+   Os textos fixos da página (títulos, menu, formulário) em inglês ficam na lista INGLES, mais abaixo.
    ========================================================= */
 
 /* CONTATOS: usados nos botões, no rodapé e nas mensagens prontas */
@@ -467,7 +484,8 @@ const CONTATO = {
   whatsappVisivel: "(41) 99866-9857", // como o número aparece escrito na tela
   instagram: "_alannaclara",          // sem o @
   youtube: "https://www.youtube.com/@alannaclaram", // deixe "" para esconder o ícone do YouTube
-  cidade: "Curitiba, PR"
+  cidade: "Curitiba, PR",
+  cidade_en: "Curitiba, Brazil"
 };
 
 /* RECEBER AS MENSAGENS DIRETO NO E-MAIL (opcional)
@@ -488,9 +506,9 @@ const MARCAS = [
 
 /* NÚMEROS DA CAPA (os três números curtos embaixo dos botões) */
 const NUMEROS_CAPA = [
-  { numero: "177",     rotulo: "vídeos entregues" },
-  { numero: "3",       rotulo: "marcas atendidas" },
-  { numero: "165 mil", rotulo: "views somadas" }
+  { numero: "177",     rotulo: "vídeos entregues", rotulo_en: "videos delivered" },
+  { numero: "3",       rotulo: "marcas atendidas", rotulo_en: "brands served" },
+  { numero: "165 mil", numero_en: "165K", rotulo: "views somadas", rotulo_en: "combined views" }
 ];
 
 /* CONTEÚDOS DE DESTAQUE (os três vídeos grandes) */
@@ -505,6 +523,8 @@ const DESTAQUES = [
     rotulo: "views no Instagram",
     titulo: "Trade AI",
     contexto: "App de investimentos com inteligência artificial, explicado sem complicação.",
+    numero_en: "+10K", rotulo_en: "views on Instagram",
+    contexto_en: "An AI-powered investing app, explained without the jargon.",
     cores: ["#e91e8c", "#2b0a1d"]   // cores do degradê enquanto não tem capa
   },
   {
@@ -516,6 +536,8 @@ const DESTAQUES = [
     rotulo: "views no Instagram",
     titulo: "TripBFF",
     contexto: "A viagem inteira planejada pelo app, do jeito que eu uso de verdade.",
+    numero_en: "+10K", rotulo_en: "views on Instagram",
+    contexto_en: "A whole trip planned in the app, the way I really use it.",
     cores: ["#b5e843", "#1d270a"]
   },
   {
@@ -527,6 +549,8 @@ const DESTAQUES = [
     rotulo: "views no Instagram",
     titulo: "Airlearn",
     contexto: "Aprender um idioma novo pelo celular, em um vídeo leve e natural.",
+    numero_en: "+5K", rotulo_en: "views on Instagram",
+    contexto_en: "Learning a new language on your phone, in a light and natural video.",
     cores: ["#e91e8c", "#b5e843"]
   }
 ];
@@ -535,44 +559,135 @@ const DESTAQUES = [
    "nicho" vira o nome do botão de filtro (os botões são criados sozinhos).
    "link" vazio ("") deixa o card sem clique. "capa" funciona igual aos destaques. */
 const TRABALHOS = [
-  { marca: "Trade AI", titulo: "App de investimentos com IA, sem complicação", nicho: "Finanças", formato: "Vídeo UGC", link: "https://youtube.com/shorts/9W3uW9gAwgk", capa: "", cores: ["#e91e8c", "#2b0a1d"] },
-  { marca: "TripBFF",  titulo: "A viagem inteira planejada pelo app",          nicho: "Viagem",   formato: "Vídeo UGC", link: "https://youtube.com/shorts/DSBikc7IU1g", capa: "", cores: ["#b5e843", "#1d270a"] },
-  { marca: "Airlearn", titulo: "Aprender idioma nos intervalos do dia",         nicho: "Idiomas",  formato: "Vídeo UGC", link: "https://youtube.com/shorts/ixQI4AiIc7o", capa: "", cores: ["#ff5cb0", "#3a1030"] }
+  { marca: "Trade AI", titulo: "App de investimentos com IA, sem complicação", nicho: "Finanças", formato: "Vídeo UGC", link: "https://youtube.com/shorts/9W3uW9gAwgk", capa: "", cores: ["#e91e8c", "#2b0a1d"],
+    titulo_en: "An AI investing app, made simple", nicho_en: "Finance", formato_en: "UGC video" },
+  { marca: "TripBFF",  titulo: "A viagem inteira planejada pelo app",          nicho: "Viagem",   formato: "Vídeo UGC", link: "https://youtube.com/shorts/DSBikc7IU1g", capa: "", cores: ["#b5e843", "#1d270a"],
+    titulo_en: "A whole trip planned in the app", nicho_en: "Travel", formato_en: "UGC video" },
+  { marca: "Airlearn", titulo: "Aprender idioma nos intervalos do dia",         nicho: "Idiomas",  formato: "Vídeo UGC", link: "https://youtube.com/shorts/ixQI4AiIc7o", capa: "", cores: ["#ff5cb0", "#3a1030"],
+    titulo_en: "Learning a language in the gaps of your day", nicho_en: "Languages", formato_en: "UGC video" }
   // para incluir um trabalho novo: coloque uma vírgula no fim da linha de cima e copie o mesmo formato
 ];
 
 /* SERVIÇOS (os números 01 a 06 são colocados sozinhos, na ordem da lista) */
 const SERVICOS = [
-  { titulo: "Vídeo UGC",               descricao: "Vídeo vertical com roteiro, gancho forte nos primeiros segundos e cara de indicação sincera." },
-  { titulo: "Corte para anúncio",      descricao: "Versões curtas do mesmo vídeo, com ganchos e chamadas diferentes, prontas para testar no tráfego pago." },
-  { titulo: "Fotos do produto",        descricao: "Fotos naturais do produto em uso, pensadas para site, redes sociais e anúncios." },
-  { titulo: "Unboxing",                descricao: "A primeira impressão de verdade: abrir, mostrar os detalhes e testar na frente da câmera." },
-  { titulo: "Publicação no meu perfil", descricao: "O vídeo também vai para o meu Instagram, em parceria com a sua marca, falando com quem já me acompanha." },
-  { titulo: "Pacote mensal",           descricao: "Uma quantidade fixa de vídeos todo mês, com calendário combinado e prioridade na minha agenda." }
+  { titulo: "Vídeo UGC",               descricao: "Vídeo vertical com roteiro, gancho forte nos primeiros segundos e cara de indicação sincera.",
+    titulo_en: "UGC video",            descricao_en: "Vertical video with a script, a strong hook in the first seconds and the feel of an honest recommendation." },
+  { titulo: "Corte para anúncio",      descricao: "Versões curtas do mesmo vídeo, com ganchos e chamadas diferentes, prontas para testar no tráfego pago.",
+    titulo_en: "Ad cuts",              descricao_en: "Short versions of the same video, with different hooks and calls to action, ready to test in paid ads." },
+  { titulo: "Fotos do produto",        descricao: "Fotos naturais do produto em uso, pensadas para site, redes sociais e anúncios.",
+    titulo_en: "Product photos",       descricao_en: "Natural photos of the product in use, made for websites, social media and ads." },
+  { titulo: "Unboxing",                descricao: "A primeira impressão de verdade: abrir, mostrar os detalhes e testar na frente da câmera.",
+    titulo_en: "Unboxing",             descricao_en: "A genuine first impression: opening it, showing the details and testing it on camera." },
+  { titulo: "Publicação no meu perfil", descricao: "O vídeo também vai para o meu Instagram, em parceria com a sua marca, falando com quem já me acompanha.",
+    titulo_en: "Post on my profile",   descricao_en: "The video also goes on my Instagram as a collab with your brand, reaching the people who already follow me." },
+  { titulo: "Pacote mensal",           descricao: "Uma quantidade fixa de vídeos todo mês, com calendário combinado e prioridade na minha agenda.",
+    titulo_en: "Monthly package",      descricao_en: "A set number of videos every month, with an agreed calendar and priority in my schedule." }
 ];
 
 /* MÉTRICAS com contador animado
    valor: só o número (sem ponto nem vírgula). prefixo e sufixo aparecem antes e depois dele. */
 const METRICAS = [
-  { prefixo: "",  valor: 165, sufixo: " mil", rotulo: "views somadas nos meus conteúdos" },
-  { prefixo: "+", valor: 10,  sufixo: " mil", rotulo: "views no vídeo de maior alcance" },
-  { prefixo: "",  valor: 3,   sufixo: "",     rotulo: "marcas de tecnologia atendidas" },
-  { prefixo: "",  valor: 72,  sufixo: "h",    rotulo: "úteis de prazo máximo para entregar" }
+  { prefixo: "",  valor: 165, sufixo: " mil", sufixo_en: "K", rotulo: "views somadas nos meus conteúdos", rotulo_en: "combined views on my content" },
+  { prefixo: "+", valor: 10,  sufixo: " mil", sufixo_en: "K", rotulo: "views no vídeo de maior alcance",  rotulo_en: "views on my best-performing video" },
+  { prefixo: "",  valor: 3,   sufixo: "",                     rotulo: "marcas de tecnologia atendidas",   rotulo_en: "tech brands served" },
+  { prefixo: "",  valor: 72,  sufixo: "h",                    rotulo: "úteis de prazo máximo para entregar", rotulo_en: "maximum delivery time, in business hours" }
 ];
 
 /* RESULTADOS DE CAMPANHA */
 const RESULTADOS = [
-  { marca: "Trade AI", numero: "+10 mil", rotulo: "views no Instagram", detalhe: "Vídeo UGC para app de investimentos com inteligência artificial." },
-  { marca: "TripBFF",  numero: "+10 mil", rotulo: "views no Instagram", detalhe: "Vídeo UGC para app de planejamento de viagens." },
-  { marca: "Airlearn", numero: "+5 mil",  rotulo: "views no Instagram", detalhe: "Vídeo UGC para app de idiomas." }
+  { marca: "Trade AI", numero: "+10 mil", rotulo: "views no Instagram", detalhe: "Vídeo UGC para app de investimentos com inteligência artificial.",
+    numero_en: "+10K", rotulo_en: "views on Instagram", detalhe_en: "UGC video for an AI-powered investing app." },
+  { marca: "TripBFF",  numero: "+10 mil", rotulo: "views no Instagram", detalhe: "Vídeo UGC para app de planejamento de viagens.",
+    numero_en: "+10K", rotulo_en: "views on Instagram", detalhe_en: "UGC video for a travel planning app." },
+  { marca: "Airlearn", numero: "+5 mil",  rotulo: "views no Instagram", detalhe: "Vídeo UGC para app de idiomas.",
+    numero_en: "+5K",  rotulo_en: "views on Instagram", detalhe_en: "UGC video for a language learning app." }
 ];
 
 /* DEPOIMENTOS das marcas (vazio = o bloco de depoimentos não aparece no site)
    Para incluir um, escreva entre os colchetes neste formato:
-   { texto: "O que a marca falou sobre o seu trabalho.", nome: "Nome da pessoa", empresa: "Marca" }
+   { texto: "O que a marca falou sobre o seu trabalho.", texto_en: "O mesmo texto em inglês.", nome: "Nome da pessoa", empresa: "Marca" }
    Para mais de um, separe com vírgula. */
 const DEPOIMENTOS = [
 ];
+
+/* INGLÊS: a versão em inglês de cada texto fixo da página.
+   O português está no próprio HTML, em cada elemento marcado com data-i18n. */
+const INGLES = {
+  "site.titulo": "Alanna Clara | UGC Portfolio",
+  "pular": "Skip to content",
+  "menu.aria": "Main menu",
+  "menu.sobre": "About",
+  "menu.destaques": "Highlights",
+  "menu.trabalhos": "Work",
+  "menu.servicos": "Services",
+  "menu.numeros": "Numbers",
+  "menu.contato": "Contact",
+  "idioma.aria": "Site language",
+  "capa.frase": "I create creative content that <em>connects</em> your brand with the right people.",
+  "capa.apoio": "UGC videos for apps and tech brands, with the script approved before filming.",
+  "capa.falar": "Let's talk",
+  "capa.ver": "See my work",
+  "capa.numeros": "My numbers",
+  "capa.foto": "Space for a photo of Alanna Clara, vertical 4:5 format",
+  "foto.legenda": "creator photo 4:5",
+  "capa.chip1": "165K combined views",
+  "capa.chip2": "Delivery within 72 business hours",
+  "sobre.foto": "Space for a photo of Alanna Clara creating content, vertical 4:5 format",
+  "sobre.sobretitulo": "About me",
+  "sobre.titulo": "Nice to meet you, I'm <span class=\"rosa\">Alanna</span>",
+  "sobre.lead": "I'm a UGC creator based in Curitiba (Brazil) and I create creative content that connects: videos that feel like a friend's recommendation, planned from the hook to the last second to make people stop, understand and want to try it.",
+  "sobre.texto": "Tech is my favorite place. Apps and digital products aren't always easy to explain, and that's where I come in: I actually use them, translate everything into the language of the person on the other side of the screen and deliver a video that feels like your brand.",
+  "prom.1": "Script approved before filming",
+  "prom.1t": "You see the idea and approve it before I hit record.",
+  "prom.2": "One round of revisions included",
+  "prom.2t": "If something isn't quite right, I'll adjust it at no extra cost.",
+  "prom.3": "Delivery within 72 business hours",
+  "prom.3t": "Your content ready fast, so it can go live.",
+  "sobre.assinatura": "With love,",
+  "dest.sobretitulo": "Highlights",
+  "dest.titulo": "Featured <span class=\"lima\">content</span>",
+  "dest.apoio": "Three videos that show how I turn an app into a conversation. Tap a card to watch.",
+  "trab.sobretitulo": "Portfolio",
+  "trab.titulo": "Work by <span class=\"grad\">niche</span>",
+  "trab.apoio": "My focus is tech. Pick an area and see only the work from it.",
+  "trab.filtros": "Filter work by niche",
+  "serv.sobretitulo": "Services",
+  "serv.titulo": "How I can <span class=\"rosa\">help</span>",
+  "serv.apoio": "From script to delivery, choose the format that makes sense for your campaign.",
+  "serv.cta": "Not sure which one to pick? Tell me your goal and I'll suggest the best format.",
+  "serv.botao": "Get a quote",
+  "num.sobretitulo": "Numbers",
+  "num.titulo": "Results that <span class=\"lima\">connect</span>",
+  "num.metricas": "Metrics",
+  "num.resultados": "Campaign results",
+  "num.depoimentos": "Client testimonials",
+  "cont.sobretitulo": "Contact",
+  "cont.titulo": "Shall we create <span class=\"grad\">together?</span>",
+  "cont.apoio": "Tell me about your brand, your product and what you have in mind. Together we'll find the right format for your campaign.",
+  "cont.email": "Email",
+  "form.titulo": "Send me a message",
+  "form.nome": "Your name",
+  "form.nome.ph": "What should I call you?",
+  "form.email": "Your email",
+  "form.email.ph": "you@yourbrand.com",
+  "form.mensagem": "Message",
+  "form.mensagem.ph": "Tell me a bit about your brand and what you need",
+  "form.enviar": "Send message",
+  "conf.whats": "Send via WhatsApp",
+  "conf.email": "Send by email",
+  "conf.nova": "Write another message",
+  "rod.redes": "My social media",
+  "rod.direitos": "All rights reserved.",
+  "rod.topo": "Back to top",
+  "kit.fechar": "Close",
+  "kit.sobretitulo": "Media kit",
+  "kit.titulo": "Want my full media kit?",
+  "kit.desc": "Formats, numbers and how to work with me, all in one place.",
+  "kit.botao": "Send it to me",
+  "kit.whats": "Get it on WhatsApp",
+  "player.fechar": "Close video",
+  "player.link": "Watch on YouTube"
+};
 
 /* =========================================================
    DAQUI PARA BAIXO É O FUNCIONAMENTO DO SITE
@@ -584,7 +699,15 @@ const movimentoReduzido = window.matchMedia("(prefers-reduced-motion: reduce)").
 const $ = (seletor, raiz = document) => raiz.querySelector(seletor);
 const $$ = (seletor, raiz = document) => Array.from(raiz.querySelectorAll(seletor));
 const esc = (texto) => String(texto == null ? "" : texto).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const formatar = (n, casas = 0) => Number(n).toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas });
+
+/* Idioma escolhido (PT ou EN). Fica salvo no navegador da pessoa, com o mesmo nome
+   usado no primeiro portfólio, então quem escolheu inglês lá já abre este em inglês. */
+let idioma = "pt";
+try { if (localStorage.getItem("idioma") === "en") idioma = "en"; } catch (e) { /* navegação privada */ }
+const tr = (pt, en) => (idioma === "en" ? en : pt);
+// Pega o campo no idioma atual: em inglês usa o campo_en quando ele existe
+const doIdioma = (obj, campo) => (idioma === "en" && obj[campo + "_en"] != null ? obj[campo + "_en"] : obj[campo]);
+const formatar = (n, casas = 0) => Number(n).toLocaleString(tr("pt-BR", "en-US"), { minimumFractionDigits: casas, maximumFractionDigits: casas });
 const primeiroNome = (nome) => String(nome).trim().split(/\s+/)[0];
 const iniciais = (nome) => String(nome).split(/\s+/).filter((p) => /^\p{L}/u.test(p)).slice(0, 2).map((p) => p[0].toUpperCase()).join("") || "?";
 const linkWhats = (texto) => `https://wa.me/${CONTATO.whatsapp}` + (texto ? `?text=${encodeURIComponent(texto)}` : "");
@@ -616,7 +739,8 @@ function capaOuDegrade(item, legenda, textoAlternativo) {
 
 /* Se a capa vertical do YouTube não existir, usa a capa padrão dele */
 function ativarReservaDasCapas() {
-  $$("img[data-reserva]").forEach((img) => {
+  $$("img[data-reserva]:not([data-vigiada])").forEach((img) => {
+    img.dataset.vigiada = "1";
     const trocar = () => {
       if (!img.dataset.reserva) return;
       img.src = img.dataset.reserva;
@@ -629,10 +753,11 @@ function ativarReservaDasCapas() {
 
 /* Contatos em todos os botões e textos */
 function preencherContatos() {
-  const mensagemPadrao = "Oi, Alanna! Vi seu portfólio e quero conversar sobre um conteúdo UGC para a minha marca.";
+  const mensagemPadrao = tr("Oi, Alanna! Vi seu portfólio e quero conversar sobre um conteúdo UGC para a minha marca.",
+    "Hi Alanna! I saw your portfolio and I'd like to talk about UGC content for my brand.");
   const links = {
     whatsapp: linkWhats(mensagemPadrao),
-    email: linkEmail("Parceria UGC", ""),
+    email: linkEmail(tr("Parceria UGC", "UGC partnership"), ""),
     instagram: `https://instagram.com/${CONTATO.instagram}`,
     youtube: CONTATO.youtube
   };
@@ -641,7 +766,7 @@ function preencherContatos() {
     if (link) el.href = link;
     else (el.closest("li") || el).hidden = true;
   });
-  const textos = { email: CONTATO.email, whatsappVisivel: CONTATO.whatsappVisivel, instagram: "@" + CONTATO.instagram, cidade: CONTATO.cidade };
+  const textos = { email: CONTATO.email, whatsappVisivel: CONTATO.whatsappVisivel, instagram: "@" + CONTATO.instagram, cidade: doIdioma(CONTATO, "cidade") };
   $$("[data-mostra]").forEach((el) => {
     const texto = textos[el.dataset.mostra];
     if (texto) el.textContent = texto;
@@ -649,10 +774,11 @@ function preencherContatos() {
 }
 
 /* Faixa de marcas que rola na capa */
+const textoFaixa = () => tr("Marcas com quem já trabalhei: ", "Brands I've worked with: ") + MARCAS.join(", ") + ".";
 function montarFaixa() {
   const trilho = $("#faixa-trilho");
   if (!trilho || !MARCAS.length) { $(".faixa") && ($(".faixa").hidden = true); return; }
-  $("#faixa-leitor").textContent = "Marcas com quem já trabalhei: " + MARCAS.join(", ") + ".";
+  $("#faixa-leitor").textContent = textoFaixa();
   let itens = [];
   while (itens.length < 16) itens = itens.concat(MARCAS);
   const grupo = itens.map((m) => `<li class="faixa-item">${esc(m)}</li>`).join("");
@@ -661,7 +787,7 @@ function montarFaixa() {
 }
 
 function montarNumerosCapa() {
-  $("#numeros-capa").innerHTML = NUMEROS_CAPA.map((n) => `<li><strong>${esc(n.numero)}</strong><span>${esc(n.rotulo)}</span></li>`).join("");
+  $("#numeros-capa").innerHTML = NUMEROS_CAPA.map((n) => `<li><strong>${esc(doIdioma(n, "numero"))}</strong><span>${esc(doIdioma(n, "rotulo"))}</span></li>`).join("");
 }
 
 function montarDestaques() {
@@ -669,56 +795,72 @@ function montarDestaques() {
     <li class="revelar" style="--atraso:${i * 0.12}s">
       <a class="destaque" href="${esc(d.link)}" target="_blank" rel="noopener"${atributosVideo(d.link, d.titulo)}>
         <div class="capa-916" style="--c1:${esc(d.cores[0])};--c2:${esc(d.cores[1])}">
-          ${capaOuDegrade(d, "capa do vídeo 9:16", "Capa do vídeo " + d.titulo)}
+          ${capaOuDegrade(d, tr("capa do vídeo 9:16", "video cover 9:16"), tr("Capa do vídeo ", "Video cover: ") + d.titulo)}
           <span class="destaque-ordem" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
           <span class="play" aria-hidden="true">${iconePlay}</span>
         </div>
         <div class="destaque-info">
-          <p class="destaque-numero">${esc(d.numero)}</p>
-          <p class="destaque-rotulo">${esc(d.rotulo)}</p>
-          <h3>${esc(d.titulo)}</h3>
-          <p class="destaque-contexto">${esc(d.contexto)}</p>
-          <span class="sr-only">Assistir ao vídeo.</span>
+          <p class="destaque-numero">${esc(doIdioma(d, "numero"))}</p>
+          <p class="destaque-rotulo">${esc(doIdioma(d, "rotulo"))}</p>
+          <h3>${esc(doIdioma(d, "titulo"))}</h3>
+          <p class="destaque-contexto">${esc(doIdioma(d, "contexto"))}</p>
+          <span class="sr-only">${tr("Assistir ao vídeo.", "Watch the video.")}</span>
         </div>
       </a>
     </li>`).join("");
 }
 
+/* Trabalhos: o filtro guarda o nicho em português (data-nicho) e mostra o nome no idioma atual */
+let nichoAtual = "Todos";
+const nomeDoNicho = (nicho) => {
+  if (nicho === "Todos") return tr("Todos", "All");
+  const t = TRABALHOS.find((x) => x.nicho === nicho);
+  return t ? doIdioma(t, "nicho") : nicho;
+};
+
 function montarTrabalhos() {
   const lista = $("#lista-trabalhos");
   const filtros = $("#filtros");
-  const aviso = $("#filtro-aviso");
   const nichos = ["Todos", ...new Set(TRABALHOS.map((t) => t.nicho))];
+  if (!nichos.includes(nichoAtual)) nichoAtual = "Todos";
   const contar = (n) => n === "Todos" ? TRABALHOS.length : TRABALHOS.filter((t) => t.nicho === n).length;
 
-  filtros.innerHTML = nichos.map((n, i) => `
-    <button type="button" class="filtro" data-nicho="${esc(n)}" aria-pressed="${i === 0}">
-      ${esc(n)} <span class="filtro-qtd" aria-hidden="true">${contar(n)}</span>
+  filtros.innerHTML = nichos.map((n) => `
+    <button type="button" class="filtro" data-nicho="${esc(n)}" aria-pressed="${n === nichoAtual}">
+      ${esc(nomeDoNicho(n))} <span class="filtro-qtd" aria-hidden="true">${contar(n)}</span>
     </button>`).join("");
 
   lista.innerHTML = TRABALHOS.map((t, i) => {
+    const titulo = doIdioma(t, "titulo");
     const miolo = `
       <div class="trabalho-capa" style="--c1:${esc(t.cores[0])};--c2:${esc(t.cores[1])}">
-        ${capaOuDegrade(t, "capa 4:5", "Capa do trabalho para " + t.marca)}
-        <span class="trabalho-tag">${esc(t.nicho)}</span>
+        ${capaOuDegrade(t, tr("capa 4:5", "cover 4:5"), tr("Capa do trabalho para ", "Cover of the work for ") + t.marca)}
+        <span class="trabalho-tag">${esc(doIdioma(t, "nicho"))}</span>
         ${t.link ? `<span class="trabalho-play" aria-hidden="true">${iconePlay}</span>` : ""}
       </div>
       <div class="trabalho-info">
         <p class="trabalho-marca">${esc(t.marca)}</p>
-        <h3>${esc(t.titulo)}</h3>
-        <p class="trabalho-formato">${esc(t.formato)}</p>
-        ${t.link ? '<span class="sr-only">Assistir ao vídeo.</span>' : ""}
+        <h3>${esc(titulo)}</h3>
+        <p class="trabalho-formato">${esc(doIdioma(t, "formato"))}</p>
+        ${t.link ? `<span class="sr-only">${tr("Assistir ao vídeo.", "Watch the video.")}</span>` : ""}
       </div>`;
     const card = t.link
-      ? `<a class="trabalho" href="${esc(t.link)}" target="_blank" rel="noopener"${atributosVideo(t.link, t.marca + ": " + t.titulo)}>${miolo}</a>`
+      ? `<a class="trabalho" href="${esc(t.link)}" target="_blank" rel="noopener"${atributosVideo(t.link, t.marca + ": " + titulo)}>${miolo}</a>`
       : `<article class="trabalho">${miolo}</article>`;
-    return `<li class="revelar" data-nicho="${esc(t.nicho)}" style="--atraso:${(i % 3) * 0.1}s">${card}</li>`;
+    const escondido = nichoAtual !== "Todos" && t.nicho !== nichoAtual ? " hidden" : "";
+    return `<li class="revelar" data-nicho="${esc(t.nicho)}" style="--atraso:${(i % 3) * 0.1}s"${escondido}>${card}</li>`;
   }).join("");
+}
 
+function ativarFiltros() {
+  const lista = $("#lista-trabalhos");
+  const filtros = $("#filtros");
+  const aviso = $("#filtro-aviso");
   filtros.addEventListener("click", (evento) => {
     const botao = evento.target.closest(".filtro");
     if (!botao) return;
     const nicho = botao.dataset.nicho;
+    nichoAtual = nicho;
     $$(".filtro", filtros).forEach((b) => b.setAttribute("aria-pressed", String(b === botao)));
     let mostrando = 0;
     $$("li", lista).forEach((item) => {
@@ -731,7 +873,11 @@ function montarTrabalhos() {
         if (!movimentoReduzido) { void item.offsetWidth; item.classList.add("aparece"); }
       }
     });
-    aviso.textContent = `Mostrando ${mostrando} ${mostrando === 1 ? "trabalho" : "trabalhos"}${nicho === "Todos" ? "" : " de " + nicho}.`;
+    const nome = nomeDoNicho(nicho);
+    aviso.textContent = tr(
+      `Mostrando ${mostrando} ${mostrando === 1 ? "trabalho" : "trabalhos"}${nicho === "Todos" ? "" : " de " + nome}.`,
+      `Showing ${mostrando} ${mostrando === 1 ? "project" : "projects"}${nicho === "Todos" ? "" : " in " + nome}.`
+    );
   });
 }
 
@@ -740,22 +886,25 @@ function montarServicos() {
     <li class="revelar" style="--atraso:${(i % 3) * 0.1}s">
       <article class="servico">
         <span class="servico-numero" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
-        <h3>${esc(s.titulo)}</h3>
-        <p>${esc(s.descricao)}</p>
+        <h3>${esc(doIdioma(s, "titulo"))}</h3>
+        <p>${esc(doIdioma(s, "descricao"))}</p>
       </article>
     </li>`).join("");
 }
 
+let metricasJaContaram = false; // depois que o contador rodou uma vez, trocar o idioma mostra direto o número final
 function montarMetricas() {
   $("#lista-metricas").innerHTML = METRICAS.map((m, i) => {
     const casas = m.casas || 0;
-    const final = (m.prefixo || "") + formatar(m.valor, casas) + (m.sufixo || "");
+    const sufixo = doIdioma(m, "sufixo") || "";
+    const final = (m.prefixo || "") + formatar(m.valor, casas) + sufixo;
+    const comeco = movimentoReduzido || metricasJaContaram ? m.valor : 0;
     return `
     <li class="revelar" style="--atraso:${i * 0.1}s">
       <div class="metrica">
-        <p class="metrica-valor" aria-hidden="true">${esc(m.prefixo || "")}<span class="contador" data-valor="${Number(m.valor)}" data-casas="${casas}">${formatar(movimentoReduzido ? m.valor : 0, casas)}</span><span class="metrica-sufixo">${esc(m.sufixo || "")}</span></p>
+        <p class="metrica-valor" aria-hidden="true">${esc(m.prefixo || "")}<span class="contador" data-valor="${Number(m.valor)}" data-casas="${casas}"${metricasJaContaram ? ' data-contou="1"' : ""}>${formatar(comeco, casas)}</span><span class="metrica-sufixo">${esc(sufixo)}</span></p>
         <p class="sr-only">${esc(final)}</p>
-        <p class="metrica-rotulo">${esc(m.rotulo)}</p>
+        <p class="metrica-rotulo">${esc(doIdioma(m, "rotulo"))}</p>
       </div>
     </li>`;
   }).join("");
@@ -768,13 +917,13 @@ function montarResultados() {
         <div class="resultado-topo">
           <span class="resultado-inicial" aria-hidden="true">${esc(r.marca.charAt(0))}</span>
           <div>
-            <p class="resultado-tag">Campanha</p>
+            <p class="resultado-tag">${tr("Campanha", "Campaign")}</p>
             <h3 class="resultado-marca">${esc(r.marca)}</h3>
           </div>
         </div>
-        <p class="resultado-numero">${esc(r.numero)}</p>
-        <p class="resultado-rotulo">${esc(r.rotulo)}</p>
-        <p class="resultado-detalhe">${esc(r.detalhe)}</p>
+        <p class="resultado-numero">${esc(doIdioma(r, "numero"))}</p>
+        <p class="resultado-rotulo">${esc(doIdioma(r, "rotulo"))}</p>
+        <p class="resultado-detalhe">${esc(doIdioma(r, "detalhe"))}</p>
       </article>
     </li>`).join("");
 }
@@ -785,10 +934,10 @@ function montarDepoimentos() {
   lista.innerHTML = DEPOIMENTOS.map((d, i) => `
     <li class="revelar" style="--atraso:${(i % 2) * 0.1}s">
       <figure class="depoimento">
-        <blockquote><p>${esc(d.texto)}</p></blockquote>
+        <blockquote><p>${esc(doIdioma(d, "texto"))}</p></blockquote>
         <figcaption>
           <span class="avatar" aria-hidden="true">${esc(iniciais(d.nome))}</span>
-          <span><strong>${esc(d.nome)}</strong><span>${esc(d.empresa)}</span></span>
+          <span><strong>${esc(d.nome)}</strong><span>${esc(doIdioma(d, "empresa"))}</span></span>
         </figcaption>
       </figure>
     </li>`).join("");
@@ -801,7 +950,7 @@ function ativarMenu() {
   const abrir = (sim) => {
     topo.classList.toggle("aberto", sim);
     botao.setAttribute("aria-expanded", String(sim));
-    botao.setAttribute("aria-label", sim ? "Fechar menu" : "Abrir menu");
+    botao.setAttribute("aria-label", sim ? tr("Fechar menu", "Close menu") : tr("Abrir menu", "Open menu"));
   };
   window.fecharMenu = () => abrir(false);
   botao.addEventListener("click", () => abrir(!topo.classList.contains("aberto")));
@@ -829,27 +978,36 @@ function ativarMenu() {
   $$("main > section").forEach((s) => observador.observe(s));
 }
 
-/* Animação de entrada ao rolar */
+/* Animação de entrada ao rolar (também vale para os cards montados de novo ao trocar o idioma) */
+let observadorRevelar = null;
+function observarRevelar() {
+  const alvos = $$(".revelar:not(.visivel)");
+  if (!observadorRevelar) { alvos.forEach((a) => a.classList.add("visivel")); return; }
+  alvos.forEach((a) => observadorRevelar.observe(a));
+}
 function ativarRevelar() {
-  const alvos = $$(".revelar");
-  if (movimentoReduzido || !("IntersectionObserver" in window)) { alvos.forEach((a) => a.classList.add("visivel")); return; }
-  const observador = new IntersectionObserver((entradas) => {
-    entradas.forEach((e) => {
-      if (!e.isIntersecting) return;
-      e.target.classList.add("visivel");
-      observador.unobserve(e.target);
-    });
-  }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
-  alvos.forEach((a) => observador.observe(a));
+  if (!movimentoReduzido && "IntersectionObserver" in window) {
+    observadorRevelar = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("visivel");
+        observadorRevelar.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+  }
+  observarRevelar();
 }
 
 /* Contador animado das métricas */
+let observadorContador = null;
 function ativarContadores() {
-  const contadores = $$(".contador");
+  const contadores = $$(".contador:not([data-contou])");
   const mostrarFinal = (el) => { el.textContent = formatar(+el.dataset.valor, +el.dataset.casas); };
   if (movimentoReduzido || !("IntersectionObserver" in window)) { contadores.forEach(mostrarFinal); return; }
   const animar = (el) => {
     const alvo = +el.dataset.valor, casas = +el.dataset.casas, duracao = 1800;
+    el.dataset.contou = "1";
+    metricasJaContaram = true;
     let inicio = null;
     const passo = (agora) => {
       if (inicio === null) inicio = agora;
@@ -859,14 +1017,16 @@ function ativarContadores() {
     };
     requestAnimationFrame(passo);
   };
-  const observador = new IntersectionObserver((entradas) => {
-    entradas.forEach((e) => {
-      if (!e.isIntersecting) return;
-      observador.unobserve(e.target);
-      animar(e.target);
-    });
-  }, { threshold: 0.6 });
-  contadores.forEach((c) => observador.observe(c));
+  if (!observadorContador) {
+    observadorContador = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        if (!e.isIntersecting) return;
+        observadorContador.unobserve(e.target);
+        animar(e.target);
+      });
+    }, { threshold: 0.6 });
+  }
+  contadores.forEach((c) => observadorContador.observe(c));
 }
 
 /* Conferência dos campos dos formulários */
@@ -875,8 +1035,8 @@ function validar(form) {
   $$("[required]", form).forEach((campo) => {
     const valor = campo.value.trim();
     let mensagem = "";
-    if (!valor) mensagem = "Preencha este campo, por favor.";
-    else if (campo.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valor)) mensagem = "Confira o e-mail, parece que falta alguma coisa.";
+    if (!valor) mensagem = tr("Preencha este campo, por favor.", "Please fill in this field.");
+    else if (campo.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valor)) mensagem = tr("Confira o e-mail, parece que falta alguma coisa.", "Please check your email, something seems to be missing.");
     campo.setAttribute("aria-invalid", mensagem ? "true" : "false");
     const erro = document.getElementById(campo.id + "-erro");
     if (erro) erro.textContent = mensagem;
@@ -914,13 +1074,16 @@ function ativarFormularioContato() {
     botao.disabled = true;
     const recebido = await enviarParaFormulario({ origem: "Formulário de contato", nome, email, mensagem });
     botao.disabled = false;
-    const texto = `Oi, Alanna! Aqui é ${nome} (${email}).\n\n${mensagem}`;
-    $("#confirmacao-titulo").textContent = recebido ? `Recebi sua mensagem, ${primeiroNome(nome)}!` : `Obrigada, ${primeiroNome(nome)}!`;
+    const pn = primeiroNome(nome);
+    const texto = tr(`Oi, Alanna! Aqui é ${nome} (${email}).\n\n${mensagem}`, `Hi Alanna! This is ${nome} (${email}).\n\n${mensagem}`);
+    $("#confirmacao-titulo").textContent = recebido ? tr(`Recebi sua mensagem, ${pn}!`, `Got your message, ${pn}!`) : tr(`Obrigada, ${pn}!`, `Thank you, ${pn}!`);
     $("#confirmacao-texto").textContent = recebido
-      ? "Ela já chegou no meu e-mail e eu te respondo em breve. Se quiser adiantar, me chama também por aqui:"
-      : "Sua mensagem está prontinha. Escolha por onde enviar e ela chega direto em mim:";
+      ? tr("Ela já chegou no meu e-mail e eu te respondo em breve. Se quiser adiantar, me chama também por aqui:",
+           "It's already in my inbox and I'll get back to you soon. If you'd like, you can also reach me here:")
+      : tr("Sua mensagem está prontinha. Escolha por onde enviar e ela chega direto em mim:",
+           "Your message is ready. Choose how to send it and it will come straight to me:");
     $("#confirmacao-whats").href = linkWhats(texto);
-    $("#confirmacao-email").href = linkEmail(`Contato pelo portfólio: ${nome}`, texto);
+    $("#confirmacao-email").href = linkEmail(tr(`Contato pelo portfólio: ${nome}`, `Contact from the portfolio: ${nome}`), texto);
     form.hidden = true;
     confirmacao.hidden = false;
     confirmacao.focus();
@@ -972,13 +1135,19 @@ function ativarCaptura() {
     botao.disabled = true;
     const recebido = await enviarParaFormulario({ origem: "Mídia kit", nome, email });
     botao.disabled = false;
-    $("#captura-titulo").textContent = recebido ? `Prontinho, ${primeiroNome(nome)}!` : `Obrigada, ${primeiroNome(nome)}!`;
+    const pn = primeiroNome(nome);
+    const titulo = $("#captura-titulo");
+    titulo.removeAttribute("data-i18n"); // o título agora é o agradecimento; a troca de idioma não mexe mais nele
+    titulo.textContent = recebido ? tr(`Prontinho, ${pn}!`, `All set, ${pn}!`) : tr(`Obrigada, ${pn}!`, `Thank you, ${pn}!`);
     $("#captura-ok-texto").textContent = recebido
-      ? "Seu pedido chegou aqui. Vou te mandar o mídia kit no e-mail que você deixou."
-      : "Para receber agora, é só me chamar no WhatsApp com um toque. A mensagem já vai pronta:";
+      ? tr("Seu pedido chegou aqui. Vou te mandar o mídia kit no e-mail que você deixou.",
+           "Your request is in. I'll send the media kit to the email you left.")
+      : tr("Para receber agora, é só me chamar no WhatsApp com um toque. A mensagem já vai pronta:",
+           "To get it now, just message me on WhatsApp with one tap. The message is ready to go:");
     const whats = $("#captura-whats");
     whats.hidden = recebido;
-    whats.href = linkWhats(`Oi, Alanna! Aqui é ${nome} (${email}) e quero receber seu mídia kit completo.`);
+    whats.href = linkWhats(tr(`Oi, Alanna! Aqui é ${nome} (${email}) e quero receber seu mídia kit completo.`,
+      `Hi Alanna! This is ${nome} (${email}) and I'd like to receive your full media kit.`));
     $("#captura-inicio").hidden = true;
     ok.hidden = false;
     ok.focus();
@@ -997,9 +1166,9 @@ function ativarPlayer() {
   const moldura = $("#player-moldura");
 
   window.abrirPlayer = (id, titulo, link) => {
-    $("#player-titulo").textContent = titulo || "Vídeo";
+    $("#player-titulo").textContent = titulo || tr("Vídeo", "Video");
     $("#player-link").href = link || `https://youtube.com/shorts/${id}`;
-    moldura.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&playsinline=1&rel=0" title="${esc(titulo || "Vídeo")}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    moldura.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&playsinline=1&rel=0&hl=${tr("pt-BR", "en")}" title="${esc(titulo || tr("Vídeo", "Video"))}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
     // o player do YouTube puxa o foco para dentro dele; devolvemos para o botão de fechar
     // para a tecla Esc continuar fechando a janela
     const devolverFoco = () => {
@@ -1031,7 +1200,79 @@ function ativarPlayer() {
   });
 }
 
+/* ---------- Troca de idioma (PT / EN) ----------
+   Quando a página abre, o português de cada pedaço fixo (os que têm data-i18n)
+   fica guardado. Ao trocar, esses pedaços recebem o texto da lista INGLES, ou voltam
+   ao português guardado. As partes montadas pelo script são montadas de novo. */
+const ORIGINAIS = new Map();
+let TITULO_PT = "";
+function guardarOriginais() {
+  TITULO_PT = document.title;
+  $$("[data-i18n]").forEach((el) => ORIGINAIS.set(el, { html: el.innerHTML, attrs: {} }));
+  $$("[data-i18n-attr]").forEach((el) => {
+    const guardado = ORIGINAIS.get(el) || { html: null, attrs: {} };
+    el.dataset.i18nAttr.split(",").forEach((par) => {
+      const attr = par.split(":")[0].trim();
+      guardado.attrs[attr] = el.getAttribute(attr);
+    });
+    ORIGINAIS.set(el, guardado);
+  });
+}
+
+function traduzirFixos() {
+  const en = idioma === "en";
+  document.documentElement.lang = en ? "en" : "pt-BR";
+  document.title = en ? INGLES["site.titulo"] : TITULO_PT;
+  ORIGINAIS.forEach((guardado, el) => {
+    if (el.dataset.i18n && guardado.html != null) {
+      const ingles = INGLES[el.dataset.i18n];
+      el.innerHTML = en && ingles != null ? ingles : guardado.html;
+    }
+    if (el.dataset.i18nAttr) {
+      el.dataset.i18nAttr.split(",").forEach((par) => {
+        const [attr, chave] = par.split(":").map((s) => s.trim());
+        const ingles = INGLES[chave];
+        const valor = en && ingles != null ? ingles : guardado.attrs[attr];
+        if (valor == null) el.removeAttribute(attr); else el.setAttribute(attr, valor);
+      });
+    }
+  });
+  $$("[data-idioma]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.idioma === idioma)));
+  const botaoMenu = $(".sanduiche");
+  const aberto = $("#topo").classList.contains("aberto");
+  botaoMenu.setAttribute("aria-label", aberto ? tr("Fechar menu", "Close menu") : tr("Abrir menu", "Open menu"));
+}
+
+function trocarIdioma(novo) {
+  novo = novo === "en" ? "en" : "pt";
+  if (novo === idioma) return;
+  idioma = novo;
+  try { localStorage.setItem("idioma", idioma); } catch (e) { /* navegação privada */ }
+  // listas que já apareceram na tela continuam visíveis depois de montadas de novo
+  const listas = ["lista-destaques", "lista-trabalhos", "lista-servicos", "lista-metricas", "lista-resultados", "lista-depoimentos"];
+  const jaVistas = listas.filter((id) => $(`#${id} .revelar.visivel`));
+  traduzirFixos();
+  preencherContatos();
+  // avisos de campo vazio somem (voltam no idioma novo se a pessoa enviar de novo)
+  $$(".erro").forEach((e) => { e.textContent = ""; });
+  $$("[aria-invalid]").forEach((c) => c.setAttribute("aria-invalid", "false"));
+  if (MARCAS.length) $("#faixa-leitor").textContent = textoFaixa();
+  montarNumerosCapa();
+  montarDestaques();
+  montarTrabalhos();
+  montarServicos();
+  montarMetricas();
+  montarResultados();
+  montarDepoimentos();
+  jaVistas.forEach((id) => $$(`#${id} .revelar`).forEach((el) => el.classList.add("visivel")));
+  ativarReservaDasCapas();
+  observarRevelar();
+  ativarContadores();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  guardarOriginais();
+  if (idioma === "en") traduzirFixos();
   preencherContatos();
   montarFaixa();
   montarNumerosCapa();
@@ -1042,19 +1283,21 @@ document.addEventListener("DOMContentLoaded", () => {
   montarResultados();
   montarDepoimentos();
   ativarReservaDasCapas();
+  ativarFiltros();
   ativarPlayer();
   ativarMenu();
   ativarRevelar();
   ativarContadores();
   ativarFormularioContato();
   ativarCaptura();
+  $$("[data-idioma]").forEach((b) => b.addEventListener("click", () => trocarIdioma(b.dataset.idioma)));
   $("#ano").textContent = new Date().getFullYear();
 });
 </script>
 </head>
 
 <body>
-<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<a class="pular" href="#conteudo" data-i18n="pular">Pular para o conteúdo</a>
 
 <!-- Ícones usados no site -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -1071,19 +1314,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!-- ============ MENU FIXO ============ -->
 <header class="topo" id="topo">
-  <nav class="container nav" aria-label="Menu principal">
+  <nav class="container nav" aria-label="Menu principal" data-i18n-attr="aria-label:menu.aria">
     <a class="marca" href="#inicio">Alanna Clara<span class="ponto" aria-hidden="true"></span></a>
-    <button class="sanduiche" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu">
-      <span></span><span></span><span></span>
-    </button>
     <ul class="menu" id="menu">
-      <li><a href="#sobre">Sobre</a></li>
-      <li><a href="#destaques">Destaques</a></li>
-      <li><a href="#trabalhos">Trabalhos</a></li>
-      <li><a href="#servicos">Serviços</a></li>
-      <li><a href="#numeros">Números</a></li>
-      <li><a class="menu-cta" href="#contato">Contato</a></li>
+      <li><a href="#sobre" data-i18n="menu.sobre">Sobre</a></li>
+      <li><a href="#destaques" data-i18n="menu.destaques">Destaques</a></li>
+      <li><a href="#trabalhos" data-i18n="menu.trabalhos">Trabalhos</a></li>
+      <li><a href="#servicos" data-i18n="menu.servicos">Serviços</a></li>
+      <li><a href="#numeros" data-i18n="menu.numeros">Números</a></li>
+      <li><a class="menu-cta" href="#contato" data-i18n="menu.contato">Contato</a></li>
     </ul>
+    <!-- IDIOMA DO SITE: o português está aqui no HTML e o inglês fica no script (lista INGLES) -->
+    <div class="topo-acoes">
+      <div class="idioma" role="group" aria-label="Idioma do site" data-i18n-attr="aria-label:idioma.aria">
+        <button type="button" data-idioma="pt" aria-pressed="true" lang="pt-BR" aria-label="Português">PT</button>
+        <button type="button" data-idioma="en" aria-pressed="false" lang="en" aria-label="English">EN</button>
+      </div>
+      <button class="sanduiche" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 </header>
 
@@ -1098,14 +1348,14 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="capa-texto">
         <p class="selo"><span class="bolinha" aria-hidden="true"></span>UGC Creator · Tech · Curitiba</p>
         <h1 class="capa-nome" id="capa-nome"><span>Alanna</span> <span class="grad">Clara</span></h1>
-        <p class="capa-frase">Eu gravo conteúdos criativos que <em>conectam</em> a sua marca com as pessoas certas.</p>
-        <p class="capa-apoio">Vídeos UGC para apps e marcas de tecnologia, com roteiro aprovado antes de gravar.</p>
+        <p class="capa-frase" data-i18n="capa.frase">Eu gravo conteúdos criativos que <em>conectam</em> a sua marca com as pessoas certas.</p>
+        <p class="capa-apoio" data-i18n="capa.apoio">Vídeos UGC para apps e marcas de tecnologia, com roteiro aprovado antes de gravar.</p>
         <div class="botoes">
-          <a class="botao botao-lima" href="#contato">Falar comigo <svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></a>
-          <a class="botao botao-vidro" href="#trabalhos">Ver os trabalhos</a>
+          <a class="botao botao-lima" href="#contato"><span data-i18n="capa.falar">Falar comigo</span> <svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></a>
+          <a class="botao botao-vidro" href="#trabalhos" data-i18n="capa.ver">Ver os trabalhos</a>
         </div>
         <!-- Os três números vêm da lista NUMEROS_CAPA no script -->
-        <ul class="capa-numeros" id="numeros-capa" aria-label="Meus números"></ul>
+        <ul class="capa-numeros" id="numeros-capa" aria-label="Meus números" data-i18n-attr="aria-label:capa.numeros"></ul>
       </div>
 
       <div class="capa-foto">
@@ -1115,12 +1365,12 @@ document.addEventListener("DOMContentLoaded", () => {
              3. Cole no lugar:
                 <img class="foto-real" src="foto-capa.jpg" alt="Alanna Clara sorrindo com o celular na mão" width="800" height="1000">
              Use foto vertical 4:5, em .webp ou .jpg, com até 300 KB para abrir rápido no celular. -->
-        <div class="foto-espaco foto-capa" role="img" aria-label="Espaço para a foto da Alanna Clara, formato vertical 4:5">
+        <div class="foto-espaco foto-capa" role="img" aria-label="Espaço para a foto da Alanna Clara, formato vertical 4:5" data-i18n-attr="aria-label:capa.foto">
           <svg class="silhueta" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="36" r="17"/><path d="M16 96c3-22 17-34 34-34s31 12 34 34z"/></svg>
-          <span class="foto-legenda">foto da creator 4:5</span>
+          <span class="foto-legenda" data-i18n="foto.legenda">foto da creator 4:5</span>
         </div>
-        <p class="chip chip-a flutua" aria-hidden="true"><svg class="ic" style="fill:currentColor;stroke:none"><use href="#i-faisca"/></svg>165 mil views somadas</p>
-        <p class="chip chip-b flutua" aria-hidden="true">Entrega em até 72h úteis</p>
+        <p class="chip chip-a flutua" aria-hidden="true"><svg class="ic" style="fill:currentColor;stroke:none"><use href="#i-faisca"/></svg><span data-i18n="capa.chip1">165 mil views somadas</span></p>
+        <p class="chip chip-b flutua" aria-hidden="true" data-i18n="capa.chip2">Entrega em até 72h úteis</p>
         <svg class="faisca faisca-1" aria-hidden="true"><use href="#i-faisca"/></svg>
         <svg class="faisca faisca-2" aria-hidden="true"><use href="#i-faisca"/></svg>
       </div>
@@ -1141,34 +1391,34 @@ document.addEventListener("DOMContentLoaded", () => {
              Apague a div "foto-espaco foto-sobre" abaixo e cole no lugar:
              <img class="foto-real" src="foto-sobre.jpg" alt="Alanna Clara gravando um vídeo com o celular" width="800" height="1000">
              Foto vertical 4:5, de preferência diferente da foto da capa. -->
-        <div class="foto-espaco foto-sobre" role="img" aria-label="Espaço para uma foto da Alanna Clara gravando conteúdo, formato vertical 4:5">
+        <div class="foto-espaco foto-sobre" role="img" aria-label="Espaço para uma foto da Alanna Clara gravando conteúdo, formato vertical 4:5" data-i18n-attr="aria-label:sobre.foto">
           <svg class="silhueta" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="36" r="17"/><path d="M16 96c3-22 17-34 34-34s31 12 34 34z"/></svg>
-          <span class="foto-legenda">foto da creator 4:5</span>
+          <span class="foto-legenda" data-i18n="foto.legenda">foto da creator 4:5</span>
         </div>
         <p class="adesivo"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span data-mostra="cidade">Curitiba, PR</span></p>
       </div>
 
       <div class="sobre-texto revelar" style="--atraso:.12s">
-        <p class="sobretitulo">Sobre mim</p>
-        <h2 id="sobre-titulo">Prazer, eu sou a <span class="rosa">Alanna</span></h2>
-        <p class="lead">Sou creator de UGC aqui em Curitiba e gravo conteúdos criativos que conectam: vídeos com cara de indicação de amiga, pensados do gancho ao último segundo para fazer a pessoa parar, entender e querer testar.</p>
-        <p>Meu lugar favorito é a tecnologia. Apps e produtos digitais nem sempre são fáceis de explicar, e é aí que eu entro: uso de verdade, traduzo tudo para a linguagem de quem está do outro lado da tela e entrego um vídeo com a cara da sua marca.</p>
+        <p class="sobretitulo" data-i18n="sobre.sobretitulo">Sobre mim</p>
+        <h2 id="sobre-titulo" data-i18n="sobre.titulo">Prazer, eu sou a <span class="rosa">Alanna</span></h2>
+        <p class="lead" data-i18n="sobre.lead">Sou creator de UGC aqui em Curitiba (Brasil) e gravo conteúdos criativos que conectam: vídeos com cara de indicação de amiga, pensados do gancho ao último segundo para fazer a pessoa parar, entender e querer testar.</p>
+        <p data-i18n="sobre.texto">Meu lugar favorito é a tecnologia. Apps e produtos digitais nem sempre são fáceis de explicar, e é aí que eu entro: uso de verdade, traduzo tudo para a linguagem de quem está do outro lado da tela e entrego um vídeo com a cara da sua marca.</p>
         <ul class="promessas">
           <li>
             <span class="promessa-icone" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
-            <div><strong>Roteiro aprovado antes de gravar</strong><span>Você vê a ideia e aprova antes de eu apertar o rec.</span></div>
+            <div><strong data-i18n="prom.1">Roteiro aprovado antes de gravar</strong><span data-i18n="prom.1t">Você vê a ideia e aprova antes de eu apertar o rec.</span></div>
           </li>
           <li>
             <span class="promessa-icone" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
-            <div><strong>Uma rodada de ajuste inclusa</strong><span>Se algo não ficou do seu jeito, eu ajusto sem custo extra.</span></div>
+            <div><strong data-i18n="prom.2">Uma rodada de ajuste inclusa</strong><span data-i18n="prom.2t">Se algo não ficou do seu jeito, eu ajusto sem custo extra.</span></div>
           </li>
           <li>
             <span class="promessa-icone" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
-            <div><strong>Entrega em até 72 horas úteis</strong><span>Seu conteúdo pronto rapidinho para entrar no ar.</span></div>
+            <div><strong data-i18n="prom.3">Entrega em até 72 horas úteis</strong><span data-i18n="prom.3t">Seu conteúdo pronto rapidinho para entrar no ar.</span></div>
           </li>
         </ul>
         <p class="assinatura">
-          <span class="assinatura-pre">Com carinho,</span>
+          <span class="assinatura-pre" data-i18n="sobre.assinatura">Com carinho,</span>
           <span class="assinatura-nome">Alanna Clara</span>
           <svg class="assinatura-risco" viewBox="0 0 220 16" preserveAspectRatio="none" aria-hidden="true"><path d="M3 11c40-9 82-10 122-5s66 4 92-5"/></svg>
         </p>
@@ -1180,9 +1430,9 @@ document.addEventListener("DOMContentLoaded", () => {
   <section class="secao destaques" id="destaques" aria-labelledby="destaques-titulo">
     <div class="container">
       <div class="cabecalho revelar">
-        <p class="sobretitulo">Destaques</p>
-        <h2 id="destaques-titulo">Conteúdos de <span class="lima">destaque</span></h2>
-        <p class="apoio">Três vídeos que mostram como eu transformo um app em conversa. Toque no card para assistir.</p>
+        <p class="sobretitulo" data-i18n="dest.sobretitulo">Destaques</p>
+        <h2 id="destaques-titulo" data-i18n="dest.titulo">Conteúdos de <span class="lima">destaque</span></h2>
+        <p class="apoio" data-i18n="dest.apoio">Três vídeos que mostram como eu transformo um app em conversa. Toque no card para assistir.</p>
       </div>
       <!-- Os três cards vêm da lista DESTAQUES no script.
            Lá, em cada vídeo: "link" é onde entra o LINK DO VÍDEO e "capa" é onde entra a CAPA 9:16. -->
@@ -1194,12 +1444,12 @@ document.addEventListener("DOMContentLoaded", () => {
   <section class="secao trabalhos" id="trabalhos" aria-labelledby="trabalhos-titulo">
     <div class="container">
       <div class="cabecalho revelar">
-        <p class="sobretitulo">Portfólio</p>
-        <h2 id="trabalhos-titulo">Trabalhos por <span class="grad">nicho</span></h2>
-        <p class="apoio">Meu foco é tecnologia. Escolha uma área e veja só os trabalhos dela.</p>
+        <p class="sobretitulo" data-i18n="trab.sobretitulo">Portfólio</p>
+        <h2 id="trabalhos-titulo" data-i18n="trab.titulo">Trabalhos por <span class="grad">nicho</span></h2>
+        <p class="apoio" data-i18n="trab.apoio">Meu foco é tecnologia. Escolha uma área e veja só os trabalhos dela.</p>
       </div>
       <!-- Botões e cards vêm da lista TRABALHOS no script -->
-      <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho"></div>
+      <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho" data-i18n-attr="aria-label:trab.filtros"></div>
       <p class="sr-only" id="filtro-aviso" aria-live="polite"></p>
       <ul class="trabalhos-grade" id="lista-trabalhos"></ul>
     </div>
@@ -1209,15 +1459,15 @@ document.addEventListener("DOMContentLoaded", () => {
   <section class="secao servicos" id="servicos" aria-labelledby="servicos-titulo">
     <div class="container">
       <div class="cabecalho revelar">
-        <p class="sobretitulo">Serviços</p>
-        <h2 id="servicos-titulo">Como eu te <span class="rosa">ajudo</span></h2>
-        <p class="apoio">Do roteiro à entrega, escolha o formato que faz sentido para a sua campanha.</p>
+        <p class="sobretitulo" data-i18n="serv.sobretitulo">Serviços</p>
+        <h2 id="servicos-titulo" data-i18n="serv.titulo">Como eu te <span class="rosa">ajudo</span></h2>
+        <p class="apoio" data-i18n="serv.apoio">Do roteiro à entrega, escolha o formato que faz sentido para a sua campanha.</p>
       </div>
       <!-- Os seis serviços vêm da lista SERVICOS no script -->
       <ol class="servicos-grade" id="lista-servicos"></ol>
       <div class="servicos-cta revelar">
-        <p>Não sabe qual escolher? Me conta o seu objetivo que eu te indico o melhor formato.</p>
-        <a class="botao botao-lima" href="#contato">Pedir orçamento <svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></a>
+        <p data-i18n="serv.cta">Não sabe qual escolher? Me conta o seu objetivo que eu te indico o melhor formato.</p>
+        <a class="botao botao-lima" href="#contato"><span data-i18n="serv.botao">Pedir orçamento</span> <svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></a>
       </div>
     </div>
   </section>
@@ -1226,13 +1476,13 @@ document.addEventListener("DOMContentLoaded", () => {
   <section class="secao numeros" id="numeros" aria-labelledby="numeros-titulo">
     <div class="container">
       <div class="cabecalho centro revelar">
-        <p class="sobretitulo">Números</p>
-        <h2 id="numeros-titulo">Resultados que <span class="lima">conectam</span></h2>
+        <p class="sobretitulo" data-i18n="num.sobretitulo">Números</p>
+        <h2 id="numeros-titulo" data-i18n="num.titulo">Resultados que <span class="lima">conectam</span></h2>
       </div>
       <!-- Vêm das listas METRICAS, RESULTADOS e DEPOIMENTOS no script -->
-      <ul class="metricas" id="lista-metricas" aria-label="Métricas"></ul>
-      <ul class="resultados" id="lista-resultados" aria-label="Resultados de campanha"></ul>
-      <ul class="depoimentos" id="lista-depoimentos" aria-label="Depoimentos de clientes"></ul>
+      <ul class="metricas" id="lista-metricas" aria-label="Métricas" data-i18n-attr="aria-label:num.metricas"></ul>
+      <ul class="resultados" id="lista-resultados" aria-label="Resultados de campanha" data-i18n-attr="aria-label:num.resultados"></ul>
+      <ul class="depoimentos" id="lista-depoimentos" aria-label="Depoimentos de clientes" data-i18n-attr="aria-label:num.depoimentos"></ul>
     </div>
   </section>
 
@@ -1240,9 +1490,9 @@ document.addEventListener("DOMContentLoaded", () => {
   <section class="secao contato" id="contato" aria-labelledby="contato-titulo">
     <div class="container contato-grade">
       <div class="contato-texto revelar">
-        <p class="sobretitulo">Contato</p>
-        <h2 id="contato-titulo">Bora criar <span class="grad">juntos?</span></h2>
-        <p class="apoio">Me conta sobre a sua marca, o produto e o que você imagina. A gente encontra junto o formato certo para a sua campanha.</p>
+        <p class="sobretitulo" data-i18n="cont.sobretitulo">Contato</p>
+        <h2 id="contato-titulo" data-i18n="cont.titulo">Bora criar <span class="grad">juntos?</span></h2>
+        <p class="apoio" data-i18n="cont.apoio">Me conta sobre a sua marca, o produto e o que você imagina. A gente encontra junto o formato certo para a sua campanha.</p>
         <ul class="canais">
           <li>
             <a class="canal" data-contato="whatsapp" href="https://wa.me/5541998669857" target="_blank" rel="noopener">
@@ -1254,7 +1504,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <li>
             <a class="canal" data-contato="email" href="mailto:contatoalannaclara@gmail.com">
               <span class="canal-icone" aria-hidden="true"><svg class="ic"><use href="#i-mail"/></svg></span>
-              <span class="canal-texto"><strong>E-mail</strong><span data-mostra="email">contatoalannaclara@gmail.com</span></span>
+              <span class="canal-texto"><strong data-i18n="cont.email">E-mail</strong><span data-mostra="email">contatoalannaclara@gmail.com</span></span>
               <svg class="ic canal-seta" aria-hidden="true"><use href="#i-seta"/></svg>
             </a>
           </li>
@@ -1270,23 +1520,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <div class="formulario-caixa revelar" style="--atraso:.12s">
         <form id="form-contato" novalidate>
-          <h3 class="form-titulo">Me manda uma mensagem</h3>
+          <h3 class="form-titulo" data-i18n="form.titulo">Me manda uma mensagem</h3>
           <div class="campo">
-            <label for="c-nome">Seu nome</label>
-            <input id="c-nome" name="nome" type="text" autocomplete="name" required aria-describedby="c-nome-erro" placeholder="Como posso te chamar?">
+            <label for="c-nome" data-i18n="form.nome">Seu nome</label>
+            <input id="c-nome" name="nome" type="text" autocomplete="name" required aria-describedby="c-nome-erro" placeholder="Como posso te chamar?" data-i18n-attr="placeholder:form.nome.ph">
             <p class="erro" id="c-nome-erro" aria-live="polite"></p>
           </div>
           <div class="campo">
-            <label for="c-email">Seu e-mail</label>
-            <input id="c-email" name="email" type="email" autocomplete="email" required aria-describedby="c-email-erro" placeholder="voce@suamarca.com">
+            <label for="c-email" data-i18n="form.email">Seu e-mail</label>
+            <input id="c-email" name="email" type="email" autocomplete="email" required aria-describedby="c-email-erro" placeholder="voce@suamarca.com" data-i18n-attr="placeholder:form.email.ph">
             <p class="erro" id="c-email-erro" aria-live="polite"></p>
           </div>
           <div class="campo">
-            <label for="c-mensagem">Mensagem</label>
-            <textarea id="c-mensagem" name="mensagem" rows="5" required aria-describedby="c-mensagem-erro" placeholder="Conta um pouco da sua marca e do que você precisa"></textarea>
+            <label for="c-mensagem" data-i18n="form.mensagem">Mensagem</label>
+            <textarea id="c-mensagem" name="mensagem" rows="5" required aria-describedby="c-mensagem-erro" placeholder="Conta um pouco da sua marca e do que você precisa" data-i18n-attr="placeholder:form.mensagem.ph"></textarea>
             <p class="erro" id="c-mensagem-erro" aria-live="polite"></p>
           </div>
-          <button class="botao botao-lima botao-cheio" type="submit">Enviar mensagem <svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></button>
+          <button class="botao botao-lima botao-cheio" type="submit"><span data-i18n="form.enviar">Enviar mensagem</span> <svg class="ic" aria-hidden="true"><use href="#i-seta"/></svg></button>
         </form>
 
         <div class="confirmacao" id="confirmacao" tabindex="-1" hidden>
@@ -1294,10 +1544,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <h3 id="confirmacao-titulo">Obrigada!</h3>
           <p id="confirmacao-texto">Sua mensagem está prontinha.</p>
           <div class="botoes">
-            <a class="botao botao-lima" id="confirmacao-whats" href="https://wa.me/5541998669857" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-whats"/></svg>Enviar pelo WhatsApp</a>
-            <a class="botao botao-vidro" id="confirmacao-email" href="mailto:contatoalannaclara@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg>Enviar por e-mail</a>
+            <a class="botao botao-lima" id="confirmacao-whats" href="https://wa.me/5541998669857" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-whats"/></svg><span data-i18n="conf.whats">Enviar pelo WhatsApp</span></a>
+            <a class="botao botao-vidro" id="confirmacao-email" href="mailto:contatoalannaclara@gmail.com"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><span data-i18n="conf.email">Enviar por e-mail</span></a>
           </div>
-          <button type="button" class="link-simples" id="confirmacao-nova">Escrever outra mensagem</button>
+          <button type="button" class="link-simples" id="confirmacao-nova" data-i18n="conf.nova">Escrever outra mensagem</button>
         </div>
       </div>
     </div>
@@ -1310,16 +1560,16 @@ document.addEventListener("DOMContentLoaded", () => {
     <p class="rodape-gigante grad">Alanna Clara</p>
     <div class="rodape-linha">
       <p class="rodape-texto">UGC Creator · <span data-mostra="cidade">Curitiba, PR</span></p>
-      <ul class="redes" aria-label="Minhas redes">
+      <ul class="redes" aria-label="Minhas redes" data-i18n-attr="aria-label:rod.redes">
         <li><a data-contato="instagram" href="https://instagram.com/_alannaclara" target="_blank" rel="noopener" aria-label="Instagram"><svg class="ic" aria-hidden="true"><use href="#i-insta"/></svg></a></li>
         <li><a data-contato="youtube" href="https://www.youtube.com/@alannaclaram" target="_blank" rel="noopener" aria-label="YouTube"><svg class="ic" aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
         <li><a data-contato="whatsapp" href="https://wa.me/5541998669857" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="ic" aria-hidden="true"><use href="#i-whats"/></svg></a></li>
-        <li><a data-contato="email" href="mailto:contatoalannaclara@gmail.com" aria-label="E-mail"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg></a></li>
+        <li><a data-contato="email" href="mailto:contatoalannaclara@gmail.com" aria-label="E-mail" data-i18n-attr="aria-label:cont.email"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg></a></li>
       </ul>
     </div>
     <div class="rodape-base">
-      <p>© <span id="ano">2026</span> Alanna Clara. Todos os direitos reservados.</p>
-      <a href="#inicio">Voltar ao topo</a>
+      <p>© <span id="ano">2026</span> Alanna Clara. <span data-i18n="rod.direitos">Todos os direitos reservados.</span></p>
+      <a href="#inicio" data-i18n="rod.topo">Voltar ao topo</a>
     </div>
   </div>
 </footer>
@@ -1327,28 +1577,28 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- ============ CARD DE CAPTURA (mídia kit) ============ -->
 <dialog class="captura" id="captura" aria-labelledby="captura-titulo">
   <div class="captura-caixa">
-    <button type="button" class="captura-fechar" id="captura-fechar" aria-label="Fechar"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
-    <p class="sobretitulo">Mídia kit</p>
-    <h2 id="captura-titulo">Quer meu mídia kit completo?</h2>
+    <button type="button" class="captura-fechar" id="captura-fechar" aria-label="Fechar" data-i18n-attr="aria-label:kit.fechar"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <p class="sobretitulo" data-i18n="kit.sobretitulo">Mídia kit</p>
+    <h2 id="captura-titulo" data-i18n="kit.titulo">Quer meu mídia kit completo?</h2>
     <div id="captura-inicio">
-      <p class="captura-desc">Formatos, números e como trabalhar comigo, tudo reunido em um só lugar.</p>
+      <p class="captura-desc" data-i18n="kit.desc">Formatos, números e como trabalhar comigo, tudo reunido em um só lugar.</p>
       <form id="form-captura" novalidate>
         <div class="campo">
-          <label for="k-nome">Seu nome</label>
-          <input id="k-nome" name="nome" type="text" autocomplete="name" required aria-describedby="k-nome-erro" placeholder="Como posso te chamar?">
+          <label for="k-nome" data-i18n="form.nome">Seu nome</label>
+          <input id="k-nome" name="nome" type="text" autocomplete="name" required aria-describedby="k-nome-erro" placeholder="Como posso te chamar?" data-i18n-attr="placeholder:form.nome.ph">
           <p class="erro" id="k-nome-erro" aria-live="polite"></p>
         </div>
         <div class="campo">
-          <label for="k-email">Seu e-mail</label>
-          <input id="k-email" name="email" type="email" autocomplete="email" required aria-describedby="k-email-erro" placeholder="voce@suamarca.com">
+          <label for="k-email" data-i18n="form.email">Seu e-mail</label>
+          <input id="k-email" name="email" type="email" autocomplete="email" required aria-describedby="k-email-erro" placeholder="voce@suamarca.com" data-i18n-attr="placeholder:form.email.ph">
           <p class="erro" id="k-email-erro" aria-live="polite"></p>
         </div>
-        <button class="botao botao-rosa botao-cheio" type="submit">Quero receber</button>
+        <button class="botao botao-rosa botao-cheio" type="submit" data-i18n="kit.botao">Quero receber</button>
       </form>
     </div>
     <div class="captura-ok" id="captura-ok" tabindex="-1" hidden>
       <p id="captura-ok-texto"></p>
-      <a class="botao botao-lima botao-cheio" id="captura-whats" href="https://wa.me/5541998669857" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-whats"/></svg>Receber no WhatsApp</a>
+      <a class="botao botao-lima botao-cheio" id="captura-whats" href="https://wa.me/5541998669857" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true"><use href="#i-whats"/></svg><span data-i18n="kit.whats">Receber no WhatsApp</span></a>
     </div>
   </div>
 </dialog>
@@ -1358,10 +1608,10 @@ document.addEventListener("DOMContentLoaded", () => {
   <div class="player-caixa">
     <div class="player-topo">
       <h2 class="player-titulo" id="player-titulo">Vídeo</h2>
-      <button type="button" class="player-fechar" id="player-fechar" aria-label="Fechar vídeo"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <button type="button" class="player-fechar" id="player-fechar" aria-label="Fechar vídeo" data-i18n-attr="aria-label:player.fechar"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     </div>
     <div class="player-moldura" id="player-moldura"></div>
-    <a class="player-link" id="player-link" href="https://www.youtube.com/@alannaclaram" target="_blank" rel="noopener">Assistir no YouTube</a>
+    <a class="player-link" id="player-link" href="https://www.youtube.com/@alannaclaram" target="_blank" rel="noopener" data-i18n="player.link">Assistir no YouTube</a>
   </div>
 </dialog>
 </body>
