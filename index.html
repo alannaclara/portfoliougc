@@ -611,6 +611,9 @@ div.video:not([data-video]){cursor:default}
 .servicos :focus-visible,.rodape :focus-visible{outline-color:#fff}
 /* Sem linhas entre os quadrados de Serviços */
 .servicos-grade{background:none;border:0}
+/* Quando sobra 1 card sozinho na última linha (ex.: 7 serviços), ele fica no meio, sem buraco do lado */
+@media (min-width:1041px){.servicos-grade > li:last-child:nth-child(3n+1){grid-column:2}}
+@media (min-width:761px) and (max-width:1040px){.servicos-grade > li:last-child:nth-child(2n+1){grid-column:1 / -1;justify-self:center;width:calc(50% - 1px)}}
 /* Fundo de Serviços: estrela, rosto, estrela, piscadinha, bem pequeno e
    clarinho. A imagem é um ladrilho que se repete (fotos/padrao-servicos.png). */
 .servicos{position:relative;isolation:isolate}
@@ -1271,9 +1274,11 @@ const CASE = [
   { video: "https://youtube.com/shorts/UxrbOZcZWl0", papel: "Os benefícios do Tour", papel_en: "What Tour offers" }
 ];
 
-// SERVIÇOS: os seis cards da seção Como eu te ajudo.
+// SERVIÇOS: os cards da seção Como eu te ajudo, na ordem daqui.
 // objetivo = o que a marca ganha com o serviço (aparece em negrito, antes da descrição)
 const SERVICOS = [
+  { titulo: "Canvas UGC", objetivo: "Para a sua marca ter vídeo novo todo dia.", descricao: "Criação e operação de uma conta dedicada à sua marca, com vídeos diários.",
+    titulo_en: "UGC Canvas", objetivo_en: "So your brand gets a new video every day.", descricao_en: "I create and run an account dedicated to your brand, with daily videos." },
   { titulo: "Vídeo UGC", objetivo: "Para vender mais no site e nas redes.", descricao: "Vídeo vertical com roteiro pensado para o seu produto e o jeito de uma indicação de amiga.",
     titulo_en: "UGC video", objetivo_en: "To sell more on your website and socials.", descricao_en: "A vertical video with a script built around your product and the feel of a friend's recommendation." },
   { titulo: "Corte para anúncio", objetivo: "Para achar o anúncio que mais converte.", descricao: "Versões curtas com ganchos diferentes nos primeiros segundos, prontas para testar nas campanhas pagas.",
