@@ -188,6 +188,7 @@ h1 { font-size: clamp(2.3rem, 4.6vw, 3.75rem); line-height: 1.1; letter-spacing:
 /* Prévia sem som (YouTube) por cima da capa */
 .previa { position: absolute; inset: 0; z-index: 1; overflow: hidden; opacity: 0; transition: opacity .45s; pointer-events: none; }
 .previa.pronta { opacity: 1; }
+.previa video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .previa iframe {
   position: absolute; top: 50%; left: 50%; border: 0;
   width: 1080px; height: 1920px;
@@ -395,6 +396,7 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
 .fechar { width: 42px; height: 42px; flex: none; border-radius: 50%; background: #fff; color: var(--tinta); display: grid; place-items: center; font-size: 1.5rem; line-height: 1; }
 .fechar:hover { background: var(--lima); }
 .player-caixa { position: relative; aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden; background: #000; }
+.player-caixa video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
 .player-caixa iframe {
   position: absolute; top: 50%; left: 50%; border: 0;
   width: var(--larg, 720px); height: var(--alt, 1280px);
@@ -718,7 +720,7 @@ const RESERVA = [
   { nicho: "beleza", marca: "Elseve L’Oréal Paris",  video: "https://youtube.com/shorts/9bYHcFGqsuU" },
   { nicho: "beleza", marca: "Neutrogena",            video: "https://youtube.com/shorts/T4j1OE_99Aw" },
   { nicho: "beleza", marca: "Creamy",                video: "https://youtube.com/shorts/43qWjraJ1iQ" },
-  { nicho: "beleza", marca: "Ruby Rose",             video: "https://youtube.com/shorts/-2MmSqlR1u8" },
+  { nicho: "beleza", marca: "Ruby Rose",             video: "https://alannaclara.github.io/portfoliougc/videos/ruby-rose.mp4" },
   { nicho: "beleza", marca: "Ruby Rose",             video: "https://youtube.com/shorts/GyJgXqU6Q64" },
   { nicho: "beleza", marca: "Ruby Rose",             video: "https://youtube.com/shorts/v1IugB42en4" },
   { nicho: "casa",   marca: "Electrolux",            video: "https://youtube.com/shorts/OzO3IoBsJ50" },
@@ -744,6 +746,10 @@ const idYoutube = (url) => {
 };
 const nomeNicho = (n) => NICHOS[n] || (n ? n.charAt(0).toUpperCase() + n.slice(1) : "Outros");
 const capaDe = (id) => `https://i.ytimg.com/vi/${id}/oar2.jpg`;
+// Vídeo guardado no próprio site (arquivo .mp4 na pasta videos/), para quando o YouTube bloqueia.
+// A capa é uma foto com o mesmo nome do vídeo, terminando em .jpg (ex.: videos/ruby-rose.jpg).
+const ehMp4 = (url) => /^https?:\/\/[^?#]+\.mp4(?:[?#]|$)/i.test(String(url || ""));
+const capaDoMp4 = (url) => String(url).replace(/\.mp4(?:[?#].*)?$/i, ".jpg");
 const PLAY = `<span class="play" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#d-play"/></svg></span>`;
 
 // Capa na melhor definição: a vertical do Shorts, depois a grande, por último a pequena
@@ -798,6 +804,13 @@ function cardVideo(t) {
   const titulo = t.marca || nicho;
   const linha = [nicho, t.formato].filter(Boolean).join(" · ");
   const info = `<span class="info"><b>${esc(titulo)}</b><small>${esc(linha)}</small></span>`;
+  if (!id && ehMp4(t.video)) {
+    // Vídeo do próprio site: toca aqui mesmo, igual aos do YouTube
+    return `<div class="video" role="button" tabindex="0" data-video="${esc(t.video)}" data-mp4="1" data-marca="${esc(titulo)}" data-nicho="${esc(nicho)}" aria-label="${esc(`Assistir vídeo: ${titulo}, ${nicho}`)}">
+      <img src="${esc(capaDoMp4(t.video))}" alt="" loading="lazy" decoding="async">
+      ${PLAY}${info}
+    </div>`;
+  }
   if (!id) {
     // Link que não é do YouTube (Instagram, TikTok, Drive): abre numa aba nova
     if (!/^https?:\/\//i.test(String(t.video || ""))) return "";
@@ -917,6 +930,17 @@ function iniciarPrevia(card) {
   const id = card.dataset.video;
   const caixa = document.createElement("span");
   caixa.className = "previa";
+  if (card.dataset.mp4) {
+    // Vídeo do próprio site: toca sem som, em repetição, e aparece quando começa de verdade
+    const video = document.createElement("video");
+    Object.assign(video, { src: id, muted: true, loop: true, autoplay: true, playsInline: true, preload: "auto" });
+    video.setAttribute("aria-hidden", "true");
+    video.addEventListener("playing", () => caixa.classList.add("pronta"));
+    caixa.appendChild(video);
+    card.appendChild(caixa);
+    video.play().catch(() => { /* o navegador não deixou tocar sozinho: fica a capa */ });
+    return;
+  }
   caixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0&enablejsapi=1" title="Prévia sem som" tabindex="-1" aria-hidden="true" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   const quadro = caixa.firstElementChild;
   card.appendChild(caixa);
@@ -999,6 +1023,16 @@ function abrirVideo(card) {
   cardAberto = card;
   const id = card.dataset.video;
   $("#player-legenda").innerHTML = `${card.dataset.nicho ? `<small>${esc(card.dataset.nicho)}</small>` : ""}${esc(card.dataset.marca)}`;
+  if (card.dataset.mp4) {
+    // Vídeo do próprio site: player do navegador, com som e controles
+    playerCaixa.innerHTML = `<video src="${esc(id)}" poster="${esc(capaDoMp4(id))}" controls autoplay playsinline preload="auto" title="${esc(`Vídeo: ${card.dataset.marca}`)}"></video>`;
+    if (typeof player.showModal === "function") player.showModal(); else player.setAttribute("open", "");
+    $("video", playerCaixa).play().catch(() => { /* sem autoplay: a pessoa aperta o play */ });
+    tocarCapa();
+    $("#fechar-player").focus();
+    registrarClique(id, card.dataset.marca);
+    return;
+  }
   playerCaixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1" title="${esc(`Vídeo: ${card.dataset.marca}`)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   const quadro = $("iframe", playerCaixa);
   const larg = Math.min(1080, Math.max(360, Math.round(larguraDoPlayer() * 2)));
