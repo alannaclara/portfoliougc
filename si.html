@@ -656,7 +656,7 @@ h2 { font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: -
 // cor = roxo, lima, rosa ou preto
 const CAPA = [
   { video: "https://youtube.com/shorts/snd1jFWqe1o", marca: "Garnier",               nicho: "Beleza",      numero: "+260",      rotulo: "vídeos entregues",          cor: "lima" },
-  { video: "https://youtube.com/shorts/w6rjR5aPjyY", marca: "Coca-Cola",             nicho: "Gastronomia", numero: "Coca-Cola", rotulo: "publi no perfil",           cor: "rosa" },
+  { video: "https://youtube.com/shorts/w6rjR5aPjyY", marca: "Coca-Cola",             nicho: "Gastronomia", numero: "Coca-Cola", rotulo: "",                          cor: "rosa" },
   { video: "https://youtube.com/shorts/LRWg2w6ejd8", marca: "Tour Curitiba",         nicho: "Turismo",     numero: "+64 mil",   rotulo: "views · Tour Curitiba",     cor: "roxo" },
   { video: "https://youtube.com/shorts/z1aXTErZ794", marca: "L’Oréal Profissionnel", nicho: "Beleza",      numero: "+395 mil",  rotulo: "views somadas",             cor: "preto" }
 ];
@@ -765,7 +765,7 @@ function montarLeque() {
         <img src="${capaDe(id)}" data-yt="${id}" alt="" decoding="async"${i > 1 ? ' loading="lazy"' : ""}>
         ${PLAY}
       </div>
-      <span class="selo selo-${esc(v.cor || "roxo")}" aria-hidden="true"><strong>${esc(v.numero)}</strong><span>${esc(v.rotulo)}</span></span>
+      <span class="selo selo-${esc(v.cor || "roxo")}" aria-hidden="true"><strong>${esc(v.numero)}</strong>${v.rotulo ? `<span>${esc(v.rotulo)}</span>` : ""}</span>
     </li>`;
   }).join("");
 }
