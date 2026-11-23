@@ -507,11 +507,22 @@ div.video:not([data-video]){cursor:default}
 
 /* ===== CARTÃO NO CANTO =====
    Pequeno, no canto de baixo. Não cobre os vídeos e o botão leva ao formulário do Contato. */
-.cartao-canto{position:fixed;right:clamp(16px,2.5vw,28px);bottom:clamp(16px,2.5vw,28px);z-index:90;width:min(300px,calc(100% - 32px));padding:20px 22px 22px;border-radius:var(--raio);background:var(--papel);color:var(--tinta);box-shadow:var(--sombra-forte);animation:modal-entra .5s var(--ease)}
+.cartao-canto{position:fixed;right:clamp(16px,2.5vw,28px);bottom:clamp(16px,2.5vw,28px);z-index:90;width:min(320px,calc(100% - 32px));padding:20px 22px 22px;border-radius:var(--raio);background:var(--papel);color:var(--tinta);box-shadow:var(--sombra-forte);animation:modal-entra .5s var(--ease)}
 .cartao-canto[hidden]{display:none}
 .cartao-canto .cartao-titulo{margin-bottom:4px;padding-right:36px;font-family:var(--serif);font-size:1.25rem;font-weight:500;line-height:1.2}
 .cartao-canto p{font-size:.92rem;line-height:1.45;color:var(--tinta-2)}
 .cartao-canto .btn{width:100%;min-height:46px;margin-top:14px;padding-block:10px}
+/* Mini formulário dentro do cartão: campos menores que os do Contato */
+.cartao-form{margin-top:12px}
+.cartao-form .campo{gap:4px;margin-bottom:8px}
+.cartao-form .campo input,.cartao-form .campo textarea{padding:10px 12px;font-size:1rem}
+/* No celular o cartão ocupa a largura toda, com a mesma margem dos dois lados */
+@media (max-width:520px){.cartao-canto{left:12px;right:12px;bottom:12px;width:auto;padding:16px 18px 18px}}
+.cartao-form .campo textarea{min-height:0;height:64px;resize:none}
+.cartao-form .btn{margin-top:4px}
+.cartao-form .erro:empty{display:none}
+.cartao-canto .erro{font-size:.8rem;line-height:1.35;color:#b3261e}
+#cartao-ok{outline:none}
 .cartao-canto .fechar{top:10px;right:10px;width:34px;height:34px;border:0}
 .cartao-canto .fechar .ico{width:16px;height:16px}
 .fechar{position:absolute;top:16px;right:16px;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--linha);border-radius:50%;background:transparent;color:var(--tinta);cursor:url("fotos/cursor-estrela.png") 16 16,pointer;transition:background-color .25s}
@@ -1114,14 +1125,37 @@ div.video:not([data-video]){cursor:default}
   <div class="player-caixa" id="player-caixa"></div>
 </dialog>
 
-<!-- ================= CARTÃO NO CANTO =================
-     Aparece uma vez por visita, depois que a pessoa passa do Case.
-     O botão leva ao formulário do Contato. -->
+<!-- ================= MINI FORMULÁRIO NO CANTO =================
+     Aparece uma vez por visita, quando a pessoa passa do Case para os Trabalhos.
+     O recado entra no painel como Lead, igual ao formulário do Contato. -->
 <aside class="cartao-canto" id="cartao-canto" aria-labelledby="cartao-titulo" hidden>
   <button class="fechar" type="button" id="fechar-cartao" aria-label="Fechar" data-i18n-attr="aria-label:cartao.fechar"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>
-  <p class="cartao-titulo" id="cartao-titulo" data-i18n="cartao.titulo">Gostou do que viu?</p>
-  <p data-i18n="cartao.texto">Me conta da sua marca e do produto.</p>
-  <a class="btn btn-azul" href="#contato" id="cartao-ir"><span data-i18n="cartao.botao">Falar comigo</span> <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></a>
+  <div id="cartao-corpo">
+    <p class="cartao-titulo" id="cartao-titulo" data-i18n="cartao.titulo">Gostou do que viu?</p>
+    <p data-i18n="cartao.texto">Me conta da sua marca e do produto.</p>
+    <form id="form-cartao" class="cartao-form" novalidate>
+      <div class="campo">
+        <label class="sr" for="m-nome" data-i18n="cartao.nome">Nome</label>
+        <input id="m-nome" name="nome" type="text" autocomplete="name" required placeholder="Seu nome" data-i18n-attr="placeholder:cartao.nome.ph" aria-describedby="m-nome-erro">
+        <span class="erro" id="m-nome-erro"></span>
+      </div>
+      <div class="campo">
+        <label class="sr" for="m-email" data-i18n="cartao.email">E-mail</label>
+        <input id="m-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="voce@marca.com" data-i18n-attr="placeholder:cartao.email.ph" aria-describedby="m-email-erro">
+        <span class="erro" id="m-email-erro"></span>
+      </div>
+      <div class="campo">
+        <label class="sr" for="m-mensagem" data-i18n="cartao.mensagem">Mensagem</label>
+        <textarea id="m-mensagem" name="mensagem" rows="2" placeholder="Sua marca e o produto (opcional)" data-i18n-attr="placeholder:cartao.mensagem.ph"></textarea>
+      </div>
+      <p class="erro" id="cartao-erro-envio" role="alert"></p>
+      <button class="btn btn-azul" type="submit"><span data-i18n="cartao.botao">Enviar</span> <svg class="ico" aria-hidden="true"><use href="#i-seta"/></svg></button>
+    </form>
+  </div>
+  <div id="cartao-ok" role="status" tabindex="-1" hidden>
+    <p class="cartao-titulo" data-i18n="cartao.ok">Recado recebido!</p>
+    <p id="cartao-ok-texto"></p>
+  </div>
 </aside>
 
 <!-- Conexão com o painel (Supabase). O endereço e a chave pública ficam em js/banco.js -->
@@ -1408,7 +1442,14 @@ const INGLES = {
   "cartao.fechar": "Close",
   "cartao.titulo": "Liked what you saw?",
   "cartao.texto": "Tell me about your brand and your product.",
-  "cartao.botao": "Talk to me",
+  "cartao.botao": "Send",
+  "cartao.nome": "Name",
+  "cartao.nome.ph": "Your name",
+  "cartao.email": "Email",
+  "cartao.email.ph": "you@brand.com",
+  "cartao.mensagem": "Message",
+  "cartao.mensagem.ph": "Your brand and product (optional)",
+  "cartao.ok": "Message received!",
   "faq.rotulo": "FAQ",
   "faq.titulo": "Before you <em>ask</em>",
   "faq.q1": "How fast do you deliver?",
@@ -2335,9 +2376,10 @@ $("#nova-mensagem").addEventListener("click", () => {
   $("#c-nome").focus();
 });
 
-/* ---------- Cartão no canto ----------
+/* ---------- Mini formulário no canto ----------
    Aparece uma vez por visita, quando a pessoa passa do Case (o Case sai da tela por cima).
-   Some sozinho quando ela chega no Contato. */
+   Some sozinho quando ela chega no Contato (se ainda não começou a escrever nele).
+   O recado entra no painel como Lead, igual ao formulário do Contato. */
 const cartao = $("#cartao-canto");
 const CHAVE_CARTAO = "cartaoMostrado";
 const cartaoJaMostrado = () => { try { return sessionStorage.getItem(CHAVE_CARTAO) === "1"; } catch (e) { return false; } };
@@ -2353,8 +2395,49 @@ function mostrarCartao() {
 }
 const fecharCartao = () => { cartao.hidden = true; };
 $("#fechar-cartao").addEventListener("click", fecharCartao);
-$("#cartao-ir").addEventListener("click", fecharCartao);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !cartao.hidden) fecharCartao(); });
+
+const formCartao = $("#form-cartao");
+const erroCartao = $("#cartao-erro-envio");
+// Se a pessoa já começou a escrever, o cartão não some sozinho
+const cartaoEmUso = () => cartao.contains(document.activeElement) ||
+  $$("input, textarea", formCartao).some((c) => c.value.trim());
+
+formCartao.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  erroCartao.textContent = "";
+  if (!validar(formCartao)) return;
+  const dados = new FormData(formCartao);
+  const nome = String(dados.get("nome") || "").trim();
+  const mensagem = String(dados.get("mensagem") || "").trim();
+  const obs = [
+    `Contato: ${nome}`,
+    "Escreveu pelo cartão do site (Gostou do que viu?).",
+    idioma === "en" ? "Escreveu pelo site em inglês." : "",
+    mensagem ? `Mensagem pelo site: ${mensagem}` : ""
+  ].filter(Boolean).join("\n");
+  const botao = $("button[type=submit]", formCartao);
+  const rotuloBotao = $("[data-i18n]", botao);
+  const textoBotao = rotuloBotao.textContent;
+  botao.disabled = true;
+  rotuloBotao.textContent = tr("Enviando...", "Sending...");
+  const deuCerto = await salvarLead(nome, dados.get("email"), obs);
+  botao.disabled = false;
+  rotuloBotao.textContent = textoBotao;
+  if (!deuCerto) {
+    erroCartao.textContent = tr(
+      "Não consegui enviar agora. Me chama no e-mail contatoalannaclara@gmail.com.",
+      "I couldn't send it right now. Email me at contatoalannaclara@gmail.com.");
+    return;
+  }
+  $("#cartao-ok-texto").textContent = tr(
+    `Obrigada, ${primeiroNome(nome)}! Vou ler com carinho e te respondo em até 48h.`,
+    `Thank you, ${primeiroNome(nome)}! I'll read it carefully and reply within 48 hours.`);
+  $("#cartao-corpo").hidden = true;
+  $("#cartao-ok").hidden = false;
+  $("#cartao-ok").focus();
+  setTimeout(fecharCartao, 8000);
+});
 
 if ("IntersectionObserver" in window) {
   if (!cartaoJaMostrado()) {
@@ -2363,7 +2446,7 @@ if ("IntersectionObserver" in window) {
     });
     vigiaCase.observe($("#case"));
   }
-  new IntersectionObserver(([e]) => { if (e.isIntersecting) fecharCartao(); }).observe($("#contato"));
+  new IntersectionObserver(([e]) => { if (e.isIntersecting && !cartaoEmUso()) fecharCartao(); }).observe($("#contato"));
 }
 
 /* ---------- Vídeos: vêm do painel (tabela videos) ----------
