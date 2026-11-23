@@ -11,7 +11,7 @@
   // "comida" continua sendo a chave de Gastronomia & Bebidas, para os vídeos antigos não perderem o nicho.
   const NICHOS = { beleza: "Beleza", comida: "Gastronomia & Bebidas", tech: "Tech", casa: "Casa & Decoração" };
   // Tipo de vídeo (ângulo): aparece no site embaixo do nome de cada vídeo, ex.: "Beleza · Review"
-  const FORMATOS = ["Review", "Problema × solução", "Tutorial", "Unboxing", "Antes e depois", "Rotina", "Depoimento", "Trend", "Storytelling", "Anúncio", "Publicação no perfil", "Personagem", "Dupla criativa", "Vlog", "Contraste", "Falando com a câmera", "TikTok Shop"];
+  const FORMATOS = ["Review", "Problema × solução", "Tutorial", "Unboxing", "Antes e depois", "Rotina", "Depoimento", "Trend", "Storytelling", "Anúncio", "Publicação no perfil", "Personagem", "Dupla criativa", "Vlog", "Contraste", "Falando com a câmera", "TikTok Shop", "Sensorial"];
 
   let secao = null;
   let videos = [];
