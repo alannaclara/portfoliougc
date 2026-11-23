@@ -352,6 +352,7 @@ section{padding-block:var(--secao)}
    nasce grande de verdade (1080x1920) e só depois é encolhido na tela.
    Assim ele manda a imagem em alta, mesmo no cartão pequeno. */
 .video-previa iframe{position:absolute;top:50%;left:50%;width:1080px;height:1920px;border:0;transform-origin:50% 50%;transform:translate(-50%,-50%) scale(var(--encolhe,.2))}
+.video-previa video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .etiquetas{position:absolute;top:14px;left:14px;right:14px;z-index:3;display:flex;flex-wrap:wrap;gap:6px}
 .etiqueta{padding:6px 11px;border-radius:999px;background:var(--papel);color:var(--tinta);font-size:.66rem;font-weight:700;line-height:1.2;letter-spacing:.12em;text-transform:uppercase}
 .etiqueta-views{background:var(--tinta);color:var(--azul)}
@@ -381,6 +382,7 @@ div.video:not([data-video]){cursor:default}
 /* Mesma ideia no player: o quadro nasce no dobro do tamanho da tela e
    encolhe, então o YouTube entrega o dobro de definição. */
 .player-caixa iframe{position:absolute;top:50%;left:50%;width:var(--larg,100%);height:var(--alt,100%);border:0;transform-origin:50% 50%;transform:translate(-50%,-50%) scale(var(--encolhe,1))}
+.player-caixa video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
 
 /* ===== COMO EU TE AJUDO ===== */
 .servicos{background:var(--tinta);color:var(--creme)}
@@ -1714,6 +1716,10 @@ const idYoutube = (url) => {
   const m = String(url || "").match(/(?:shorts\/|[?&]v=|youtu\.be\/|embed\/)([\w-]{11})/);
   return m ? m[1] : "";
 };
+// Vídeo guardado no próprio site (arquivo .mp4 na pasta videos/), para quando o YouTube bloqueia.
+// A capa é uma foto com o mesmo nome do vídeo, terminando em .jpg (ex.: videos/ruby-rose.jpg).
+const ehMp4 = (url) => /^https?:\/\/[^?#]+\.mp4(?:[?#]|$)/i.test(String(url || ""));
+const capaDoMp4 = (url) => String(url).replace(/\.mp4(?:[?#].*)?$/i, ".jpg");
 // Nome bonito do nicho, no idioma atual (os que não estão na lista ganham a primeira letra maiúscula)
 const nomeNicho = (n) => {
   const lista = idioma === "en" ? NICHOS_EN : NICHOS;
@@ -1728,7 +1734,9 @@ const fraseNicho = (n) => (idioma === "en" ? FRASES_NICHOS_EN[n] : FRASES_NICHOS
 const TIPOS_EN = {
   "review": "Review", "problema × solução": "Problem × solution", "tutorial": "Tutorial", "unboxing": "Unboxing",
   "antes e depois": "Before & after", "rotina": "Routine", "depoimento": "Testimonial", "trend": "Trend",
-  "storytelling": "Storytelling", "anúncio": "Ad", "publicação no perfil": "Post on my profile"
+  "storytelling": "Storytelling", "anúncio": "Ad", "publicação no perfil": "Post on my profile",
+  "personagem": "Character", "dupla criativa": "Creative duo", "vlog": "Vlog", "contraste": "Contrast",
+  "falando com a câmera": "Talking to camera", "tiktok shop": "TikTok Shop"
 };
 const nomeTipo = (f) => {
   const tipo = String(f || "").trim();
@@ -1745,6 +1753,16 @@ function cardVideo(t) {
   const linha = t.linha || nomeTipo(t.formato);
   const info = `<span class="video-info"><span class="video-titulo">${esc(titulo)}</span>${linha ? `<span class="video-nicho">${esc(linha)}</span>` : ""}</span>`;
   const linkSeguro = /^https?:\/\//i.test(String(t.video || "")) ? t.video : "";
+  if (!id && ehMp4(linkSeguro)) {
+    // Vídeo do próprio site: toca aqui mesmo, igual aos do YouTube
+    const capaMp4 = t.capa ? esc(t.capa) : esc(capaDoMp4(linkSeguro));
+    return `<div class="video" role="button" tabindex="0" data-video="${esc(linkSeguro)}" data-mp4="1" data-marca="${esc(titulo)}" data-nicho="${esc(nicho)}" aria-label="${esc(tr(`Assistir vídeo: ${titulo}, ${nicho}`, `Watch video: ${titulo}, ${nicho}`))}">
+      <img class="video-capa" src="${capaMp4}" alt="" loading="lazy" decoding="async">
+      ${etiquetas}
+      <span class="play" aria-hidden="true"><svg><use href="#i-play"/></svg></span>
+      ${info}
+    </div>`;
+  }
   if (!id && linkSeguro) {
     // Link que não é do YouTube (Instagram, TikTok, Drive): abre numa aba nova
     return `<a class="video" href="${esc(linkSeguro)}" target="_blank" rel="noopener" aria-label="${esc(tr(`Ver vídeo: ${titulo}, ${nicho} (abre em nova aba)`, `Watch video: ${titulo}, ${nicho} (opens in a new tab)`))}">
@@ -1952,6 +1970,17 @@ function iniciarPrevia(card) {
   const id = card.dataset.video;
   const caixa = document.createElement("span");
   caixa.className = "video-previa";
+  if (card.dataset.mp4) {
+    // Vídeo do próprio site: toca sem som, em repetição, e aparece quando começa de verdade
+    const video = document.createElement("video");
+    Object.assign(video, { src: id, muted: true, loop: true, autoplay: true, playsInline: true, preload: "auto" });
+    video.setAttribute("aria-hidden", "true");
+    video.addEventListener("playing", () => { caixa.classList.add("pronta"); card.classList.add("tocando"); });
+    caixa.appendChild(video);
+    card.appendChild(caixa);
+    video.play().catch(() => { /* o navegador não deixou tocar sozinho: fica a capa */ });
+    return;
+  }
   caixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0&enablejsapi=1&vq=hd1080" title="Prévia sem som" tabindex="-1" aria-hidden="true" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   const quadro = $("iframe", caixa);
   card.appendChild(caixa);
@@ -2043,6 +2072,15 @@ function abrirVideo(card) {
   cardAberto = card;
   const id = card.dataset.video;
   $("#player-legenda").innerHTML = `<small>${esc(card.dataset.nicho)}</small>${esc(card.dataset.marca)}`;
+  if (card.dataset.mp4) {
+    // Vídeo do próprio site: player do navegador, com som e controles
+    playerCaixa.innerHTML = `<video src="${esc(id)}" poster="${esc(capaDoMp4(id))}" controls autoplay playsinline preload="auto" title="Vídeo: ${esc(card.dataset.marca)}"></video>`;
+    if (typeof player.showModal === "function") player.showModal(); else player.setAttribute("open", "");
+    $("video", playerCaixa).play().catch(() => { /* sem autoplay: a pessoa aperta o play */ });
+    $("#fechar-player").focus();
+    registrarClique(id, card.dataset.marca);
+    return;
+  }
   playerCaixa.innerHTML = `<iframe src="${EMBED}${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&vq=hd1080" title="Vídeo: ${esc(card.dataset.marca)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   if (typeof player.showModal === "function") player.showModal(); else player.setAttribute("open", "");
   const quadro = $("iframe", playerCaixa);
