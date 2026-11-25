@@ -22,6 +22,9 @@
   --creme:#f3eee9; --creme-2:#ebe3da; --papel:#fbf8f5;
   --tinta:#173b43; --tinta-2:#554b41;
   --destaque:#a7ebf2; --sobre-destaque:#173b43;
+  /* a cor de destaque usada em cima do fundo escuro (fita "mais escolhido", bloco de contato).
+     Com cor de marca escura, vira uma versão clara dela, para dar para ler. */
+  --no-escuro:#a7ebf2; --sobre-no-escuro:#173b43;
   --linha:rgba(23,59,67,.14); --linha-forte:rgba(23,59,67,.24);
   --sombra:0 1px 2px rgba(23,59,67,.05),0 22px 44px -26px rgba(23,59,67,.38);
   --raio:20px; --raio-sm:12px;
@@ -31,8 +34,9 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:84px}
-body{margin:0;background:var(--creme);color:var(--tinta);font-family:var(--sans);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.08;margin:0;letter-spacing:-.015em}
+/* Texto igual ao do portfólio (index.html): mesmas fontes, tamanho e acabamento */
+body{margin:0;background:var(--creme);color:var(--tinta);font-family:var(--sans);font-size:1.0625rem;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.05;margin:0;letter-spacing:-.015em;font-optical-sizing:auto}
 p{margin:0}
 a{color:inherit}
 ul{margin:0;padding:0;list-style:none}
@@ -45,7 +49,7 @@ ul{margin:0;padding:0;list-style:none}
 .botao{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:50px;padding:12px 24px;border:1px solid var(--tinta);border-radius:999px;background:var(--papel);color:var(--tinta);font:600 .95rem/1.2 var(--sans);text-decoration:none;cursor:pointer;transition:background-color .25s,color .25s,transform .25s,box-shadow .25s}
 .botao:hover{background:var(--tinta);color:var(--creme)}
 .botao-destaque{background:var(--destaque);color:var(--sobre-destaque);border-color:var(--tinta);box-shadow:0 10px 24px -14px rgba(23,59,67,.6)}
-.botao-destaque:hover{background:var(--tinta);color:var(--destaque);transform:translateY(-1px)}
+.botao-destaque:hover{background:var(--tinta);color:var(--no-escuro);transform:translateY(-1px)}
 .botao-pequeno{min-height:40px;padding:8px 18px;font-size:.88rem}
 
 /* ---------- Topo ---------- */
@@ -70,7 +74,7 @@ ul{margin:0;padding:0;list-style:none}
 
 /* ---------- Seções ---------- */
 .secao{padding:clamp(48px,7vw,80px) 0}
-.rotulo{display:block;margin-bottom:12px;font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-2)}
+.rotulo{display:block;margin-bottom:14px;font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-2)}
 .secao-titulo{font-size:clamp(2rem,4.5vw,3rem);margin-bottom:clamp(28px,4vw,44px)}
 .centro{text-align:center}
 
@@ -79,13 +83,13 @@ ul{margin:0;padding:0;list-style:none}
 .pacote{position:relative;display:flex;flex-direction:column;padding:28px 26px 26px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);box-shadow:var(--sombra);min-width:0}
 .pacote.destacado{border:2px solid var(--tinta);padding:27px 25px 25px}
 .pacote-num{position:absolute;top:22px;right:24px;font-size:.8rem;font-weight:700;color:var(--tinta-2)}
-.fita{align-self:flex-start;margin:-6px 0 12px;padding:4px 12px;border-radius:999px;background:var(--tinta);color:var(--destaque);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.fita{align-self:flex-start;margin:-6px 0 12px;padding:4px 12px;border-radius:999px;background:var(--tinta);color:var(--no-escuro);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 .pacote h3{font-size:clamp(1.55rem,2.6vw,1.9rem);padding-right:30px}
 .pacote-desc{margin-top:10px;color:var(--tinta-2);font-size:.95rem;white-space:pre-line}
 .preco{margin-top:22px}
 .preco-de{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:.88rem;color:var(--tinta-2)}
 .preco-de s{opacity:.8}
-.pct{padding:2px 10px;border-radius:999px;background:var(--destaque);color:var(--sobre-destaque);font-size:.76rem;font-weight:700}
+.pct{padding:2px 10px;border-radius:999px;background:var(--destaque);color:var(--sobre-destaque);font-size:.76rem;font-weight:600}
 .preco-por{display:block;margin-top:4px;font-family:var(--serif);font-size:clamp(2.2rem,4vw,2.8rem);line-height:1.05;letter-spacing:-.02em}
 .preco-consulta{font-family:var(--serif);font-size:1.6rem}
 .itens{display:grid;gap:9px;margin:22px 0 26px;padding-top:20px;border-top:1px solid var(--linha);font-size:.95rem}
@@ -97,10 +101,24 @@ ul{margin:0;padding:0;list-style:none}
 /* ---------- Adicionais ---------- */
 .adicionais{display:grid;gap:10px;margin-top:clamp(36px,5vw,52px)}
 .adicionais h3{font-size:1.4rem;margin-bottom:6px}
-.adicional{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 16px;padding:16px 20px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel)}
-.adicional b{flex:1 1 180px;font-weight:700}
-.adicional span{flex:2 1 260px;color:var(--tinta-2);font-size:.92rem}
-.adicional .valor{flex:none;padding:3px 12px;border-radius:999px;background:var(--creme-2);color:var(--tinta);font-weight:700;font-size:.9rem}
+.adicional{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px 20px;padding:16px 20px;border:1px solid var(--linha);border-radius:var(--raio-sm);background:var(--papel);transition:border-color .2s,box-shadow .2s}
+.adicional.escolhido{border-color:var(--tinta);box-shadow:inset 3px 0 0 var(--tinta)}
+.adicional-texto{min-width:0}
+.adicional-texto b{display:block;font-weight:600}
+.adicional-texto span{display:block;margin-top:2px;color:var(--tinta-2);font-size:.92rem}
+.adicional .valor{justify-self:start;padding:3px 12px;border-radius:999px;background:var(--creme-2);color:var(--tinta);font-weight:600;font-size:.9rem;white-space:nowrap}
+.qtd{display:flex;align-items:center;gap:12px;font-size:.9rem;color:var(--tinta-2)}
+.qtd-caixa{display:inline-flex;align-items:stretch;border:1px solid var(--linha-forte);border-radius:var(--raio-sm);background:#fff;overflow:hidden}
+.qtd-caixa button{width:40px;height:40px;border:0;background:transparent;color:var(--tinta);font:400 1.3rem/1 var(--sans);cursor:pointer;transition:background-color .2s}
+.qtd-caixa button:hover:not(:disabled){background:var(--creme)}
+.qtd-caixa button:disabled{opacity:.3;cursor:default}
+.qtd-caixa output{display:grid;place-items:center;min-width:40px;border-inline:1px solid var(--linha);font-weight:600;color:var(--tinta);font-variant-numeric:tabular-nums}
+.extras-resumo{padding:14px 20px;border:1px dashed var(--linha-forte);border-radius:var(--raio-sm);font-size:.95rem}
+.extras-resumo[hidden]{display:none}
+.extras-resumo span{color:var(--tinta-2)}
+.total-com{display:block;margin-top:8px;font-size:.88rem;color:var(--tinta-2)}
+.total-com[hidden]{display:none}
+.total-com b{color:var(--tinta);font-weight:600}
 
 /* ---------- Observações ---------- */
 .observacoes{display:grid;gap:12px}
@@ -110,13 +128,13 @@ ul{margin:0;padding:0;list-style:none}
 
 /* ---------- Contato ---------- */
 .contato{background:var(--tinta);color:var(--creme);border-radius:clamp(20px,3vw,32px);padding:clamp(40px,6vw,72px) var(--gutter);text-align:center}
-.contato .rotulo{color:var(--destaque)}
+.contato .rotulo{color:var(--no-escuro)}
 .contato h2{font-size:clamp(2rem,4.6vw,3.1rem);max-width:20ch;margin:0 auto}
 .contato p{max-width:52ch;margin:14px auto 0;color:rgba(243,238,233,.82);white-space:pre-line}
 .contato-botoes{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:28px}
 .contato .botao{border-color:rgba(243,238,233,.4);background:transparent;color:var(--creme)}
 .contato .botao:hover{background:var(--creme);color:var(--tinta)}
-.contato .botao-destaque{background:var(--destaque);color:var(--sobre-destaque);border-color:var(--destaque)}
+.contato .botao-destaque{background:var(--no-escuro);color:var(--sobre-no-escuro);border-color:var(--no-escuro)}
 .contato .botao-destaque:hover{background:var(--creme);color:var(--tinta)}
 .portfolio-link{display:inline-block;margin-top:22px;font-size:.92rem;color:rgba(243,238,233,.82)}
 
@@ -132,6 +150,10 @@ ul{margin:0;padding:0;list-style:none}
   .capa-botoes .botao{width:100%}
   .pacote{padding:24px 20px 20px}
   .pacote.destacado{padding:23px 19px 19px}
+}
+@media (max-width:640px){
+  .adicional{grid-template-columns:minmax(0,1fr) auto}
+  .adicional-texto{grid-column:1/-1}
 }
 @media print{
   body{background:#fff}
@@ -199,13 +221,31 @@ function recado(titulo, texto) {
 }
 
 // A cor da marca, quando ligada no painel. O texto por cima dela fica claro ou escuro conforme a cor.
+const paraRGB = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const paraHex = (rgb) => "#" + rgb.map((c) => Math.round(c).toString(16).padStart(2, "0")).join("");
+const luzDe = (rgb) => {
+  const [r, g, b] = rgb.map((c) => c / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contraste = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+
 function aplicarCor(cor) {
   if (!/^#[0-9a-f]{6}$/i.test(cor || "")) return;
-  const [r, g, b] = [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16) / 255)
-    .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
-  const luz = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  document.documentElement.style.setProperty("--destaque", cor);
-  document.documentElement.style.setProperty("--sobre-destaque", luz > 0.45 ? "#173b43" : "#ffffff");
+  const raiz = document.documentElement.style;
+  const rgb = paraRGB(cor);
+  const tinta = luzDe(paraRGB("#173b43"));
+  // O texto por cima da cor é branco ou o verde-escuro do site, o que der mais contraste
+  raiz.setProperty("--destaque", cor);
+  raiz.setProperty("--sobre-destaque", contraste(luzDe(rgb), 1) > contraste(luzDe(rgb), tinta) ? "#ffffff" : "#173b43");
+
+  // Em cima do fundo escuro do site, a cor precisa de contraste para ser lida.
+  // Se não tiver, clareia a própria cor da marca aos poucos, até dar para ler.
+  let clara = rgb;
+  for (let mistura = 0.1; contraste(luzDe(clara), tinta) < 4.5 && mistura <= 1; mistura += 0.1) {
+    clara = rgb.map((c) => c + (255 - c) * mistura);
+  }
+  raiz.setProperty("--no-escuro", paraHex(clara));
+  raiz.setProperty("--sobre-no-escuro", "#173b43");
 }
 
 function linkWhats(texto) {
@@ -236,10 +276,112 @@ async function abrir() {
   desenhar();
 }
 
+/* ---------- Adicionais com quantidade ----------
+   A marca escolhe quantos quer de cada adicional. A página faz a conta sozinha
+   quando o valor está em reais ("R$ 35", "R$ 90 por gancho") ou em porcentagem
+   ("+30%", calculada sobre o valor de cada pacote). Com texto livre, a quantidade
+   vai na mensagem, mas a conta fica com você. */
+let pacotes = [];
+let extras = [];
+let qtds = [];
+
+const maxDe = (a) => (a.max === undefined || a.max === null || a.max === "" ? 10 : Math.max(0, Math.min(99, Math.round(num(a.max)))));
+// { tipo: "reais" | "pct", v } ou null quando não dá para fazer conta
+function valorDoTexto(t) {
+  const s = String(t || "");
+  const pct = s.match(/(\d+(?:,\d+)?)\s*%/);
+  if (pct) return { tipo: "pct", v: Number(pct[1].replace(",", ".")) };
+  const m = s.match(/\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+(?:,\d{1,2})?/);
+  return m ? { tipo: "reais", v: Number(m[0].replace(/\./g, "").replace(",", ".")) } : null;
+}
+const escolhidos = () => extras.map((a, i) => ({ a, q: qtds[i] || 0, v: valorDoTexto(a.valor) })).filter((x) => x.q > 0);
+// Quanto um adicional escolhido custa em cima de um pacote (null se não dá para calcular)
+const custoSobre = (x, valorPacote) => (!x.v ? null : x.v.tipo === "reais" ? x.q * x.v.v : valorPacote > 0 ? x.q * x.v.v / 100 * valorPacote : null);
+// Soma dos adicionais sobre um pacote, ou null se algum não tiver conta possível
+const somaSobre = (valorPacote) => { const cs = escolhidos().map((x) => custoSobre(x, valorPacote)); return cs.some((c) => c === null) ? null : cs.reduce((s, c) => s + c, 0); };
+const textoExtras = () => escolhidos().map((x) => `${x.q}× ${x.a.nome}`).join(", ");
+
+function mensagemPacote(p, i) {
+  const nome = p.nome || `Pacote ${i + 1}`;
+  const valor = num(p.valor);
+  const xs = escolhidos();
+  const soma = somaSobre(valor);
+  let texto = `Oi, Alanna! Vi o orçamento${paraQuem()} e tenho interesse no pacote ${nome}${valor > 0 ? ` (${valorBR(valor)})` : ""}.`;
+  if (xs.length) {
+    texto += ` Também quero: ${xs.map((x) => {
+      const c = custoSobre(x, valor);
+      return `${x.q}× ${x.a.nome}${c !== null ? ` (${x.v.tipo === "pct" ? `${x.a.valor.trim()}: ` : ""}${valorBR(c)})` : ""}`;
+    }).join(", ")}.`;
+  }
+  if (xs.length && soma !== null && valor > 0) texto += ` Total: ${valorBR(valor + soma)}.`;
+  return texto;
+}
+
+function linhaAdicional(a, i) {
+  const max = maxDe(a);
+  return `<div class="adicional" data-adicional="${i}">
+    <div class="adicional-texto"><b>${esc(a.nome)}</b>${a.descricao ? `<span>${esc(a.descricao)}</span>` : ""}</div>
+    ${a.valor ? `<span class="valor">${esc(a.valor)}</span>` : "<span></span>"}
+    ${max > 0 ? `<div class="qtd">
+      <span id="qtd-rotulo-${i}">Quantidade</span>
+      <div class="qtd-caixa" role="group" aria-labelledby="qtd-rotulo-${i}">
+        <button type="button" data-qtd="-1" data-i="${i}" aria-label="Tirar um: ${esc(a.nome)}">−</button>
+        <output id="qtd-${i}" aria-live="polite">0</output>
+        <button type="button" data-qtd="1" data-i="${i}" aria-label="Somar um: ${esc(a.nome)}">+</button>
+      </div>
+    </div>` : "<span></span>"}
+  </div>`;
+}
+
+// Atualiza quantidades, o resumo, o total de cada pacote e a mensagem dos botões
+function atualizarExtras() {
+  extras.forEach((a, i) => {
+    const linha = document.querySelector(`[data-adicional="${i}"]`);
+    if (!linha) return;
+    const q = qtds[i] || 0;
+    linha.classList.toggle("escolhido", q > 0);
+    const saida = linha.querySelector("output");
+    if (saida) saida.textContent = q;
+    const menos = linha.querySelector('[data-qtd="-1"]'), mais = linha.querySelector('[data-qtd="1"]');
+    if (menos) menos.disabled = q <= 0;
+    if (mais) mais.disabled = q >= maxDe(a);
+  });
+  const xs = escolhidos();
+  const resumo = document.getElementById("extras-resumo");
+  if (resumo) {
+    // No resumo, o que é em reais vira um valor; o que é porcentagem aparece como "+30% sobre o pacote"
+    const reais = xs.filter((x) => x.v && x.v.tipo === "reais").reduce((s, x) => s + x.q * x.v.v, 0);
+    const pcts = xs.filter((x) => x.v && x.v.tipo === "pct").map((x) => `${x.q > 1 ? x.q + "× " : ""}${x.a.valor.trim().replace(/^\+\s*/, "")} sobre o pacote`);
+    const partes = [reais > 0 ? valorBR(reais) : "", ...pcts].filter(Boolean);
+    resumo.hidden = !xs.length;
+    resumo.innerHTML = xs.length
+      ? `<b>Adicionais escolhidos:</b> ${esc(textoExtras())}${partes.length ? ` · ${esc(partes.join(" + "))}` : ""} <span>· Eles vão junto na mensagem do pacote que você escolher.</span>`
+      : "";
+  }
+  pacotes.forEach((p, i) => {
+    const cartao = document.querySelector(`[data-pacote="${i}"]`);
+    if (!cartao) return;
+    const valor = num(p.valor);
+    const soma = somaSobre(valor);
+    const total = cartao.querySelector("[data-total]");
+    if (total) {
+      const mostra = xs.length && soma !== null && soma > 0 && valor > 0;
+      total.hidden = !mostra;
+      total.innerHTML = mostra ? `Com os adicionais: <b>${esc(valorBR(valor + soma))}</b>` : "";
+    }
+    const botao = cartao.querySelector("[data-escolha]");
+    if (botao) {
+      botao.href = linkWhats(mensagemPacote(p, i));
+      botao.dataset.escolha = (p.nome || `Pacote ${i + 1}`) + (xs.length ? ` + ${textoExtras()}` : "");
+    }
+  });
+}
+
 function desenhar() {
   const d = dados;
-  const pacotes = lista(d.pacotes);
-  const adicionais = lista(d.adicionais).filter((a) => a.nome);
+  pacotes = lista(d.pacotes);
+  extras = lista(d.adicionais).filter((a) => a.nome);
+  qtds = extras.map(() => 0);
   const observacoes = lista(d.observacoes).filter((b) => b.titulo || b.texto);
   const venceu = d.validade && String(d.validade).slice(0, 10) < hojeISO();
   const whatsGeral = linkWhats(`Oi, Alanna! Vi o orçamento${paraQuem()} e quero conversar.`);
@@ -274,9 +416,10 @@ function desenhar() {
       <div class="container">
         <div class="centro"><span class="rotulo">Escolha o seu formato</span><h2 class="secao-titulo">${pacotes.length === 1 ? "O pacote" : "Os pacotes"}</h2></div>
         <div class="pacotes">${pacotes.map(cartaoPacote).join("")}</div>
-        ${adicionais.length ? `<div class="adicionais">
+        ${extras.length ? `<div class="adicionais">
           <h3>Para somar a qualquer pacote</h3>
-          ${adicionais.map((a) => `<div class="adicional"><b>${esc(a.nome)}</b>${a.descricao ? `<span>${esc(a.descricao)}</span>` : ""}${a.valor ? `<em class="valor">${esc(a.valor)}</em>` : ""}</div>`).join("")}
+          ${extras.map(linhaAdicional).join("")}
+          <p class="extras-resumo" id="extras-resumo" aria-live="polite" hidden></p>
         </div>` : ""}
       </div>
     </section>` : ""}
@@ -310,6 +453,7 @@ function desenhar() {
         ${d.atualizado_em ? `<span>Proposta atualizada em ${esc(new Date(d.atualizado_em).toLocaleDateString("pt-BR"))}</span>` : ""}
       </div>
     </footer>`;
+  atualizarExtras();
 }
 
 function cartaoPacote(p, i) {
@@ -318,8 +462,8 @@ function cartaoPacote(p, i) {
   const nome = p.nome || `Pacote ${i + 1}`;
   const itens = lista(p.itens).filter(Boolean);
   const textoBotao = p.botao || `Quero o ${nome}`;
-  const whats = linkWhats(`Oi, Alanna! Vi o orçamento${paraQuem()} e tenho interesse no pacote ${nome}${valor > 0 ? ` (${valorBR(valor)})` : ""}.`);
-  return `<article class="pacote${p.destaque ? " destacado" : ""}">
+  const whats = linkWhats(mensagemPacote(p, i));
+  return `<article class="pacote${p.destaque ? " destacado" : ""}" data-pacote="${i}">
     <span class="pacote-num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
     ${p.destaque ? `<span class="fita">Mais escolhido</span>` : ""}
     <h3>${esc(nome)}</h3>
@@ -327,7 +471,8 @@ function cartaoPacote(p, i) {
     <div class="preco">
       ${valor > 0
         ? `${pct ? `<span class="preco-de"><s><span class="sr">De </span>${esc(valorBR(cheio))}</s><span class="pct">${pct}% de desconto</span></span>` : ""}
-           <b class="preco-por">${pct ? `<span class="sr">por </span>` : ""}${esc(valorBR(valor))}</b>`
+           <b class="preco-por">${pct ? `<span class="sr">por </span>` : ""}${esc(valorBR(valor))}</b>
+           <span class="total-com" data-total aria-live="polite" hidden></span>`
         : `<span class="preco-consulta">Sob consulta</span>`}
     </div>
     <ul class="itens">
@@ -341,6 +486,13 @@ function cartaoPacote(p, i) {
 
 // Quando a marca clica em um pacote, o painel fica sabendo qual foi. O WhatsApp abre normalmente.
 document.addEventListener("click", (e) => {
+  const passo = e.target.closest("[data-qtd]");
+  if (passo) {
+    const i = Number(passo.dataset.i);
+    qtds[i] = Math.max(0, Math.min(maxDe(extras[i]), (qtds[i] || 0) + Number(passo.dataset.qtd)));
+    atualizarExtras();
+    return;
+  }
   const botao = e.target.closest("[data-escolha]");
   if (!botao || !token) return;
   try {
