@@ -942,3 +942,35 @@ tr.deslizando:hover{background:transparent}
   .lt-nome{flex-basis:64px;width:64px;padding:0 6px;font-size:10.5px}
   .lt-campos .campo{flex:1 1 40%}
 }
+
+/* ---------- Aba Orçamentos ---------- */
+.oc-barra{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.oc-barra-titulo{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;min-width:0}
+.oc-barra-titulo b{font-size:16px}
+.oc-sujo{color:var(--amarelo);font-weight:600}
+.oc-editor{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.oc-form{display:grid;gap:16px;min-width:0}
+.oc-lado{position:sticky;top:16px;display:grid;gap:12px;min-width:0}
+.oc-lista{display:grid;gap:10px}
+.oc-item{display:grid;gap:12px;padding:14px;border:1px solid var(--linha);border-radius:var(--raio);background:#fff}
+.oc-item.destacado{border-color:var(--tinta);box-shadow:inset 3px 0 0 var(--tinta)}
+.oc-item-topo{display:flex;align-items:center;gap:8px;min-width:0}
+.oc-item-nome{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.oc-num{flex:none;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--azul);font-size:11.5px;font-weight:700}
+.oc-desconto{display:inline-block;padding:1px 9px;border-radius:999px;background:var(--amarelo-fundo);color:var(--amarelo);font-weight:700}
+.oc-desconto[hidden]{display:none}
+.oc-dado{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--linha);font-size:13px}
+.oc-dado:last-child{border-bottom:0}
+.oc-dado span{color:var(--tinta-2)}
+.oc-dado b{text-align:right}
+.oc-escolha{margin-top:8px;padding:10px 12px;border-radius:var(--raio-sm);background:var(--verde-fundo);color:var(--verde);font-size:13px;line-height:1.5}
+.oc-vence{font-size:11.5px;font-weight:600;color:var(--tinta-2)}
+.oc-vence.perto{color:var(--amarelo)}
+.oc-vence.venceu{color:var(--vermelho)}
+.oc-cor{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.oc-cor input[type=color]{width:46px;height:34px;padding:2px;border:1px solid var(--linha-forte);border-radius:8px;background:#fff;cursor:pointer}
+.campo-rotulo{font-size:12px;font-weight:600}
+@media (max-width:1100px){
+  .oc-editor{grid-template-columns:minmax(0,1fr)}
+  .oc-lado{position:static}
+}

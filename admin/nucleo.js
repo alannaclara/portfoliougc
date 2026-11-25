@@ -290,6 +290,7 @@
     prospeccao: "Prospecção",
     cupons: "Cupons",
     midiakit: "Mídia kit",
+    orcamentos: "Orçamentos",
     roteiro: "Roteiro",
     transcricao: "Transcrições",
     edicao: "Edição de vídeos",
