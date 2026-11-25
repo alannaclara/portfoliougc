@@ -105,7 +105,7 @@
     const lista = (v) => (Array.isArray(v) ? v : []);
     const x = { ...PADRAO, ...o };
     x.pacotes = lista(o.pacotes).map((p) => ({ ...pacoteVazio(), ...p, itens: lista(p.itens) }));
-    x.adicionais = lista(o.adicionais).map((a) => ({ nome: "", descricao: "", valor: "", ...a }));
+    x.adicionais = lista(o.adicionais).map((a) => ({ nome: "", descricao: "", valor: "", max: 10, ...a }));
     x.observacoes = lista(o.observacoes).map((b) => ({ titulo: "", texto: "", ...b }));
     return x;
   }
@@ -273,7 +273,7 @@
             </div>
             <div class="cartao-corpo">
               <div class="oc-lista" id="oc-adicionais">${htmlAdicionais()}</div>
-              <p class="mudo pequeno" style="margin-top:10px">Coisas que a marca pode somar a qualquer pacote: gancho extra, entrega expressa, mais tempo de anúncio, arquivo bruto...</p>
+              <p class="mudo pequeno" style="margin-top:10px">Coisas que a marca pode somar a qualquer pacote: gancho extra, entrega expressa, mais tempo de anúncio, arquivo bruto... Na página, ela escolhe a quantidade de cada um, vê o total junto do pacote, e o que ela escolher vai na mensagem do WhatsApp e aparece aqui no painel.</p>
             </div>
           </section>
 
@@ -405,7 +405,10 @@
         <div class="oc-item-topo"><b class="oc-item-nome">${P.esc(a.nome || "Adicional sem nome")}</b>${botoesDoItem("adicional", i, xs.length, false)}</div>
         <div class="grade-campos">
           ${campo("Nome", `<input id="${id("nome")}" data-a="nome" type="text" value="${P.esc(a.nome)}" placeholder="Ex.: Gancho extra">`, { para: id("nome") })}
-          ${campo("Valor", `<input id="${id("valor")}" data-a="valor" type="text" value="${P.esc(a.valor)}" placeholder="Ex.: R$ 90 por gancho, ou +30%">`, { para: id("valor") })}
+          ${campo("Valor", `<input id="${id("valor")}" data-a="valor" type="text" value="${P.esc(a.valor)}" placeholder="Ex.: R$ 35, ou +30%">`,
+            { para: id("valor"), ajuda: "Em reais (R$ 35) ou porcentagem (+30%, calculada sobre cada pacote), a página faz a conta sozinha conforme a quantidade." })}
+          ${campo("Quantidade máxima", `<input id="${id("max")}" data-a="max" type="number" min="0" max="99" step="1" inputmode="numeric" value="${P.num(a.max)}">`,
+            { para: id("max"), ajuda: "Até quantos a marca pode escolher. 1 vira um liga/desliga. 0 tira a escolha de quantidade." })}
           ${campo("Descrição", `<input id="${id("descricao")}" data-a="descricao" type="text" value="${P.esc(a.descricao)}" placeholder="Ex.: Uma abertura diferente para testar no anúncio">`, { para: id("descricao"), largo: true })}
         </div>
       </div>`;
@@ -628,7 +631,7 @@
       lerEditor();
       const campoDe = { pacote: "pacotes", adicional: "adicionais", obs: "observacoes" }[tipo];
       const xs = atual[campoDe];
-      if (verbo === "add") xs.push(tipo === "pacote" ? pacoteVazio() : tipo === "adicional" ? { nome: "", descricao: "", valor: "" } : { titulo: "", texto: "" });
+      if (verbo === "add") xs.push(tipo === "pacote" ? pacoteVazio() : tipo === "adicional" ? { nome: "", descricao: "", valor: "", max: 10 } : { titulo: "", texto: "" });
       if (verbo === "del") xs.splice(i, 1);
       if (verbo === "dup") xs.splice(i + 1, 0, JSON.parse(JSON.stringify(xs[i])));
       if (verbo === "sobe" && i > 0) [xs[i - 1], xs[i]] = [xs[i], xs[i - 1]];
